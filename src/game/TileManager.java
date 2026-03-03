@@ -19,11 +19,13 @@ import javax.imageio.ImageIO;
 public class TileManager {
     panel gp;
     Tiles[] tile;
+    Tiles[] nightTile; // add lp para ma upload yung night tilr
     int mapTileNum[][];
     
     public TileManager(panel gp){
         this.gp = gp;
         tile = new Tiles[15];
+        nightTile = new Tiles[15]; // added
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];
         getTileImage();
         loadMap();
@@ -50,9 +52,12 @@ public class TileManager {
             tile[3] = new Tiles(getRotatedImage(sheet.getSubimage(619, 11, 59, 60), 180), false); // straight road w/ grass - left side (naka-rotate lang gamit yung method sa taas)
             tile[4] = new Tiles(getRotatedImage(sheet.getSubimage(619, 11, 59, 60), 90), false); // straight road w/ grass - up side (naka-rotate lang gamit yung method sa taas)
             tile[5] = new Tiles(getRotatedImage(sheet.getSubimage(619, 11, 59, 60), 270), false); // straight road w/ grass - down side (naka-rotate lang gamit yung method sa taas)
-            comment muna kasi parang mas okay na walang road hehe */ 
-           
+            comment muna kasi parang mas okay na walang road hehe */
+
             
+            BufferedImage nightSheet = ImageIO.read(getClass().getResourceAsStream("/assets/no_sanctuary_map/MAP_TILES_NIGHT.png"));
+            nightTile[0] = new Tiles(nightSheet.getSubimage(732, 87, 64, 63), false); // solid grass - night
+            nightTile[1] = new Tiles(nightSheet.getSubimage(735, 157, 58, 51), false); // grass w/ flowers - night
             
         }catch(IOException e){
             e.printStackTrace();
@@ -81,6 +86,12 @@ public class TileManager {
         int worldCol = 0;
         int worldRow = 0;
 
+        
+        boolean isNight = gp.dC.currentState == dayCounter.dayNightState.Night
+                       || gp.dC.currentState == dayCounter.dayNightState.Sunset
+                       || gp.dC.currentState == dayCounter.dayNightState.Sunrise;
+        Tiles[] currentTile = isNight ? nightTile : tile;
+
         while (worldCol < gp.maxWorldCol && worldRow < gp.maxWorldRow) {
             int tileNum = mapTileNum[worldCol][worldRow];
             int worldX = worldCol * gp.tileSize;
@@ -89,7 +100,7 @@ public class TileManager {
             int screenY = worldY - gp.player.worldY + gp.player.screenY;
             
 
-            g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize + 4, gp.tileSize + 4 , null);
+            g2.drawImage(currentTile[tileNum].image, screenX, screenY, gp.tileSize + 4, gp.tileSize + 4 , null);
 
             worldCol++;
             if (worldCol == gp.maxWorldCol) {
