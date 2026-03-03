@@ -6,17 +6,21 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+
 public class Player extends Entity {
     panel gp;
     KeyHandler keyH;
     
-    
+    // gaano kalapit bago pwedeng mag collect
+    private final int collectRange = 50;
+
     public Player(panel gp, KeyHandler KeyH) {
         this.gp = gp;
         this.keyH = KeyH;
         setDefaultValues();
         getPlayerImage();
     }
+
     public void setDefaultValues() {
         worldX = gp.tileSize * 20;
         worldY = gp.tileSize * 15;
@@ -26,6 +30,7 @@ public class Player extends Entity {
         screenY = gp.screenheight / 2 - gp.tileSize / 2;
         solidArea = new Rectangle(8, 16, 16, 16);
     }
+
     public void getPlayerImage() {
         try {
             down1 = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/player/down1.png"));
@@ -40,6 +45,7 @@ public class Player extends Entity {
             e.printStackTrace();
         }
     }
+
     public void update() {
         if (keyH.upPressed || keyH.downPressed || keyH.rightPressed || keyH.leftPressed) {
             if (keyH.upPressed) {
@@ -76,7 +82,57 @@ public class Player extends Entity {
                 spriteCounter = 0;
             }
         }
+
+        // collect pag E pressed - daytime lang
+        if (keyH.ePressed) {
+            boolean isDay = gp.dC.currentState == game.dayCounter.dayNightState.Day;
+            if (isDay) {
+                collectNearbyItems();
+            }
+            keyH.ePressed = false; // reset para hindi paulit ulit
+        }
     }
+
+    // check kung malapit sa apple item o wood item tapos kuha
+    private void collectNearbyItems() {
+
+        // check apple items na nasa lupa
+        for (int i = 0; i < gp.objectM.appleItems.length; i++) {
+            if (gp.objectM.appleItems[i] == null) continue;
+            if (gp.objectM.appleItems[i].collected) continue;
+
+            int dx = Math.abs(worldX - gp.objectM.appleItems[i].worldX);
+            int dy = Math.abs(worldY - gp.objectM.appleItems[i].worldY);
+
+            if (dx <= collectRange && dy <= collectRange) {
+                boolean added = gp.inventory.addApple();
+                if (added) {
+                    gp.objectM.appleItems[i].collected = true;
+                    System.out.println("Apple picked up!");
+                }
+                break; // isa lang per press
+            }
+        }
+
+        // check wood items na nasa lupa
+        for (int i = 0; i < gp.objectM.woodItems.length; i++) {
+            if (gp.objectM.woodItems[i] == null) continue;
+            if (gp.objectM.woodItems[i].collected) continue;
+
+            int dx = Math.abs(worldX - gp.objectM.woodItems[i].worldX);
+            int dy = Math.abs(worldY - gp.objectM.woodItems[i].worldY);
+
+            if (dx <= collectRange && dy <= collectRange) {
+                boolean added = gp.inventory.addWood();
+                if (added) {
+                    gp.objectM.woodItems[i].collected = true;
+                    System.out.println("Wood picked up!");
+                }
+                break; // isa lang per press
+            }
+        }
+    }
+
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
         switch (direction) {
