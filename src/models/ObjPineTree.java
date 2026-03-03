@@ -8,14 +8,16 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class ObjPineTree extends GameObject {
-    
+
+    private static BufferedImage sheet;
+
     public ObjPineTree(panel gp, double scale) {
-       try {
-            BufferedImage sheet = ImageIO.read(getClass().getResourceAsStream("/assets/no_sanctuary_map/MAP TILES.png"));
+        try {
+            if (sheet == null)
+                sheet = ImageIO.read(getClass().getResourceAsStream("/assets/no_sanctuary_map/MAP TILES.png"));
 
             BufferedImage rawImage = sheet.getSubimage(342, 74, 51, 114); // pine tree
-
-            int newWidth = (int)(rawImage.getWidth() * scale);
+            int newWidth  = (int)(rawImage.getWidth()  * scale);
             int newHeight = (int)(rawImage.getHeight() * scale);
 
             image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -24,8 +26,8 @@ public class ObjPineTree extends GameObject {
             g2.dispose();
 
             collision = true;
-            solidArea = new Rectangle((int)(15*scale), (int)(85*scale), (int)(22*scale), (int)(28*scale)); // trunk area
-
+            solidArea = new Rectangle((int)(15*scale), (int)(85*scale), (int)(22*scale), (int)(28*scale));
+            generateNightImage(); 
         } catch (IOException e) {
             e.printStackTrace();
         }
