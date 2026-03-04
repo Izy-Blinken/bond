@@ -31,8 +31,10 @@ public class panel extends JPanel implements Runnable {
     public Player player = new Player(this, keyH);
     public ObjectManager objectM = new ObjectManager(this);
     public dayCounter dC = new dayCounter(this);
+    public Inventory inventory = new Inventory(this); // tracks wood and apple count
     Thread GameThread;
     public InteractionChecker interactionChecker = new InteractionChecker(this);
+
 
     int playerY = 100;
     int playerX = 100;
@@ -95,6 +97,7 @@ public class panel extends JPanel implements Runnable {
         }
 
         dC.update();
+
     }
 
     public void paintComponent(Graphics g) {
@@ -106,6 +109,7 @@ public class panel extends JPanel implements Runnable {
         player.draw(g2);
         dC.draw(g2);
         dC.drawOverlay(g2);
+        inventory.draw(g2); // draw inventory hud sa taas ng lahat
 
         g2.setColor(java.awt.Color.WHITE);
         g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 18));

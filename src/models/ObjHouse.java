@@ -42,6 +42,7 @@ public class ObjHouse extends GameObject {
         else if (windowNum == 2) isWindow2Open = !isWindow2Open;
         else if (windowNum == 3) isWindow3Open = !isWindow3Open;
     }
+    private static BufferedImage sheet;
 
     public ObjHouse(panel gp, double scale) {
         this.gp = gp;
@@ -54,6 +55,12 @@ public class ObjHouse extends GameObject {
             wall = scale(details.getSubimage(16, 14, 129, 81), scale);
 
             roof = scale(details.getSubimage(9, 98, 139, 103), scale);
+            if (sheet == null)
+                sheet = ImageIO.read(getClass().getResourceAsStream("/assets/no_sanctuary_map/MAP TILES.png"));
+
+            BufferedImage rawImage = sheet.getSubimage(531, 155, 116, 102); // house
+            int newWidth  = (int)(rawImage.getWidth()  * scale);
+            int newHeight = (int)(rawImage.getHeight() * scale);
 
             doorClosed = scale(doorsWin.getSubimage(66, 0, 30, 32), scale);
             doorOpened = scale(doorsWin.getSubimage(66, 96, 30, 32), scale);
@@ -78,8 +85,10 @@ public class ObjHouse extends GameObject {
             win3OffsetY = (int)(52 * scale);
 
             // Collision (wall lang)
-            collision = true;
-            solidArea = new Rectangle((int)(1*scale), (int)(1*scale), (int)(119*scale), (int)(70*scale));
+            collision = true;   
+            
+            solidArea = new Rectangle((int)(5*scale), (int)(40*scale), (int)(106*scale), (int)(60*scale));
+            generateNightImage(); 
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,3 +127,5 @@ public class ObjHouse extends GameObject {
         g2.drawImage(roof, screenX + roofOffsetX, screenY + roofOffsetY, null);
     }
 }
+
+

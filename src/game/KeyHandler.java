@@ -9,8 +9,8 @@ public class KeyHandler implements KeyListener {
     public boolean interactPressed;
     public boolean closePressed;
     
-    
-    @Override
+    public boolean ePressed;
+
     public void keyTyped(KeyEvent e) {
 
     }
@@ -38,12 +38,13 @@ public class KeyHandler implements KeyListener {
         
         if (code == KeyEvent.VK_E ) {
             interactPressed = true;
+            ePressed = true;
         }
         
         if(code == KeyEvent.VK_F) {
             closePressed = true;
         }
-        
+       
     }
 
     @Override
@@ -69,11 +70,13 @@ public class KeyHandler implements KeyListener {
         
         if (code == KeyEvent.VK_E ) {
             interactPressed = false;
+            ePressed = false;
         }
 
         if(code == KeyEvent.VK_F) {
             closePressed = false;
         }
+        
     }
     
 

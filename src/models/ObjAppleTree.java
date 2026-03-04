@@ -8,14 +8,16 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class ObjAppleTree extends GameObject {
-    
+
+    private static BufferedImage sheet;
+
     public ObjAppleTree(panel gp, double scale) {
-       try {
-            BufferedImage sheet = ImageIO.read(getClass().getResourceAsStream("/assets/no_sanctuary_map/MAP TILES.png"));
+        try {
+            if (sheet == null)
+                sheet = ImageIO.read(getClass().getResourceAsStream("/assets/no_sanctuary_map/MAP TILES.png"));
 
             BufferedImage rawImage = sheet.getSubimage(95, 76, 79, 113); // apple tree
-
-            int newWidth = (int)(rawImage.getWidth() * scale);
+            int newWidth  = (int)(rawImage.getWidth()  * scale);
             int newHeight = (int)(rawImage.getHeight() * scale);
 
             image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -24,8 +26,8 @@ public class ObjAppleTree extends GameObject {
             g2.dispose();
 
             collision = true;
-            solidArea = new Rectangle((int)(20*scale), (int)(80*scale), (int)(40*scale), (int)(30*scale)); // trunk area
-            
+            solidArea = new Rectangle((int)(20*scale), (int)(80*scale), (int)(40*scale), (int)(30*scale));
+            generateNightImage(); 
         } catch (IOException e) {
             e.printStackTrace();
         }
