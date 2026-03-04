@@ -6,10 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RadialGradientPaint;
-import java.awt.AlphaComposite;
-import java.awt.image.BufferedImage;
-import java.awt.geom.Point2D;
 import javax.swing.JPanel;
 
 public class panel extends JPanel implements Runnable {
@@ -160,6 +156,7 @@ public class panel extends JPanel implements Runnable {
         // Cabinet (wood)
         if (interactionChecker.showCabinetPrompt && !objectM.interior.cabinet.isOpen) {
             
+            
             g2.setFont(new Font("Arial", Font.BOLD, 18));
             g2.setColor(Color.WHITE);
             g2.drawString("P - Open Cabinet", screenWidth / 2 - 130, screenheight - 60);
@@ -187,66 +184,19 @@ public class panel extends JPanel implements Runnable {
             g2.drawString(interactionChecker.appleTableFeedback, screenWidth / 2 - 150, screenheight - 120);
         }
 
-        // Night darkness with torch light effect
+        // Extra darkness + warning when torch is out at night
         boolean isNight = dC.currentState == dayCounter.dayNightState.Night
                        || dC.currentState == dayCounter.dayNightState.Sunset
                        || dC.currentState == dayCounter.dayNightState.Sunrise;
 
-        if (isNight && tileM.currentMap == 2) {
+        if (isNight && !objectM.interior.torch.isLit) {
             
-            drawNightOverlay(g2);
-        }
-
-        if (isNight && tileM.currentMap == 2 && !objectM.interior.isInteriorLit()) {
-            
+            g2.setColor(new Color(0, 0, 8, 130));
+            g2.fillRect(0, 0, screenWidth, screenheight);
             g2.setFont(new Font("Arial", Font.BOLD, 20));
             g2.setColor(new Color(255, 60, 60, 210));
             g2.drawString("Torch is out!", screenWidth / 2 - 260, screenheight / 2);
         }
-    }
-
-    private void drawNightOverlay(Graphics2D g2) {
-        
-        // draw darkness on a separate image so we can punch light holes into it
-        BufferedImage darkLayer = new BufferedImage(screenWidth, screenheight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D dg = darkLayer.createGraphics();
-
-        // fill the whole screen dark
-        dg.setColor(new Color(0, 0, 8, 180));
-        dg.fillRect(0, 0, screenWidth, screenheight);
-
-        // punch a light hole for each lit torch using DST_OUT
-        dg.setComposite(AlphaComposite.DstOut);
-
-        models.ObjTorch[] torches = {objectM.interior.torch, objectM.interior.torch2, objectM.interior.torch3};
-
-        for (models.ObjTorch t : torches) {
-            
-            if (!t.isLit) continue;
-
-            int cx = t.worldX - player.worldX + player.screenX + 20;
-            int cy = t.worldY - player.worldY + player.screenY + 10;
-            float radius = 160f;
-
-            RadialGradientPaint gradient = new RadialGradientPaint(
-                new Point2D.Float(cx, cy),
-                radius,
-                new float[]{0f, 0.5f, 1f},
-                new Color[]{
-                    new Color(255, 160, 40, 220),
-                    new Color(255, 100, 10, 100),
-                    new Color(0, 0, 0, 0)
-                }
-            );
-
-            dg.setPaint(gradient);
-            dg.fillOval(cx - (int)radius, cy - (int)radius, (int)radius * 2, (int)radius * 2);
-        }
-
-        dg.dispose();
-
-        // draw the darkness layer with holes onto screen
-        g2.drawImage(darkLayer, 0, 0, null);
     }
 
     public void switchToInterior() {
