@@ -87,7 +87,7 @@ public class ObjHouse extends GameObject {
             // Collision (wall lang)
             collision = true;   
             
-            solidArea = new Rectangle((int)(5*scale), (int)(40*scale), (int)(106*scale), (int)(60*scale));
+            solidArea = new Rectangle((int)(1*scale), (int)(50*scale), (int)(114*scale), (int)(20*scale));
             generateNightImage(); 
 
         } catch (IOException e) {

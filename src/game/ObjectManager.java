@@ -180,14 +180,14 @@ public class ObjectManager {
             index4++;
         }
 
-        objAppleTree[0] = new ObjAppleTree(gp,1.5); objAppleTree[0].worldX = 700; objAppleTree[0].worldY = 300;
-        objAppleTree[1] = new ObjAppleTree(gp, 1.5); objAppleTree[1].worldX = 1700; objAppleTree[1].worldY = 700;
+        objAppleTree[0] = new ObjAppleTree(gp,1.5); objAppleTree[0].worldX = 700; objAppleTree[0].worldY = 100;
+        objAppleTree[1] = new ObjAppleTree(gp, 1.5); objAppleTree[1].worldX = 700; objAppleTree[1].worldY = 700;
         objAppleTree[2] = new ObjAppleTree(gp, 1.5); objAppleTree[2].worldX = 2000; objAppleTree[2].worldY = 1200;
         objAppleTree[3] = new ObjAppleTree(gp, 1.5); objAppleTree[3].worldX = 805; objAppleTree[3].worldY = 605;
-        objAppleTree[4] = new ObjAppleTree(gp, 1.5); objAppleTree[4].worldX = 598; objAppleTree[4].worldY = 350;
-        objAppleTree[5] = new ObjAppleTree(gp, 1.5); objAppleTree[5].worldX = 1500; objAppleTree[5].worldY = 500;
-        objAppleTree[6] = new ObjAppleTree(gp, 1.5); objAppleTree[6].worldX = 1205; objAppleTree[6].worldY = 605;
-        objAppleTree[7] = new ObjAppleTree(gp, 1.5); objAppleTree[7].worldX = 798; objAppleTree[7].worldY = 350;
+        objAppleTree[4] = new ObjAppleTree(gp, 1.5); objAppleTree[4].worldX = 750; objAppleTree[4].worldY = 110;
+        objAppleTree[5] = new ObjAppleTree(gp, 1.5); objAppleTree[5].worldX = 356; objAppleTree[5].worldY = 500;
+        objAppleTree[6] = new ObjAppleTree(gp, 1.5); objAppleTree[6].worldX = 500; objAppleTree[6].worldY = 605;
+        objAppleTree[7] = new ObjAppleTree(gp, 1.5); objAppleTree[7].worldX = 398; objAppleTree[7].worldY = 750;
         objAppleTree[8] = new ObjAppleTree(gp, 1.5); objAppleTree[8].worldX = 1800; objAppleTree[8].worldY = 400;
 
         ObjVehicle[0] = new ObjVehicle(gp, 1, 1.5); ObjVehicle[0].worldX = 490; ObjVehicle[0].worldY = 250;
@@ -209,7 +209,7 @@ public class ObjectManager {
 
         ObjHouse[0] = new ObjHouse(gp, 2.5);
         ObjHouse[0].worldX = 1300;
-        ObjHouse[0].worldY = 1253;
+        ObjHouse[0].worldY = 850;
     }
 
     public void spawnCollectibles() {
@@ -220,7 +220,9 @@ public class ObjectManager {
             if (objAppleTree[t] == null) continue;
             if (appleIndex >= appleItems.length) break;
             for (int a = 0; a < 2; a++) {
+                
                 if (appleIndex >= appleItems.length) break;
+                
                 appleItems[appleIndex] = new ObjAppleItem(gp);
                 appleItems[appleIndex].worldX = objAppleTree[t].worldX + offsets[rand.nextInt(offsets.length)] + rand.nextInt(20) - 10;
                 appleItems[appleIndex].worldY = objAppleTree[t].worldY + 80 + rand.nextInt(20);

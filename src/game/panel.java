@@ -142,15 +142,15 @@ public class panel extends JPanel implements Runnable {
     public void switchToInterior() {
         tileM.switchMap(2);
 
-        player.worldX = 48 * 12;
-        player.worldY = 48 * 3;
+        player.worldX = 160;
+        player.worldY = 144;
     }
 
     public void switchToExterior() {
         tileM.switchMap(1);
 
-        player.worldX = 1300 + (int) (86 * 2.5) + 10;
-        player.worldY = 1350 + (int) (50 * 2.5) + 40;
+        player.worldX = 1455;
+        player.worldY = 1056;
     }
     
     public boolean isPlayerSafe() {

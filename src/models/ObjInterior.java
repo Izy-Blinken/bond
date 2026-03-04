@@ -17,9 +17,10 @@ public class ObjInterior extends GameObject {
 
             BufferedImage doorsWin = ImageIO.read(getClass().getResourceAsStream("/assets/EX_INT PNG/Doors_windows_animation.png"));
 
-            double scale = 2.5;
-            doorClosed = scale(doorsWin.getSubimage(33, 0, 31, 32), scale);
-            doorOpened = scale(doorsWin.getSubimage(33, 96, 31, 32), scale);
+            double scale = 2.6;
+            doorClosed = scale(doorsWin.getSubimage(31, 0, 32, 32), scale);
+            doorOpened = scale(doorsWin.getSubimage(63, 96, 32, 32), scale);
+            scale = 2.5;
             winClosed = scale(doorsWin.getSubimage(105, 3, 20, 20), scale);
             winOpened = scale(doorsWin.getSubimage(105, 98, 20, 20), scale);
 

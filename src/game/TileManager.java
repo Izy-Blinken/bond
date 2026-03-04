@@ -71,7 +71,7 @@ public class TileManager {
             tile[17] = new Tiles(wallSheet.getSubimage(0, 16, 16, 16), true); // left border
             tile[18] = new Tiles(wallSheet.getSubimage(48, 16, 16, 16), true); // room upper left wall corner
             tile[19] = new Tiles(wallSheet.getSubimage(48, 32, 16, 16), true); // room mid wall
-            tile[20] = new Tiles(wallSheet.getSubimage(48, 48, 16, 16), true); // room left wall corner
+            tile[20] = new Tiles(wallSheet.getSubimage(48, 48, 16, 16), true); // room left wall cornertile[2] = new Tiles(wallSheet.getSubimage(64, 144, 16, 16), false); // floor
 
             // Interior tiles sa nightTile — same lang, walang night version
             for (int i = 2; i <= 20; i++) {
@@ -147,7 +147,7 @@ public class TileManager {
                 if (tileNum != 2) continue;
                 int screenX = (col * gp.tileSize) - gp.player.worldX + gp.player.screenX;
                 int screenY = (row * gp.tileSize) - gp.player.worldY + gp.player.screenY;
-                g2.drawImage(currentTile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+                g2.drawImage(currentTile[tileNum].image, screenX, screenY, gp.tileSize + 4, gp.tileSize + 4, null);
             }
         }
 
@@ -158,7 +158,7 @@ public class TileManager {
                 if (tileNum == 2) continue;
                 int screenX = (col * gp.tileSize) - gp.player.worldX + gp.player.screenX;
                 int screenY = (row * gp.tileSize) - gp.player.worldY + gp.player.screenY;
-                g2.drawImage(currentTile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+                g2.drawImage(currentTile[tileNum].image, screenX, screenY, gp.tileSize + 4, gp.tileSize + 4, null);
             }
         }
     }
