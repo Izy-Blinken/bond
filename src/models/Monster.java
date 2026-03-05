@@ -25,64 +25,55 @@ import javax.imageio.ImageIO;
  */
 public class Monster extends Entity {
 
-    // ── State machine ─────────────────────────────────────────────────────────
     public enum State { IDLE, CHASING, ATTACKING, KNOCKING }
     public State state = State.IDLE;
 
-    // ── Directions ────────────────────────────────────────────────────────────
-    private static final int DIRS      = 4;
-    private static final int DIR_UP    = 0;
-    private static final int DIR_LEFT  = 1;
-    private static final int DIR_DOWN  = 2;
+    private static final int DIRS = 4;
+    private static final int DIR_UP = 0;
+    private static final int DIR_LEFT = 1;
+    private static final int DIR_DOWN = 2;
     private static final int DIR_RIGHT = 3;
     private int currentDir = DIR_DOWN;
 
-    // ── Walk animation ────────────────────────────────────────────────────────
     private static final int WALK_FRAMES = 10;
-    private static final int WALK_SPEED  = 10;   // ticks per frame
+    private static final int WALK_SPEED = 10;
     private BufferedImage[][] walkFrames = new BufferedImage[DIRS][WALK_FRAMES];
 
-    // ── Attack (slash) animation ──────────────────────────────────────────────
     private static final int SLASH_FRAMES = 6;
-    private static final int SLASH_SPEED  = 5;  // ticks per frame (faster)
+    private static final int SLASH_SPEED = 5;
     private BufferedImage[][] slashFrames = new BufferedImage[DIRS][SLASH_FRAMES];
 
-    // Shared animation counters
     private int animCounter = 0;
-    private int animFrame   = 0;
+    private int animFrame = 0;
 
-    // ── Timers ────────────────────────────────────────────────────────────────
     private static final int KNOCK_INTERVAL = 90;
     private static final int ACTION_DISPLAY = 60;
-    private int knockTimer  = 0;
-    public  int actionTimer = 0;
+    private int knockTimer = 0;
+    public int actionTimer = 0;
 
-    // ── Ranges ────────────────────────────────────────────────────────────────
+    private int damageCooldown = 0;
+
     private static final double ATTACK_RANGE = 40;
-    private static final double KNOCK_RANGE  = 60;
+    private static final double KNOCK_RANGE = 60;
 
     private final panel gp;
 
-    // ── Constructor ───────────────────────────────────────────────────────────
     public Monster(panel gp) {
         this.gp = gp;
-        speed     = 4;
+        speed = 4;
         solidArea = new Rectangle(8, 16, 32, 32);
-        worldX    = -1000;
-        worldY    = -1000;
+        worldX = -1000;
+        worldY = -1000;
         loadSprites();
     }
 
-    // ── Load sprites ──────────────────────────────────────────────────────────
     private void loadSprites() {
         try {
             BufferedImage sheet = ImageIO.read(
                 getClass().getResourceAsStream(
                     "/assets/Charac/edp character/monster1_universal.png"));
 
-            // Walk: rows 8-11
-            int[] walkRows  = { 8, 9, 10, 11 };
-            // Slash: rows 12-15
+            int[] walkRows = { 8, 9, 10, 11 };
             int[] slashRows = { 12, 13, 14, 15 };
 
             for (int d = 0; d < DIRS; d++) {
@@ -96,7 +87,7 @@ public class Monster extends Entity {
         } catch (IOException | IllegalArgumentException e) {
             System.err.println("Monster sprite load failed: " + e.getMessage());
             for (int d = 0; d < DIRS; d++) {
-                for (int f = 0; f < WALK_FRAMES;  f++) walkFrames[d][f]  = blankFrame();
+                for (int f = 0; f < WALK_FRAMES; f++) walkFrames[d][f] = blankFrame();
                 for (int f = 0; f < SLASH_FRAMES; f++) slashFrames[d][f] = blankFrame();
             }
         }
@@ -106,17 +97,22 @@ public class Monster extends Entity {
         return new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
     }
 
-    // ── Spawn at world edge ───────────────────────────────────────────────────
     public void spawnNearEdge() {
-        worldX      = 200;
-        worldY      = gp.player.worldY;
-        state       = State.CHASING;
-        animFrame   = 0;
+        worldX = 200;
+        worldY = gp.player.worldY;
+        state = State.CHASING;
+        animFrame = 0;
         animCounter = 0;
     }
 
-    // ── Per-frame update ──────────────────────────────────────────────────────
     public void update() {
+
+        if (damageCooldown > 0) {
+            damageCooldown--;
+        }
+
+        if (actionTimer > 0) actionTimer--;
+
         if (actionTimer > 0) actionTimer--;
 
         boolean isNight = (gp.dC.currentState == game.dayCounter.dayNightState.Night
@@ -124,15 +120,14 @@ public class Monster extends Entity {
                         || gp.dC.currentState == game.dayCounter.dayNightState.Sunset
                         || gp.dC.currentState == game.dayCounter.dayNightState.Sunrise);
 
-        // ── Daytime: hide ─────────────────────────────────────────────────
         if (!isNight) {
-            state  = State.IDLE;
+            state = State.IDLE;
             worldX = -1000;
             worldY = -1000;
             return;
         }
 
-        boolean playerSafe    = gp.isPlayerSafe();
+        boolean playerSafe = gp.isPlayerSafe();
         boolean playerOutside = (gp.tileM.currentMap == 1);
 
         double distToPlayer = Double.MAX_VALUE;
@@ -146,13 +141,11 @@ public class Monster extends Entity {
         int houseY = (gp.objectM.ObjHouse[0] != null) ? gp.objectM.ObjHouse[0].worldY + 200 : 1050;
         double distToHouse = Math.sqrt(Math.pow(houseX - worldX, 2) + Math.pow(houseY - worldY, 2));
 
-        // ── AI conditional logic ──────────────────────────────────────────
         if (playerOutside && !playerSafe) {
             if (distToPlayer < ATTACK_RANGE) {
-                // Enter attack state
                 if (state != State.ATTACKING) {
-                    state       = State.ATTACKING;
-                    animFrame   = 0;   // restart slash anim from frame 0
+                    state = State.ATTACKING;
+                    animFrame = 0;
                     animCounter = 0;
                     actionTimer = ACTION_DISPLAY;
                 }
@@ -167,7 +160,7 @@ public class Monster extends Entity {
                 faceToward(houseX, houseY);
                 knockTimer++;
                 if (knockTimer >= KNOCK_INTERVAL) {
-                    knockTimer  = 0;
+                    knockTimer = 0;
                     actionTimer = ACTION_DISPLAY;
                 }
             } else {
@@ -176,37 +169,28 @@ public class Monster extends Entity {
             }
         }
 
-        // ── Animate ───────────────────────────────────────────────────────
         if (state == State.CHASING) {
-            // Walk: loop
             animCounter++;
             if (animCounter >= WALK_SPEED) {
                 animCounter = 0;
-                animFrame   = (animFrame + 1) % WALK_FRAMES;
+                animFrame = (animFrame + 1) % WALK_FRAMES;
             }
         } else if (state == State.ATTACKING) {
-            // Slash: play once, then hold last frame until state changes
-            if (animFrame < SLASH_FRAMES - 1) {
-                animCounter++;
-                if (animCounter >= SLASH_SPEED) {
-                    animCounter = 0;
-                    animFrame++;
-                }
+            if (damageCooldown == 0) {
+                gp.player.takeDamage(30);
+                damageCooldown = 60;
             }
-            // When player moves away, state becomes CHASING and animFrame resets
         } else {
-            // KNOCKING / IDLE – stand still
-            animFrame   = 0;
+            animFrame = 0;
             animCounter = 0;
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
     private void faceToward(int tx, int ty) {
         int dx = tx - worldX, dy = ty - worldY;
         currentDir = (Math.abs(dx) > Math.abs(dy))
                    ? (dx > 0 ? DIR_RIGHT : DIR_LEFT)
-                   : (dy > 0 ? DIR_DOWN  : DIR_UP);
+                   : (dy > 0 ? DIR_DOWN : DIR_UP);
     }
 
     private void moveToward(int tx, int ty) {
@@ -218,7 +202,6 @@ public class Monster extends Entity {
         faceToward(tx, ty);
     }
 
-    // ── Draw ─────────────────────────────────────────────────────────────────
     public void draw(Graphics2D g2) {
         if (state == State.IDLE) return;
 
@@ -228,7 +211,6 @@ public class Monster extends Entity {
         if (screenX < -96 || screenX > gp.screenWidth + 96
          || screenY < -96 || screenY > gp.screenheight + 96) return;
 
-        // Choose correct frame array
         BufferedImage frame;
         if (state == State.ATTACKING) {
             int safeFrame = Math.min(animFrame, SLASH_FRAMES - 1);
@@ -239,16 +221,15 @@ public class Monster extends Entity {
 
         g2.drawImage(frame, screenX, screenY, 64, 64, null);
 
-        // Floating label
         if (actionTimer > 0) {
             String label;
-            Color  col;
+            Color col;
             if (state == State.ATTACKING) {
                 label = "⚠ ATTACKED!";
-                col   = new Color(220, 30, 30);
+                col = new Color(220, 30, 30);
             } else if (state == State.KNOCKING) {
                 label = "*KNOCK KNOCK*";
-                col   = new Color(220, 140, 0);
+                col = new Color(220, 140, 0);
             } else {
                 return;
             }
@@ -263,17 +244,16 @@ public class Monster extends Entity {
         }
     }
 
-    // ── HUD banner ───────────────────────────────────────────────────────────
     public void drawAlert(Graphics2D g2) {
         if (actionTimer <= 0 || state == State.IDLE) return;
 
         String alert;
-        Color  alertColor;
+        Color alertColor;
         if (state == State.ATTACKING) {
-            alert      = "  THE MONSTER IS ATTACKING YOU!  ";
+            alert = "  THE MONSTER IS ATTACKING YOU!  ";
             alertColor = new Color(220, 30, 30);
         } else if (state == State.KNOCKING) {
-            alert      = "  *KNOCK KNOCK*  Something is at the door!  ";
+            alert = "  *KNOCK KNOCK*  Something is at the door!  ";
             alertColor = new Color(200, 130, 0);
         } else {
             return;

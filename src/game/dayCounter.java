@@ -10,23 +10,23 @@ public class dayCounter {
     Graphics2D g2;
     Font arial_40;
 
-    private int dayCount = 1;
+    public int dayCount = 1;
 
     public enum dayNightState {
         Day,
-        Sunset,      // fade to black
-        NightTitle,  // full black + Night Time text
+        Sunset,
+        NightTitle,
         Night,
-        Sunrise,     // fade from black
-        DayTitle     // full black + Day Time text
+        Sunrise,
+        DayTitle
     }
 
     public dayNightState currentState = dayNightState.Day;
 
-    private final float day_duration        = 27f;
-    private final float night_duration      = 27f;
+    private final float day_duration = 27f;
+    private final float night_duration = 27f;
     private final float transition_duration = 3f;
-    private final float title_duration      = 2f;
+    private final float title_duration = 2f;
 
     private float stateCounter = 0f;
 
