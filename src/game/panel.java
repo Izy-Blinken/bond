@@ -1,5 +1,6 @@
 package game;
 
+import models.Monster;
 import models.Player;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,6 +27,7 @@ public class panel extends JPanel implements Runnable {
     public CollisionChecker cChecker = new CollisionChecker(this);
     public Player  player = new Player(this, keyH);
     public ObjectManager objectM = new ObjectManager(this);
+    public Monster monster = new Monster(this);
     public dayCounter dC = new dayCounter(this);
     public Inventory inventory = new Inventory(this);
     public InteractionChecker interactionChecker = new InteractionChecker(this);
@@ -74,9 +76,23 @@ public class panel extends JPanel implements Runnable {
         }
     }
 
+    // Track previous night state to spawn monster once per night
+    private boolean wasNight = false;
+
     public void update() {
         
+        // Spawn monster at the start of each night
+        boolean isNight = (dC.currentState == dayCounter.dayNightState.Night
+                        || dC.currentState == dayCounter.dayNightState.NightTitle
+                        || dC.currentState == dayCounter.dayNightState.Sunset
+                        || dC.currentState == dayCounter.dayNightState.Sunrise);
+        if (isNight && !wasNight) {
+            monster.spawnNearEdge();
+        }
+        wasNight = isNight;
+
         player.update();
+        monster.update();
         objectM.update();
         
         if (tileM.currentMap == 1) {
@@ -95,9 +111,11 @@ public class panel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
         tileM.draw(g2);
         objectM.draw(g2);
+        if (tileM.currentMap == 1) { monster.draw(g2); }
         player.draw(g2);
         dC.draw(g2);
         dC.drawOverlay(g2);
+        monster.drawAlert(g2);
         inventory.draw(g2);
         drawHUD(g2);
         g2.dispose();
