@@ -90,9 +90,7 @@ public class ObjectManager {
         java.util.Random rand = new java.util.Random();
         
         for(int row = 0; row < rows; row++) {
-            
             for(int col = 0; col < cols; col++) {
-                
                 int randomOffsetX = rand.nextInt(40) - 15;
                 int randomOffsetY = rand.nextInt(30) - 18;
                 objects[indexLeft] = new ObjTree(gp, 1);
@@ -107,9 +105,7 @@ public class ObjectManager {
         int rightStartY = 119;
         
         for(int row = 0; row < rows; row++) {
-            
             for(int col = 0; col < cols; col++) {
-                
                 int randomOffsetX = rand.nextInt(40) - 15;
                 int randomOffsetY = rand.nextInt(30) - 18;
                 objects[indexRight] = new ObjTree(gp, 1);
@@ -159,7 +155,6 @@ public class ObjectManager {
             index2++;
         }
 
-        // Tree Top Bottom Left
         int index3 = 0;
         int[][] coordsTop = {
             {-10,1935},{77,1909},{180,1914},{289,1907},{372,1910},
@@ -175,7 +170,6 @@ public class ObjectManager {
             index3++;
         }
 
-        // Tree Top Bottom Right
         int index4 = 0;
         int[][] coordsTopRight = {
             {2415,1928},{2594,1911},{2594,1929},{2689,1918},{2784,1914},
@@ -231,9 +225,7 @@ public class ObjectManager {
             if (objAppleTree[t] == null) continue;
             if (appleIndex >= appleItems.length) break;
             for (int a = 0; a < 2; a++) {
-                
                 if (appleIndex >= appleItems.length) break;
-                
                 appleItems[appleIndex] = new ObjAppleItem(gp);
                 appleItems[appleIndex].worldX = objAppleTree[t].worldX + offsets[rand.nextInt(offsets.length)] + rand.nextInt(20) - 10;
                 appleItems[appleIndex].worldY = objAppleTree[t].worldY + 80 + rand.nextInt(20);
@@ -263,9 +255,7 @@ public class ObjectManager {
 
     public void draw(Graphics2D g2) {
 
-        boolean isNight = gp.dC.currentState == dayCounter.dayNightState.Night
-                       || gp.dC.currentState == dayCounter.dayNightState.Sunset
-                       || gp.dC.currentState == dayCounter.dayNightState.Sunrise;
+        boolean isNight = gp.dC.currentState == dayCounter.dayNightState.Night;
 
         if (gp.tileM.currentMap == 1) {
             for (int i = 0; i < objects.length; i++) {

@@ -1,4 +1,5 @@
 package models;
+
 import game.panel;
 import game.KeyHandler;
 import java.awt.Graphics2D;
@@ -107,26 +108,11 @@ public class Player extends Entity {
 
         // collect pag E pressed - daytime lang
         if (keyH.ePressed) {
-            boolean isDay = gp.dC.currentState == game.dayCounter.dayNightState.Day;
-            if (!useApple()) {
             collectNearbyItems();
-            }
-            keyH.ePressed = false; // reset para hindi paulit ulit
+            keyH.ePressed = false;
         }
     }
     
-    private boolean useApple() {
-    if (gp.inventory.apple > 0 && hp < maxHP) {
-        hp += 20; // heal amount, adjust as needed
-        if (hp > maxHP) hp = maxHP;
-        gp.inventory.apple--; // reduce apple count in inventory
-        System.out.println("Used an apple! HP is now " + hp + ", Apples: " + gp.inventory.apple);
-        
-        gp.playerHealedThisNight = true; 
-        return true;
-    }
-    return false;
-}
 
     // check kung malapit sa apple item o wood item tapos kuha
     private void collectNearbyItems() {
@@ -200,10 +186,5 @@ public void takeDamage(int amount) {
                 break;
         }
         g2.drawImage(image, screenX + (gp.tileSize - 32) / 2, screenY + (gp.tileSize - 48) / 2, 32, 48, null);
-        // Debug: show player world position
-        g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 13));
-        g2.setColor(java.awt.Color.WHITE);
-        g2.drawString("X: " + worldX + "  Y: " + worldY, 10, 20);
-        g2.drawString("Map: " + gp.tileM.currentMap, 10, 38);
     }
 }

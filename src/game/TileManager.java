@@ -44,36 +44,32 @@ public class TileManager {
 
             BufferedImage lowerBorder = getRotatedImage(wallSheet.getSubimage(32, 16, 16, 18), 90);
 
-            // Exterior tiles
-            tile[0] = new Tiles(sheet.getSubimage(732, 87, 64, 63), false); // solid grass
-            tile[1] = new Tiles(sheet.getSubimage(735, 157, 58, 51), false); // grass w/ flowers
+            tile[0] = new Tiles(sheet.getSubimage(732, 87, 64, 63), false);
+            tile[1] = new Tiles(sheet.getSubimage(735, 157, 58, 51), false);
 
-            // Night exterior tiles
-            nightTile[0] = new Tiles(nightSheet.getSubimage(732, 87, 64, 63), false); // solid grass - night
-            nightTile[1] = new Tiles(nightSheet.getSubimage(735, 157, 58, 51), false); // grass w/ flowers - night
+            nightTile[0] = new Tiles(nightSheet.getSubimage(732, 87, 64, 63), false);
+            nightTile[1] = new Tiles(nightSheet.getSubimage(735, 157, 58, 51), false);
 
-            // Interior tiles (no night version, same tiles)
-            tile[2] = new Tiles(wallSheet.getSubimage(64, 144, 16, 16), false); // floor
-            tile[3] = new Tiles(wallSheet.getSubimage(16, 32, 16, 16), true); // wall upper center
-            tile[4] = new Tiles(wallSheet.getSubimage(16, 48, 16, 16), true); // wall middle center
-            tile[5] = new Tiles(wallSheet.getSubimage(16, 64, 16, 16), true); // wall lower center
-            tile[6] = new Tiles(wallSheet.getSubimage(48, 16, 16, 16), true); // wall upper left corner
-            tile[7] = new Tiles(wallSheet.getSubimage(64, 16, 18, 16), true); // wall upper right corner
-            tile[8] = new Tiles(wallSheet.getSubimage(48, 48, 16, 16), true); // wall bottom left corner
-            tile[9] = new Tiles(wallSheet.getSubimage(64, 48, 16, 16), true); // wall bottom right corner
-            tile[10] = new Tiles(wallSheet.getSubimage(48, 64, 18, 16), true); // bottom left border
-            tile[11] = new Tiles(wallSheet.getSubimage(64, 64, 18, 16), true); // bottom right border
-            tile[12] = new Tiles(lowerBorder, true); // lower center border
-            tile[13] = new Tiles(wallSheet.getSubimage(48, 32, 16, 16), true); // upper left wall
-            tile[14] = new Tiles(createBlackTile(), true); // void/black
-            tile[15] = new Tiles(wallSheet2.getSubimage(64, 144, 16, 16), true); // left wall floor
-            tile[16] = new Tiles(wallSheet.getSubimage(78, 16, 16, 18), true); // right border
-            tile[17] = new Tiles(wallSheet.getSubimage(0, 16, 16, 16), true); // left border
-            tile[18] = new Tiles(wallSheet.getSubimage(48, 16, 16, 16), true); // room upper left wall corner
-            tile[19] = new Tiles(wallSheet.getSubimage(48, 32, 16, 16), true); // room mid wall
-            tile[20] = new Tiles(wallSheet.getSubimage(48, 48, 16, 16), true); // room left wall cornertile[2] = new Tiles(wallSheet.getSubimage(64, 144, 16, 16), false); // floor
+            tile[2] = new Tiles(wallSheet.getSubimage(64, 144, 16, 16), false);
+            tile[3] = new Tiles(wallSheet.getSubimage(16, 32, 16, 16), true);
+            tile[4] = new Tiles(wallSheet.getSubimage(16, 48, 16, 16), true);
+            tile[5] = new Tiles(wallSheet.getSubimage(16, 64, 16, 16), true);
+            tile[6] = new Tiles(wallSheet.getSubimage(48, 16, 16, 16), true);
+            tile[7] = new Tiles(wallSheet.getSubimage(64, 16, 18, 16), true);
+            tile[8] = new Tiles(wallSheet.getSubimage(48, 48, 16, 16), true);
+            tile[9] = new Tiles(wallSheet.getSubimage(64, 48, 16, 16), true);
+            tile[10] = new Tiles(wallSheet.getSubimage(48, 64, 18, 16), true);
+            tile[11] = new Tiles(wallSheet.getSubimage(64, 64, 18, 16), true);
+            tile[12] = new Tiles(lowerBorder, true);
+            tile[13] = new Tiles(wallSheet.getSubimage(48, 32, 16, 16), true);
+            tile[14] = new Tiles(createBlackTile(), true);
+            tile[15] = new Tiles(wallSheet2.getSubimage(64, 144, 16, 16), true);
+            tile[16] = new Tiles(wallSheet.getSubimage(78, 16, 16, 18), true);
+            tile[17] = new Tiles(wallSheet.getSubimage(0, 16, 16, 16), true);
+            tile[18] = new Tiles(wallSheet.getSubimage(48, 16, 16, 16), true);
+            tile[19] = new Tiles(wallSheet.getSubimage(48, 32, 16, 16), true);
+            tile[20] = new Tiles(wallSheet.getSubimage(48, 48, 16, 16), true);
 
-            // Interior tiles sa nightTile — same lang, walang night version
             for (int i = 2; i <= 20; i++) {
                 nightTile[i] = tile[i];
             }
@@ -135,12 +131,9 @@ public class TileManager {
     }
 
     public void draw(Graphics2D g2) {
-        boolean isNight = gp.dC.currentState == dayCounter.dayNightState.Night
-                       || gp.dC.currentState == dayCounter.dayNightState.Sunset
-                       || gp.dC.currentState == dayCounter.dayNightState.Sunrise;
+        boolean isNight = gp.dC.currentState == dayCounter.dayNightState.Night;
         Tiles[] currentTile = isNight ? nightTile : tile;
 
-        // First pass: floor only
         for (int row = 0; row < gp.maxWorldRow; row++) {
             for (int col = 0; col < gp.maxWorldCol; col++) {
                 int tileNum = mapTileNum[col][row];
@@ -151,7 +144,6 @@ public class TileManager {
             }
         }
 
-        // Second pass: everything else
         for (int row = 0; row < gp.maxWorldRow; row++) {
             for (int col = 0; col < gp.maxWorldCol; col++) {
                 int tileNum = mapTileNum[col][row];

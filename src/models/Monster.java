@@ -1,3 +1,4 @@
+
 package models;
 
 import game.panel;
@@ -113,12 +114,7 @@ public class Monster extends Entity {
 
         if (actionTimer > 0) actionTimer--;
 
-        if (actionTimer > 0) actionTimer--;
-
-        boolean isNight = (gp.dC.currentState == game.dayCounter.dayNightState.Night
-                        || gp.dC.currentState == game.dayCounter.dayNightState.NightTitle
-                        || gp.dC.currentState == game.dayCounter.dayNightState.Sunset
-                        || gp.dC.currentState == game.dayCounter.dayNightState.Sunrise);
+        boolean isNight = (gp.dC.currentState == game.dayCounter.dayNightState.Night);
 
         if (!isNight) {
             state = State.IDLE;
@@ -250,10 +246,10 @@ public class Monster extends Entity {
         String alert;
         Color alertColor;
         if (state == State.ATTACKING) {
-            alert = "  THE MONSTER IS ATTACKING YOU!  ";
+            alert = "  sound effects to  ";
             alertColor = new Color(220, 30, 30);
         } else if (state == State.KNOCKING) {
-            alert = "  *KNOCK KNOCK*  Something is at the door!  ";
+            alert = "  sound effects to  ";
             alertColor = new Color(200, 130, 0);
         } else {
             return;

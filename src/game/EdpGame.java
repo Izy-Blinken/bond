@@ -1,8 +1,6 @@
 package game;
-
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
 public class EdpGame {
     
     public static void main(String[] args) {
@@ -14,9 +12,9 @@ public class EdpGame {
             
             LandingPage landingPage = new LandingPage(() -> {
                 
-                frame.getContentPane();
+                frame.getContentPane().removeAll();
                 
-                panel gamePanel = new panel();
+                panel gamePanel = new panel(frame);
                 frame.add(gamePanel);
                 
                 frame.pack();
