@@ -3,17 +3,10 @@ package game;
 import java.awt.BasicStroke;
 import models.Monster;
 import models.Player;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class panel extends JPanel implements Runnable {
 
@@ -51,7 +44,9 @@ public class panel extends JPanel implements Runnable {
     private static final int TYPEWRITER_DELAY = 3;
 
     // Win / Lose
-    public enum GameState { PLAYING, WIN, LOSE }
+    public enum GameState {
+        PLAYING, WIN, LOSE
+    }
     public GameState gameState = GameState.PLAYING;
     public WinScreen winScreen = new WinScreen(this);
     public LoseScreen loseScreen = new LoseScreen(this);
@@ -68,11 +63,15 @@ public class panel extends JPanel implements Runnable {
 
     private static final int MENU_PANEL_W = 480;
     private static final int MENU_PANEL_H = 260;
-    
+
     public boolean showNarration = true;
     public String narrationText = "";
     private static final int NARRATION_W = 600;
     private static final int NARRATION_H = 220;
+
+    public float narrationAlpha = 0f;
+    public boolean narrationComplete = false;
+    public boolean narrationFadeOut = false;
 
     private JFrame parentFrame;
 
@@ -107,24 +106,25 @@ public class panel extends JPanel implements Runnable {
         this.parentFrame = frame;
 
         this.addMouseListener(new java.awt.event.MouseAdapter() {
+            
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
 
-                
                 int mx = e.getX();
                 int my = e.getY();
-                
+
                 if (showNarration) {
-                    
-                    int px = screenWidth  / 2 - NARRATION_W / 2;
+
+                    int px = screenWidth / 2 - NARRATION_W / 2;
                     int py = screenheight / 2 - NARRATION_H / 2;
                     int btnW = 120, btnH = 28;
-                    int btnX = px + NARRATION_W / 2 - btnW / 2;
+                    int btnX = px + NARRATION_W - btnW;
                     int btnY = py + NARRATION_H - 38;
-                    if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
-                        showNarration = false;
-                    }
                     
+                    if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
+                        narrationFadeOut = true;
+                    }
+
                     return;
                 }
 
@@ -226,7 +226,8 @@ public class panel extends JPanel implements Runnable {
     }
 
     private void returnToMenu() {
-
+        
+        
         GameThread = null;
         parentFrame.getContentPane().removeAll();
         LandingPage landingPage = new LandingPage(() -> {
@@ -237,6 +238,10 @@ public class panel extends JPanel implements Runnable {
             parentFrame.revalidate();
             parentFrame.repaint();
             parentFrame.setLocationRelativeTo(null);
+            
+            gamePanel.showNarration = true;
+            gamePanel.narrationAlpha = 0f;
+            gamePanel.narrationComplete = true;
             gamePanel.startThread();
             gamePanel.requestFocusInWindow();
         });
@@ -268,7 +273,9 @@ public class panel extends JPanel implements Runnable {
 
                 double remaining = nextDrawTime - System.nanoTime();
                 remaining /= 1000000;
-                if (remaining < 0) remaining = 0;
+                if (remaining < 0) {
+                    remaining = 0;
+                }
                 Thread.sleep((long) remaining);
                 nextDrawTime += drawInterval;
 
@@ -281,6 +288,33 @@ public class panel extends JPanel implements Runnable {
     private boolean wasNight = false;
 
     public void update() {
+
+        if (narrationComplete) {
+
+            narrationAlpha += 0.02f;
+
+            if (narrationAlpha >= 1f) {
+
+                narrationAlpha = 1f;
+                narrationComplete = false;
+            }
+            return;
+        }
+        
+        if (narrationFadeOut) {
+            
+            narrationAlpha -= 0.02f;
+            
+            if (narrationAlpha <= 0f) {
+                
+                narrationAlpha = 0f;
+                narrationFadeOut = false;
+                showNarration = false;
+            }
+            
+            return;
+        }
+
         if (showNarration) {
             return;
         }
@@ -370,37 +404,47 @@ public class panel extends JPanel implements Runnable {
             }
             playerHealedThisNight = false;
         }*/
-
         wasNight = isNight;
     }
 
     public void paintComponent(Graphics g) {
 
         super.paintComponent(g);
+
         Graphics2D g2 = (Graphics2D) g;
-        tileM.draw(g2);
-        objectM.draw(g2);
-        if (tileM.currentMap == 1) { monster.draw(g2); }
-        player.draw(g2);
-        dC.draw(g2);
-        dC.drawOverlay(g2);
-        monster.drawAlert(g2);
 
-        drawHUD(g2);
-        drawHPBar(g2);
-        drawMenuButton(g2);
-        inventory.drawButtons(g2);
-        inventory.drawInventoryPanel(g2);
-        inventory.drawScrollPanel(g2);
-        drawMenuPanel(g2);
+        if (!showNarration) {
+            tileM.draw(g2);
+            objectM.draw(g2);
 
-        if (isGameOver) {
-            if (gameState == GameState.WIN) winScreen.draw(g2);
-            else if (gameState == GameState.LOSE) loseScreen.draw(g2);
+            if (tileM.currentMap == 1) {
+                monster.draw(g2);
+            }
+
+            player.draw(g2);
+            dC.draw(g2);
+            dC.drawOverlay(g2);
+            monster.drawAlert(g2);
+        
+            drawHUD(g2);
+            drawHPBar(g2);
+            drawMenuButton(g2);
+            inventory.drawButtons(g2);
+            inventory.drawInventoryPanel(g2);
+            inventory.drawScrollPanel(g2);
+            drawMenuPanel(g2);
         }
+            if (isGameOver) {
+                if (gameState == GameState.WIN) {
+                    winScreen.draw(g2);
+                } else if (gameState == GameState.LOSE) {
+                    loseScreen.draw(g2);
+                }
+            }
 
-        drawNarrationPanel(g2);
-        g2.dispose();
+            drawNarrationPanel(g2);
+            g2.dispose();
+        
     }
 
     // HP bar
@@ -426,7 +470,7 @@ public class panel extends JPanel implements Runnable {
         g2.fillRect(x + 22, y, barWidth - 22, barHeight);
 
         double hpPercent = (double) player.hp / player.maxHP;
-        int currentWidth = (int)((barWidth - 22) * hpPercent);
+        int currentWidth = (int) ((barWidth - 22) * hpPercent);
 
         if (player.hp > 60) {
             g2.setColor(new Color(45, 110, 55));
@@ -435,6 +479,7 @@ public class panel extends JPanel implements Runnable {
         } else {
             g2.setColor(new Color(120, 25, 25));
         }
+
         g2.fillRect(x + 22, y, currentWidth, barHeight);
 
         g2.setColor(new Color(65, 60, 55));
@@ -480,9 +525,11 @@ public class panel extends JPanel implements Runnable {
     // Menu panel
     private void drawMenuPanel(Graphics2D g2) {
 
-        if (!showMenuPanel) return;
+        if (!showMenuPanel) {
+            return;
+        }
 
-        int px = screenWidth  / 2 - MENU_PANEL_W / 2;
+        int px = screenWidth / 2 - MENU_PANEL_W / 2;
         int py = screenheight / 2 - MENU_PANEL_H / 2;
 
         inventory.drawPanelBase(g2, px, py, MENU_PANEL_W, MENU_PANEL_H, "Menu");
@@ -511,7 +558,6 @@ public class panel extends JPanel implements Runnable {
         g2.setColor(new Color(45, 43, 40, 200));
         g2.fillRect(px + 12, rowY, pw - 24, rowH);
 
-
         g2.setFont(getImFell(15f));
         g2.setColor(new Color(190, 185, 175));
         int lw = g2.getFontMetrics().stringWidth(label);
@@ -520,41 +566,42 @@ public class panel extends JPanel implements Runnable {
         g2.setStroke(new BasicStroke(1f));
     }
 
-
     private boolean isMenuBtnClicked(int mx, int my) {
         return mx >= MENU_BTN_X && mx <= MENU_BTN_X + MENU_BTN_W
-            && my >= MENU_BTN_Y && my <= MENU_BTN_Y + MENU_BTN_H;
+                && my >= MENU_BTN_Y && my <= MENU_BTN_Y + MENU_BTN_H;
     }
 
     private boolean isMenuPanelXClicked(int mx, int my) {
 
-        int px = screenWidth  / 2 - MENU_PANEL_W / 2;
+        int px = screenWidth / 2 - MENU_PANEL_W / 2;
         int py = screenheight / 2 - MENU_PANEL_H / 2;
         return mx >= px + MENU_PANEL_W - 24 && mx <= px + MENU_PANEL_W - 6
-            && my >= py + 8 && my <= py + 28;
+                && my >= py + 8 && my <= py + 28;
     }
 
     private boolean isMuteRowClicked(int mx, int my) {
 
-        int px   = screenWidth  / 2 - MENU_PANEL_W / 2;
-        int py   = screenheight / 2 - MENU_PANEL_H / 2;
+        int px = screenWidth / 2 - MENU_PANEL_W / 2;
+        int py = screenheight / 2 - MENU_PANEL_H / 2;
         int rowY = py + 62;
         return mx >= px + 12 && mx <= px + MENU_PANEL_W - 12
-            && my >= rowY && my <= rowY + 36;
+                && my >= rowY && my <= rowY + 36;
     }
 
     private boolean isQuitRowClicked(int mx, int my) {
 
-        int px   = screenWidth  / 2 - MENU_PANEL_W / 2;
-        int py   = screenheight / 2 - MENU_PANEL_H / 2;
+        int px = screenWidth / 2 - MENU_PANEL_W / 2;
+        int py = screenheight / 2 - MENU_PANEL_H / 2;
         int rowY = py + 62 + 44 + 8;
         return mx >= px + 12 && mx <= px + MENU_PANEL_W - 12
-            && my >= rowY && my <= rowY + 36;
+                && my >= rowY && my <= rowY + 36;
     }
 
     private void handleDialogueClick(int mx, int my) {
 
-        if (!showMonsterDialogue) return;
+        if (!showMonsterDialogue) {
+            return;
+        }
 
         // Show full text kapag nagclick while still typing
         if (dialogueCharIndex < dialogueFullText.length()) {
@@ -596,12 +643,17 @@ public class panel extends JPanel implements Runnable {
     }
 
     private void drawNarrationPanel(Graphics2D g2) {
-        if (!showNarration) return;
+        if (!showNarration) {
+            return;
+        }
+
+        Composite orig = g2.getComposite();
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, narrationAlpha));
 
         g2.setColor(new Color(0, 0, 0, 160));
         g2.fillRect(0, 0, screenWidth, screenheight);
 
-        int px = screenWidth  / 2 - NARRATION_W / 2;
+        int px = screenWidth / 2 - NARRATION_W / 2;
         int py = screenheight / 2 - NARRATION_H / 2;
 
         //bg
@@ -629,32 +681,31 @@ public class panel extends JPanel implements Runnable {
         g2.setColor(new Color(160, 155, 145));
         drawWrappedText(g2, narrationText, px + 20, py + 58, NARRATION_W - 40, 20);
 
-        // accent line bottom 
-        g2.setColor(new Color(65, 60, 55));
-        g2.drawLine(px + 20, py + NARRATION_H - 46, px + NARRATION_W - 20, py + NARRATION_H - 46);
-
         //Continue button
         int btnW = 120;
-        int btnH = 28;
-        int btnX = px + NARRATION_W / 2 - btnW / 2;
+        int btnX = px + NARRATION_W - btnW;
         int btnY = py + NARRATION_H - 38;
 
-       
         g2.setColor(new Color(90, 85, 78));
         g2.setStroke(new BasicStroke(1f));
-        g2.drawRect(btnX, btnY, btnW, btnH);
 
         g2.setFont(getImFell(13f));
         g2.setColor(new Color(190, 185, 175));
+
         String btnLabel = "Continue";
+
         int lw = g2.getFontMetrics().stringWidth(btnLabel);
         g2.drawString(btnLabel, btnX + btnW / 2 - lw / 2, btnY + 19);
 
         g2.setStroke(new BasicStroke(1f));
+
+        g2.setComposite(orig);
     }
 
     private void drawWrappedText(Graphics2D g2, String text, int x, int y, int maxWidth, int lineHeight) {
-        if (text == null || text.isEmpty()) return;
+        if (text == null || text.isEmpty()) {
+            return;
+        }
         String[] words = text.split(" ");
         StringBuilder line = new StringBuilder();
         for (String word : words) {
@@ -667,7 +718,9 @@ public class panel extends JPanel implements Runnable {
                 line = new StringBuilder(test);
             }
         }
-        if (line.length() > 0) g2.drawString(line.toString(), x, y);
+        if (line.length() > 0) {
+            g2.drawString(line.toString(), x, y);
+        }
     }
 
     private void drawPlayerHP(Graphics2D g2) {
@@ -681,7 +734,7 @@ public class panel extends JPanel implements Runnable {
         g2.fillRect(x, y, barWidth, barHeight);
 
         double hpPercent = (double) player.hp / player.maxHP;
-        int currentWidth = (int)(barWidth * hpPercent);
+        int currentWidth = (int) (barWidth * hpPercent);
 
         if (player.hp > 60) {
             g2.setColor(Color.GREEN);
@@ -737,13 +790,13 @@ public class panel extends JPanel implements Runnable {
         // Outer panel
         g2.setColor(new Color(8, 8, 6, 210));
         g2.fillRect(boxX, y, boxW, boxH);
-        
+
         g2.drawRect(boxX, y, boxW, boxH);
 
         // Key box
         int keyX = boxX + padX;
         int keyY = y + padY;
-        
+
         g2.setColor(new Color(220, 210, 180));
         g2.setFont(getImFell(fontSize));
         g2.drawString(key, keyX + (keyBoxSize - keyW) / 2, keyY + keyBoxSize - 4);
@@ -811,7 +864,7 @@ public class panel extends JPanel implements Runnable {
             int sBoxH = 13 + sPadY * 2;
             int sBoxX = cx - sBoxW / 2;
             int sBoxY = screenheight - 110;
-            
+
             g2.setColor(new Color(8, 8, 6, 200));
             g2.fillRect(sBoxX, sBoxY, sBoxW, sBoxH);
             g2.setColor(new Color(70, 60, 45));
@@ -901,19 +954,11 @@ public class panel extends JPanel implements Runnable {
             int btnAlpha = typingDone ? 220 : 80;
 
             // YES button
-            
-            g2.setColor(new Color(55, 80, 45, btnAlpha));
-            g2.setStroke(new BasicStroke(1f));
-            g2.drawRect(x + 60, y + 105, 110, 32);
             g2.setFont(getImFell(14f));
             g2.setColor(new Color(140, 170, 110, btnAlpha));
             g2.drawString("Yes", x + 103, y + 126);
 
             // NO button
-           
-            g2.setColor(new Color(90, 40, 40, btnAlpha));
-            g2.setStroke(new BasicStroke(1f));
-            g2.drawRect(x + 290, y + 105, 110, 32);
             g2.setColor(new Color(180, 100, 90, btnAlpha));
             g2.drawString("No", x + 336, y + 126);
 

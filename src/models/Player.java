@@ -38,6 +38,7 @@ public class Player extends Entity {
     }
 
     public void getPlayerImage() {
+        
         try {
             down1 = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/player/down1.png"));
             down2 = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/player/down2.png"));
@@ -47,6 +48,7 @@ public class Player extends Entity {
             right2 = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/player/right2.png"));
             top1 = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/player/top1.png"));
             top2 = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/player/top2.png"));
+            
         } catch (IOException e) {
             e.printStackTrace();
         }

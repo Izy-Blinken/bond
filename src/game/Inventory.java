@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
+import models.Player;
 
 public class Inventory {
 
@@ -93,7 +94,10 @@ public class Inventory {
 
     public boolean eatApple() {
 
-        if (apple > 0) { apple--; return true; }
+        if (apple > 0) {
+            apple--;
+            return true;
+        }
         return false;
     }
 
@@ -153,12 +157,14 @@ public class Inventory {
         int btnX = px + PANEL_W / 2 - btnW / 2;
         int btnY = rowY + rowH + 28;
 
-        boolean canEat = apple > 0;
+        boolean canEat = apple > 0 && gp.player.hp < 100;
         
         g2.setColor(canEat ? new Color(35, 45, 28, 215) : new Color(30, 28, 25, 180));
         g2.fillRect(btnX, btnY, btnW, btnH);
+        
         g2.setColor(canEat ? new Color(90, 105, 75) : new Color(75, 70, 65));
         g2.setStroke(new BasicStroke(1f));
+        
         g2.drawRect(btnX, btnY, btnW, btnH);
         g2.setFont(getImFell(14f));
         g2.setColor(canEat ? new Color(190, 205, 170) : new Color(100, 95, 88));
@@ -282,8 +288,14 @@ public class Inventory {
 
     public boolean isEatClicked(int mx, int my) {
 
-        if (!showPanel) return false;
+        if (!showPanel) {
+            return false;
+        }
 
+        if(apple <= 0 || gp.player.hp >= 100 ){
+            return false;
+        }
+        
         int px = gp.screenWidth  / 2 - PANEL_W / 2;
         int py = gp.screenheight / 2 - PANEL_H / 2;
         int rowY = py + 75;

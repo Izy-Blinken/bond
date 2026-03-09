@@ -23,6 +23,10 @@ public class EdpGame {
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
                 
+                gamePanel.showNarration = true;
+                gamePanel.narrationAlpha = 0f;
+                gamePanel.narrationComplete = true;
+                
                 gamePanel.startThread();
                 gamePanel.requestFocusInWindow();
             });
