@@ -111,9 +111,10 @@ public class RiddleManager {
         }
     }
 
-    /** TODO Task 4: replace flag with real portal spawn logic. */
+    
     private void spawnPortal() {
         portalSpawned = true;
-        System.out.println("[RiddleManager] All riddles solved! Portal spawned.");
+        gp.objectM.revealPortal();
+        System.out.println(" All riddles solved! Portal spawned.");
     }
 }
