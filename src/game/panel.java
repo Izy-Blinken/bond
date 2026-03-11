@@ -31,11 +31,9 @@ public class panel extends JPanel implements Runnable {
     public Monster monster = new Monster(this);
     public dayCounter dC = new dayCounter(this);
     public Inventory inventory = new Inventory(this);
+    public RiddleManager riddleM  = new RiddleManager(this);
+    public RiddleUI      riddleUI = new RiddleUI(this);
     public boolean isGameOver = false;
-
-    // --- Riddle system ---
-    public RiddleManager riddleM;
-    public RiddleUI      riddleUI;
     private boolean showMonsterDialogue = false;
     private String dialogueText = "";
     private Runnable onYesAction = null;
@@ -71,11 +69,29 @@ public class panel extends JPanel implements Runnable {
     public boolean showNarration = true;
     public String narrationText = "";
     private static final int NARRATION_W = 600;
-    private static final int NARRATION_H = 220;
+    private static final int NARRATION_H = 290;
 
     public float narrationAlpha = 0f;
     public boolean narrationComplete = false;
     public boolean narrationFadeOut = false;
+
+    // ── Multi-page typewriter narration ───────────────────────────────────────
+    private static final String[] NARRATION_PAGES = {
+        "You weren't supposed to survive the crash. The forest made sure of that — or so it thought. But here you are, still breathing, still bleeding, fingers clawing at the mud while something in the treeline watches you rise. It has been watching since before you even arrived.",
+        "Three days. That is all you have before the darkness consumes what little remains of this place — and of you. Not because of the cold. Not because of hunger. Something is counting down alongside you, and it is far more patient than you will ever be.",
+        "It started on the first night. A sound outside the window. Not wind. Not an animal. Something deliberate. Something that already knew the layout of the house, which floorboards creak, which window latch is weak. Something that had clearly been here before.",
+        "Every night, it comes back. It does not tire. It does not sleep. It does not feel the cold the way you do. It has been waiting in this forest long before you stumbled into it — and it will still be here long after your name is forgotten and your bones go cold.",
+        "The others who came before you boarded up every window. Stacked furniture against the door. Lit every torch they could find and prayed the light would keep it out. You can still see the scratch marks on the outside of the shutters. Long, deep, and very deliberate.",
+        "But you are still breathing. That means something — though you are not yet sure what. Maybe you are different. Maybe the thing outside is simply not done with you yet. Maybe it wants you to reach the portal first. Maybe it feeds on hope before it feeds on anything else.",
+        "Find the portal before the third night ends. Gather what you can. Keep the torches burning. Keep the doors sealed. And if you hear knocking — do not mistake it for rescue. Nothing out there is coming to save you. It is only checking whether you are still afraid.",
+        "Whatever you do — do not open the door. Not for any sound. Not for any voice. Not even if it learns to say your name. Especially then. It has had a long time to practice, and by now, it is very, very good at sounding like someone you used to love."
+    };
+    private int   narPageIndex    = 0;
+    private int   narCharIndex    = 0;
+    private int   narTickCounter  = 0;
+    private static final int NAR_TYPEWRITER_DELAY = 2; // ticks per character
+
+    public long getGameStartTime() { return gameStartTime; }
 
     private JFrame parentFrame;
 
@@ -109,10 +125,6 @@ public class panel extends JPanel implements Runnable {
 
         this.parentFrame = frame;
 
-        // Init riddle system
-        riddleM  = new RiddleManager(this);
-        riddleUI = new RiddleUI(this);
-
         this.addMouseListener(new java.awt.event.MouseAdapter() {
             
             @Override
@@ -121,24 +133,31 @@ public class panel extends JPanel implements Runnable {
                 int mx = e.getX();
                 int my = e.getY();
 
+                if (riddleUI.isOpen) {
+                    riddleUI.handleClick(mx, my);
+                    return;
+                }
+
                 if (showNarration) {
 
                     int px = screenWidth / 2 - NARRATION_W / 2;
                     int py = screenheight / 2 - NARRATION_H / 2;
-                    int btnW = 120, btnH = 28;
-                    int btnX = px + NARRATION_W - btnW;
-                    int btnY = py + NARRATION_H - 38;
+                    int btnW = 100, btnH = 32;
+                    int btnX = px + NARRATION_W - btnW - 16;
+                    int btnY = py + NARRATION_H - 48;
                     
-                    if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
-                        narrationFadeOut = true;
+                    if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH
+                            && narPageIndex < NARRATION_PAGES.length) {
+                        String fullPage = NARRATION_PAGES[narPageIndex];
+                        if (narCharIndex < fullPage.length()) {
+                            // First click reveals remaining text
+                            narCharIndex  = fullPage.length();
+                            narrationText = fullPage;
+                        } else {
+                            advanceNarration();
+                        }
                     }
 
-                    return;
-                }
-
-                // Riddle UI consumes all clicks while open
-                if (riddleUI != null && riddleUI.isOpen) {
-                    riddleUI.handleClick(mx, my);
                     return;
                 }
 
@@ -311,6 +330,11 @@ public class panel extends JPanel implements Runnable {
 
                 narrationAlpha = 1f;
                 narrationComplete = false;
+                // Start typewriter from first page
+                narPageIndex   = 0;
+                narCharIndex   = 0;
+                narTickCounter = 0;
+                narrationText  = "";
             }
             return;
         }
@@ -330,6 +354,31 @@ public class panel extends JPanel implements Runnable {
         }
 
         if (showNarration) {
+
+            // Typewriter: reveal characters one by one
+            String fullPage = NARRATION_PAGES[narPageIndex];
+            if (narCharIndex < fullPage.length()) {
+                narTickCounter++;
+                if (narTickCounter >= NAR_TYPEWRITER_DELAY) {
+                    narTickCounter = 0;
+                    narCharIndex++;
+                    narrationText = fullPage.substring(0, narCharIndex);
+                }
+            }
+
+            // Space / Enter: skip or advance
+            if (keyH.skipPressed) {
+                keyH.skipPressed = false;
+                if (narCharIndex < fullPage.length()) {
+                    // Reveal full current page immediately
+                    narCharIndex  = fullPage.length();
+                    narrationText = fullPage;
+                } else {
+                    // Advance to next page or close
+                    advanceNarration();
+                }
+            }
+
             return;
         }
 
@@ -366,7 +415,7 @@ public class panel extends JPanel implements Runnable {
             monster.spawnNearEdge();
         }
 
-        // Riddle UI open -> pause game loop
+        // Riddle UI pauses the game loop while open
         if (riddleUI.isOpen) {
             riddleUI.update();
             return;
@@ -453,7 +502,6 @@ public class panel extends JPanel implements Runnable {
             inventory.drawInventoryPanel(g2);
             inventory.drawScrollPanel(g2);
             drawMenuPanel(g2);
-            riddleUI.draw(g2);
         }
             if (isGameOver) {
                 if (gameState == GameState.WIN) {
@@ -464,6 +512,7 @@ public class panel extends JPanel implements Runnable {
             }
 
             drawNarrationPanel(g2);
+            if (riddleUI.isOpen) riddleUI.draw(g2);
             g2.dispose();
         
     }
@@ -667,6 +716,15 @@ public class panel extends JPanel implements Runnable {
         if (!showNarration) {
             return;
         }
+        // During fade-out narPageIndex may equal NARRATION_PAGES.length – draw only the dim overlay
+        if (narPageIndex >= NARRATION_PAGES.length) {
+            Composite orig2 = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, narrationAlpha));
+            g2.setColor(new Color(0, 0, 0, 160));
+            g2.fillRect(0, 0, screenWidth, screenheight);
+            g2.setComposite(orig2);
+            return;
+        }
 
         Composite orig = g2.getComposite();
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, narrationAlpha));
@@ -689,34 +747,64 @@ public class panel extends JPanel implements Runnable {
         //accent line sa top 
         g2.setColor(new Color(65, 60, 55));
         g2.setStroke(new BasicStroke(1f));
-        g2.drawLine(px + 20, py + 36, px + NARRATION_W - 20, py + 36);
+        g2.drawLine(px + 20, py + 40, px + NARRATION_W - 20, py + 40);
 
         //title 
         g2.setFont(getImFell(15f));
         g2.setColor(new Color(210, 205, 195));
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.drawString("No Sanctuary", px + 20, py + 26);
+        g2.drawString("No Sanctuary", px + 20, py + 28);
 
-        // narration text
-        g2.setFont(getImFell(13f));
-        g2.setColor(new Color(160, 155, 145));
-        drawWrappedText(g2, narrationText, px + 20, py + 58, NARRATION_W - 40, 20);
+        // narration text — starts lower, bigger font, more line height
+        g2.setFont(getImFell(15f));
+        g2.setColor(new Color(168, 162, 150));
+        int textStartY = py + 84;
+        drawWrappedText(g2, narrationText, px + 28, textStartY, NARRATION_W - 56, 26);
 
-        //Continue button
-        int btnW = 120;
-        int btnX = px + NARRATION_W - btnW;
-        int btnY = py + NARRATION_H - 38;
-
-        g2.setColor(new Color(90, 85, 78));
+        // Bottom accent line above footer
+        g2.setColor(new Color(55, 50, 46));
         g2.setStroke(new BasicStroke(1f));
+        g2.drawLine(px + 20, py + NARRATION_H - 48, px + NARRATION_W - 20, py + NARRATION_H - 48);
 
+        // Footer row: page indicator (left) | skip hint (center) | button (right)
+        int footerY = py + NARRATION_H - 22;
+
+        // Page indicator — left
+        g2.setFont(getImFell(12f));
+        String pageLabel = (narPageIndex + 1) + " / " + NARRATION_PAGES.length;
+        g2.setColor(new Color(110, 105, 98));
+        g2.drawString(pageLabel, px + 24, footerY);
+
+        // Skip hint — center
+        String hint = "Space · Enter · Click to advance";
+        int hintW = g2.getFontMetrics().stringWidth(hint);
+        g2.setColor(new Color(90, 86, 80));
+        g2.drawString(hint, px + NARRATION_W / 2 - hintW / 2, footerY);
+
+        // Blinking cursor while typewriter is still running
+        String fullPage = NARRATION_PAGES[narPageIndex];
+        if (narCharIndex < fullPage.length()) {
+            long blink = (System.currentTimeMillis() / 400) % 2;
+            if (blink == 0) {
+                g2.setFont(getImFell(15f));
+                g2.setColor(new Color(160, 155, 145, 180));
+                // approximate cursor X based on last line width
+                int approxX = px + 28 + (g2.getFontMetrics().stringWidth(narrationText) % (NARRATION_W - 56));
+                g2.fillRect(approxX + 2, textStartY - 14, 2, 16);
+            }
+        }
+
+        // Continue button — right aligned
+        int btnW = 100;
+        int btnX = px + NARRATION_W - btnW - 16;
+        int btnY = py + NARRATION_H - 48;
         g2.setFont(getImFell(13f));
-        g2.setColor(new Color(190, 185, 175));
-
-        String btnLabel = "Continue";
-
+        String btnLabel = narCharIndex < fullPage.length()
+                ? "Skip >"
+                : (narPageIndex + 1 < NARRATION_PAGES.length ? "Next >" : "Begin");
+        g2.setColor(new Color(195, 188, 174));
         int lw = g2.getFontMetrics().stringWidth(btnLabel);
-        g2.drawString(btnLabel, btnX + btnW / 2 - lw / 2, btnY + 19);
+        g2.drawString(btnLabel, btnX + btnW / 2 - lw / 2, btnY + 28);
 
         g2.setStroke(new BasicStroke(1f));
 
@@ -843,6 +931,18 @@ public class panel extends JPanel implements Runnable {
                     drawKeyPromptBox(g2, "F", "Close Door", cx + 60, screenheight - 70, 15f);
                 } else {
                     drawKeyPromptBox(g2, "E", "Open Door", cx, screenheight - 70, 15f);
+                }
+            }
+
+            if (interactionChecker.showPortalPrompt) {
+                drawKeyPromptBox(g2, "E", "Enter the Portal", cx, screenheight - 110, 15f);
+            }
+
+            if (interactionChecker.showRiddlePrompt) {
+                int ri = interactionChecker.nearRiddleIndex;
+                boolean solved = ri >= 0 && riddleM.getRiddle(ri) != null && riddleM.getRiddle(ri).solved;
+                if (!solved) {
+                    drawKeyPromptBox(g2, "E", "Read the Riddle  (" + (riddleM.solvedCount) + "/3 solved)", cx, screenheight - 110, 15f);
                 }
             }
 
@@ -984,6 +1084,19 @@ public class panel extends JPanel implements Runnable {
             g2.drawString("No", x + 336, y + 126);
 
             g2.setStroke(new BasicStroke(1f));
+        }
+    }
+
+
+    /** Advance to the next narration page, or begin fade-out if all pages done. */
+    private void advanceNarration() {
+        narPageIndex++;
+        if (narPageIndex >= NARRATION_PAGES.length) {
+            narrationFadeOut = true;
+        } else {
+            narCharIndex   = 0;
+            narTickCounter = 0;
+            narrationText  = "";
         }
     }
 
