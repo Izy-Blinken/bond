@@ -33,7 +33,7 @@ public class dayCounter {
     private final float hold_duration   = 3.5f;  // suspense hold with text visible
     // total DayTitle = fade_duration + hold_duration + fade_duration = 6.5f
 
-    private float stateCounter = 0f;
+    public float stateCounter = 0f;
 
     public dayCounter(panel gp) {
         this.gp = gp;
