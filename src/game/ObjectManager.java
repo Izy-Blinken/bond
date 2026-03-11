@@ -9,6 +9,7 @@ import models.ObjAppleTree;
 import models.ObjHouse;
 import models.ObjInterior;
 import models.ObjPineTree;
+import models.ObjRiddle;
 import models.ObjTree;
 import models.ObjTreeTop;
 import models.ObjTreeTopBR;
@@ -17,6 +18,7 @@ import models.ObjWoodItem;
 import models.ObjWoods;
 
 public class ObjectManager {
+
     panel gp;
     public GameObject[] objects;
     public GameObject[] objAppleTree;
@@ -27,24 +29,28 @@ public class ObjectManager {
     public GameObject[] ObjPineTree;
     public GameObject[] ObjTreeTop;
     public GameObject[] ObjTreeTopBR;
-    public ObjInterior interior;
+    public ObjInterior  interior;
     public GameObject[] appleItems;
     public GameObject[] woodItems;
 
+    // --- Riddle tablets ---
+    public GameObject[] riddleObjects;
+
     public ObjectManager(panel gp) {
         this.gp = gp;
-        objects = new GameObject[5900];
+        objects      = new GameObject[5900];
         objAppleTree = new GameObject[100];
-        ObjVehicle = new GameObject[100];
-        ObjHouse = new GameObject[10];
-        ObjWoods = new GameObject[100];
-        FireCamp = new GameObject[100];
-        ObjPineTree = new GameObject[100];
-        ObjTreeTop = new GameObject[100];
+        ObjVehicle   = new GameObject[100];
+        ObjHouse     = new GameObject[10];
+        ObjWoods     = new GameObject[100];
+        FireCamp     = new GameObject[100];
+        ObjPineTree  = new GameObject[100];
+        ObjTreeTop   = new GameObject[100];
         ObjTreeTopBR = new GameObject[100];
-        interior = new models.ObjInterior(gp);
-        appleItems = new GameObject[50];
-        woodItems  = new GameObject[50];
+        interior     = new models.ObjInterior(gp);
+        appleItems   = new GameObject[50];
+        woodItems    = new GameObject[50];
+        riddleObjects = new GameObject[3];
         setObjects();
         spawnCollectibles();
     }
@@ -52,7 +58,7 @@ public class ObjectManager {
     public void update() {
         if (gp.tileM.currentMap == 2) interior.update();
     }
-    
+
     public void setObjects() {
 
         int index = 0;
@@ -70,8 +76,8 @@ public class ObjectManager {
             {95,91,100,92,92,93,101,99,95,100,94,94,97,101,98,98,94,92,91,99,100,91,101,94,91,92,94,101,94,93},
             {155,160,145,147,145,158,140,150,155,149,158,139,145,139,141,145,162,140,148,139,150,161,140,145,149,139,158,123,144,150}
         };
-        for(int row = 0; row < posX.length; row++){
-            for(int col = 0; col < posX[row].length; col++){
+        for (int row = 0; row < posX.length; row++) {
+            for (int col = 0; col < posX[row].length; col++) {
                 objects[index] = new ObjTree(gp, 1);
                 objects[index].worldX = posX[row][col];
                 objects[index].worldY = posY[row][col];
@@ -86,11 +92,10 @@ public class ObjectManager {
         int cols = 10;
         int spacingX = 45;
         int spacingY = 60;
-        
         java.util.Random rand = new java.util.Random();
-        
-        for(int row = 0; row < rows; row++) {
-            for(int col = 0; col < cols; col++) {
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
                 int randomOffsetX = rand.nextInt(40) - 15;
                 int randomOffsetY = rand.nextInt(30) - 18;
                 objects[indexLeft] = new ObjTree(gp, 1);
@@ -103,9 +108,9 @@ public class ObjectManager {
         int indexRight = indexLeft;
         int rightStartX = 2800;
         int rightStartY = 119;
-        
-        for(int row = 0; row < rows; row++) {
-            for(int col = 0; col < cols; col++) {
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
                 int randomOffsetX = rand.nextInt(40) - 15;
                 int randomOffsetY = rand.nextInt(30) - 18;
                 objects[indexRight] = new ObjTree(gp, 1);
@@ -146,9 +151,9 @@ public class ObjectManager {
             {962,2112},{1048,2112},{1137,2112},{1247,2099},{1330,2108},
             {1438,2112},{1547,2097},{1643,2110},{1729,2112},{1834,2112},
             {1912,2105},{2005,2101},{2124,2112},{2217,2112},{2311,2106},
-            {2402,2112},{2502,2112},{2597,2105},{2690,2112},{2771,2109}
+            {2402,2112},{2502,2112},{2597,2105},{2700,2112},{2771,2109}
         };
-        for(int i = 0; i < coords.length; i++) {
+        for (int i = 0; i < coords.length; i++) {
             objects[index2] = new ObjTree(gp, 1);
             objects[index2].worldX = coords[i][0];
             objects[index2].worldY = coords[i][1];
@@ -163,7 +168,7 @@ public class ObjectManager {
             {-10,2071},{72,2066},{170,2068},{279,2057},{364,2064},
             {-19,2112},{94,2098},{187,2112},{289,2112},{367,2112}
         };
-        for(int i = 0; i < coordsTop.length; i++) {
+        for (int i = 0; i < coordsTop.length; i++) {
             ObjTreeTop[index3] = new ObjTreeTop(gp, 1.6);
             ObjTreeTop[index3].worldX = coordsTop[i][0] - 30;
             ObjTreeTop[index3].worldY = coordsTop[i][1] - 10;
@@ -178,43 +183,56 @@ public class ObjectManager {
             {2405,2051},{2492,2075},{2611,2053},{2696,2053},{2779,2051},
             {2502,2112},{2512,2112},{2607,2105},{2700,2112},{2781,2109}
         };
-        for(int i = 0; i < coordsTopRight.length; i++) {
+        for (int i = 0; i < coordsTopRight.length; i++) {
             ObjTreeTopBR[index4] = new ObjTreeTopBR(gp, 1.6);
             ObjTreeTopBR[index4].worldX = coordsTopRight[i][0] - 30;
             ObjTreeTopBR[index4].worldY = coordsTopRight[i][1] - 10;
             index4++;
         }
 
-        objAppleTree[0] = new ObjAppleTree(gp,1.5); objAppleTree[0].worldX = 700; objAppleTree[0].worldY = 100;
-        objAppleTree[1] = new ObjAppleTree(gp, 1.5); objAppleTree[1].worldX = 700; objAppleTree[1].worldY = 700;
+        objAppleTree[0] = new ObjAppleTree(gp, 1.5); objAppleTree[0].worldX = 700;  objAppleTree[0].worldY = 100;
+        objAppleTree[1] = new ObjAppleTree(gp, 1.5); objAppleTree[1].worldX = 700;  objAppleTree[1].worldY = 700;
         objAppleTree[2] = new ObjAppleTree(gp, 1.5); objAppleTree[2].worldX = 2000; objAppleTree[2].worldY = 1200;
-        objAppleTree[3] = new ObjAppleTree(gp, 1.5); objAppleTree[3].worldX = 805; objAppleTree[3].worldY = 605;
-        objAppleTree[4] = new ObjAppleTree(gp, 1.5); objAppleTree[4].worldX = 750; objAppleTree[4].worldY = 110;
-        objAppleTree[5] = new ObjAppleTree(gp, 1.5); objAppleTree[5].worldX = 356; objAppleTree[5].worldY = 500;
-        objAppleTree[6] = new ObjAppleTree(gp, 1.5); objAppleTree[6].worldX = 500; objAppleTree[6].worldY = 605;
-        objAppleTree[7] = new ObjAppleTree(gp, 1.5); objAppleTree[7].worldX = 398; objAppleTree[7].worldY = 750;
+        objAppleTree[3] = new ObjAppleTree(gp, 1.5); objAppleTree[3].worldX = 805;  objAppleTree[3].worldY = 605;
+        objAppleTree[4] = new ObjAppleTree(gp, 1.5); objAppleTree[4].worldX = 750;  objAppleTree[4].worldY = 110;
+        objAppleTree[5] = new ObjAppleTree(gp, 1.5); objAppleTree[5].worldX = 356;  objAppleTree[5].worldY = 500;
+        objAppleTree[6] = new ObjAppleTree(gp, 1.5); objAppleTree[6].worldX = 500;  objAppleTree[6].worldY = 605;
+        objAppleTree[7] = new ObjAppleTree(gp, 1.5); objAppleTree[7].worldX = 398;  objAppleTree[7].worldY = 750;
         objAppleTree[8] = new ObjAppleTree(gp, 1.5); objAppleTree[8].worldX = 1800; objAppleTree[8].worldY = 400;
 
-        ObjVehicle[0] = new ObjVehicle(gp, 1, 1.5); ObjVehicle[0].worldX = 490; ObjVehicle[0].worldY = 250;
+        ObjVehicle[0] = new ObjVehicle(gp, 1, 1.5); ObjVehicle[0].worldX = 490;  ObjVehicle[0].worldY = 250;
         ObjVehicle[1] = new ObjVehicle(gp, 2, 1.5); ObjVehicle[1].worldX = 1000; ObjVehicle[1].worldY = 1000;
         ObjVehicle[2] = new ObjVehicle(gp, 1, 1.5); ObjVehicle[2].worldX = 1800; ObjVehicle[2].worldY = 750;
-        ObjVehicle[3] = new ObjVehicle(gp, 2, 1.5); ObjVehicle[3].worldX = 905; ObjVehicle[3].worldY = 900;
+        ObjVehicle[3] = new ObjVehicle(gp, 2, 1.5); ObjVehicle[3].worldX = 905;  ObjVehicle[3].worldY = 900;
 
         ObjWoods[0] = new ObjWoods(gp, 1.5); ObjWoods[0].worldX = 2000; ObjWoods[0].worldY = 250;
         ObjWoods[1] = new ObjWoods(gp, 1.5); ObjWoods[1].worldX = 1500; ObjWoods[1].worldY = 1900;
-        ObjWoods[2] = new ObjWoods(gp, 1.5); ObjWoods[2].worldX = 600; ObjWoods[2].worldY = 1100;
+        ObjWoods[2] = new ObjWoods(gp, 1.5); ObjWoods[2].worldX = 600;  ObjWoods[2].worldY = 1100;
         ObjWoods[3] = new ObjWoods(gp, 1.5); ObjWoods[3].worldX = 1000; ObjWoods[3].worldY = 900;
 
-        FireCamp[0] = new FireCamp(gp, 1.5); FireCamp[0].worldX = 800; FireCamp[0].worldY = 500;
+        FireCamp[0] = new FireCamp(gp, 1.5); FireCamp[0].worldX = 800;  FireCamp[0].worldY = 500;
         FireCamp[1] = new FireCamp(gp, 1.5); FireCamp[1].worldX = 1900; FireCamp[1].worldY = 400;
 
         ObjPineTree[0] = new ObjPineTree(gp, 2); ObjPineTree[0].worldX = 1600; ObjPineTree[0].worldY = 220;
         ObjPineTree[1] = new ObjPineTree(gp, 2); ObjPineTree[1].worldX = 2000; ObjPineTree[1].worldY = 450;
-        ObjPineTree[2] = new ObjPineTree(gp, 2); ObjPineTree[2].worldX = 600; ObjPineTree[2].worldY = 1100;
+        ObjPineTree[2] = new ObjPineTree(gp, 2); ObjPineTree[2].worldX = 600;  ObjPineTree[2].worldY = 1100;
 
         ObjHouse[0] = new ObjHouse(gp, 2.5);
         ObjHouse[0].worldX = 1300;
         ObjHouse[0].worldY = 850;
+
+        // --- Riddle tablets ---
+        riddleObjects[0] = new ObjRiddle(gp, 0);
+        riddleObjects[0].worldX = 620;
+        riddleObjects[0].worldY = 420;
+
+        riddleObjects[1] = new ObjRiddle(gp, 1);
+        riddleObjects[1].worldX = 1820;
+        riddleObjects[1].worldY = 580;
+
+        riddleObjects[2] = new ObjRiddle(gp, 2);
+        riddleObjects[2].worldX = 1080;
+        riddleObjects[2].worldY = 1650;
     }
 
     public void spawnCollectibles() {
@@ -258,6 +276,7 @@ public class ObjectManager {
         boolean isNight = gp.dC.currentState == dayCounter.dayNightState.Night;
 
         if (gp.tileM.currentMap == 1) {
+
             for (int i = 0; i < objects.length; i++) {
                 if (objects[i] == null) continue;
                 int screenX = objects[i].worldX - gp.player.worldX + gp.player.screenX;
@@ -343,6 +362,23 @@ public class ObjectManager {
                 int screenY = woodItems[i].worldY - gp.player.worldY + gp.player.screenY;
                 BufferedImage img = (isNight && woodItems[i].nightImage != null) ? woodItems[i].nightImage : woodItems[i].image;
                 g2.drawImage(img, screenX, screenY, null);
+            }
+
+            // --- Riddle tablets ---
+            for (int i = 0; i < riddleObjects.length; i++) {
+                if (riddleObjects[i] == null) continue;
+                ObjRiddle rt = (ObjRiddle) riddleObjects[i];
+                int screenX = rt.worldX - gp.player.worldX + gp.player.screenX;
+                int screenY = rt.worldY - gp.player.worldY + gp.player.screenY;
+                BufferedImage img = (isNight && rt.nightImage != null) ? rt.nightImage : rt.image;
+                g2.drawImage(img, screenX, screenY, null);
+
+                // Green glow badge when solved
+                if (gp.riddleM.getRiddle(rt.riddleIndex) != null
+                        && gp.riddleM.getRiddle(rt.riddleIndex).solved) {
+                    g2.setColor(new java.awt.Color(80, 200, 90, 160));
+                    g2.fillOval(screenX + 14, screenY - 6, 12, 12);
+                }
             }
         }
 
