@@ -32,6 +32,10 @@ public class panel extends JPanel implements Runnable {
     public dayCounter dC = new dayCounter(this);
     public Inventory inventory = new Inventory(this);
     public boolean isGameOver = false;
+
+    // --- Riddle system ---
+    public RiddleManager riddleM;
+    public RiddleUI      riddleUI;
     private boolean showMonsterDialogue = false;
     private String dialogueText = "";
     private Runnable onYesAction = null;
@@ -105,6 +109,10 @@ public class panel extends JPanel implements Runnable {
 
         this.parentFrame = frame;
 
+        // Init riddle system
+        riddleM  = new RiddleManager(this);
+        riddleUI = new RiddleUI(this);
+
         this.addMouseListener(new java.awt.event.MouseAdapter() {
             
             @Override
@@ -125,6 +133,12 @@ public class panel extends JPanel implements Runnable {
                         narrationFadeOut = true;
                     }
 
+                    return;
+                }
+
+                // Riddle UI consumes all clicks while open
+                if (riddleUI != null && riddleUI.isOpen) {
+                    riddleUI.handleClick(mx, my);
                     return;
                 }
 
@@ -352,6 +366,12 @@ public class panel extends JPanel implements Runnable {
             monster.spawnNearEdge();
         }
 
+        // Riddle UI open -> pause game loop
+        if (riddleUI.isOpen) {
+            riddleUI.update();
+            return;
+        }
+
         player.update();
         monster.update();
         objectM.update();
@@ -433,6 +453,7 @@ public class panel extends JPanel implements Runnable {
             inventory.drawInventoryPanel(g2);
             inventory.drawScrollPanel(g2);
             drawMenuPanel(g2);
+            riddleUI.draw(g2);
         }
             if (isGameOver) {
                 if (gameState == GameState.WIN) {
