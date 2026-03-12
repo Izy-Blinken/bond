@@ -174,7 +174,7 @@ public class panel extends JPanel implements Runnable, LandingPage.LandingPageLi
         dbConn = new DatabaseConn(this);
         dC = new dayCounter(this);
         holder = new playerDataHolder();
-        LPage = new LandingPage(this,this);
+        //LPage = new LandingPage(this,this);
 
         this.addMouseListener(new java.awt.event.MouseAdapter() {
 
