@@ -217,50 +217,7 @@ public class Monster extends Entity {
 
         g2.drawImage(frame, screenX, screenY, 64, 64, null);
 
-        if (actionTimer > 0) {
-            String label;
-            Color col;
-            if (state == State.ATTACKING) {
-                label = "⚠ ATTACKED!";
-                col = new Color(220, 30, 30);
-            } else if (state == State.KNOCKING) {
-                label = "*KNOCK KNOCK*";
-                col = new Color(220, 140, 0);
-            } else {
-                return;
-            }
-            g2.setFont(new Font("Arial", Font.BOLD, 14));
-            int lw = g2.getFontMetrics().stringWidth(label);
-            int lx = screenX + 32 - lw / 2;
-            int ly = screenY - 10;
-            g2.setColor(new Color(0, 0, 0, 160));
-            g2.fillRoundRect(lx - 5, ly - 16, lw + 10, 22, 8, 8);
-            g2.setColor(col);
-            g2.drawString(label, lx, ly);
-        }
+        
     }
-
-    public void drawAlert(Graphics2D g2) {
-        if (actionTimer <= 0 || state == State.IDLE) return;
-
-        String alert;
-        Color alertColor;
-        if (state == State.ATTACKING) {
-            alert = "  sound effects to  ";
-            alertColor = new Color(220, 30, 30);
-        } else if (state == State.KNOCKING) {
-            alert = "  sound effects to  ";
-            alertColor = new Color(200, 130, 0);
-        } else {
-            return;
-        }
-
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
-        int aw = g2.getFontMetrics().stringWidth(alert);
-        int ay = gp.screenheight / 2 - 40;
-        g2.setColor(new Color(0, 0, 0, 190));
-        g2.fillRoundRect(gp.screenWidth / 2 - aw / 2 - 12, ay - 26, aw + 24, 38, 14, 14);
-        g2.setColor(alertColor);
-        g2.drawString(alert, gp.screenWidth / 2 - aw / 2, ay);
-    }
+   
 }

@@ -32,7 +32,7 @@ public class panel extends JPanel implements Runnable {
     public dayCounter dC = new dayCounter(this);
     public Inventory inventory = new Inventory(this);
     public RiddleManager riddleM  = new RiddleManager(this);
-    public RiddleUI      riddleUI = new RiddleUI(this);
+    public RiddleUI  riddleUI = new RiddleUI(this);
     public boolean isGameOver = false;
     private boolean showMonsterDialogue = false;
     private String dialogueText = "";
@@ -57,6 +57,22 @@ public class panel extends JPanel implements Runnable {
     // Settings / Menu
     private boolean showMenuPanel = false;
     public boolean isMuted = false;
+    
+    public Sound doorCreak = new Sound();
+    public Sound doorKnock = new Sound();
+    public Sound heartbeat = new Sound();
+    public Sound landingMusic = new Sound();
+    public Sound monsterAttack = new Sound();
+    public Sound hardKnock = new Sound();
+    public Sound musicLose = new Sound();
+    public Sound musicWin = new Sound();
+    public Sound playerFootsteps = new Sound();
+    public Sound torchLight = new Sound();
+    public Sound torchOut = new Sound();
+    public Sound typewriting = new Sound();
+    public Sound windowCreak = new Sound();
+    public Sound musicBox = new Sound();
+    
 
     private static final int MENU_BTN_X = 900;
     private static final int MENU_BTN_Y = 10;
@@ -75,7 +91,7 @@ public class panel extends JPanel implements Runnable {
     public boolean narrationComplete = false;
     public boolean narrationFadeOut = false;
 
-    // ── Multi-page typewriter narration ───────────────────────────────────────
+    //narration 
     private static final String[] NARRATION_PAGES = {
         "You weren't supposed to survive the crash. The forest made sure of that — or so it thought. But here you are, still breathing, still bleeding, fingers clawing at the mud while something in the treeline watches you rise. It has been watching since before you even arrived.",
         "Three days. That is all you have before the darkness consumes what little remains of this place — and of you. Not because of the cold. Not because of hunger. Something is counting down alongside you, and it is far more patient than you will ever be.",
@@ -84,14 +100,21 @@ public class panel extends JPanel implements Runnable {
         "The others who came before you boarded up every window. Stacked furniture against the door. Lit every torch they could find and prayed the light would keep it out. You can still see the scratch marks on the outside of the shutters. Long, deep, and very deliberate.",
         "But you are still breathing. That means something — though you are not yet sure what. Maybe you are different. Maybe the thing outside is simply not done with you yet. Maybe it wants you to reach the portal first. Maybe it feeds on hope before it feeds on anything else.",
         "Find the portal before the third night ends. Gather what you can. Keep the torches burning. Keep the doors sealed. And if you hear knocking — do not mistake it for rescue. Nothing out there is coming to save you. It is only checking whether you are still afraid.",
-        "Whatever you do — do not open the door. Not for any sound. Not for any voice. Not even if it learns to say your name. Especially then. It has had a long time to practice, and by now, it is very, very good at sounding like someone you used to love."
+        "They touch, they break, they steal. No one here is free. Here they come, they come for three. Until you stop the melody..."
+        
     };
-    private int   narPageIndex    = 0;
-    private int   narCharIndex    = 0;
-    private int   narTickCounter  = 0;
-    private static final int NAR_TYPEWRITER_DELAY = 2; // ticks per character
-
-    public long getGameStartTime() { return gameStartTime; }
+    private int narPageIndex = 0;
+    private int narCharIndex = 0;
+    private int narTickCounter = 0;
+    private static final int NAR_TYPEWRITER_DELAY = 2; 
+    
+    private int knockDelayTimer = 0;
+    private int musicBoxDelayTimer = 0;
+    private boolean knockPlayed = false;
+    
+    public long getGameStartTime() { 
+        return gameStartTime;
+    }
 
     private JFrame parentFrame;
 
@@ -122,6 +145,21 @@ public class panel extends JPanel implements Runnable {
     }
 
     public panel(JFrame frame) {
+        
+        doorCreak.load("door_creak.wav");
+        doorKnock.load("door_knock.wav");
+        heartbeat.load("heartbeat.wav");
+        landingMusic.load("landingPage_music.wav");
+        monsterAttack.load("monster_attack.wav");
+        hardKnock.load("monster_hardKnock.wav");
+        musicLose.load("music_lose.wav");
+        musicWin.load("music_win.wav");
+        playerFootsteps.load("player_footsteps.wav");
+        torchLight.load("torch_light.wav");
+        torchOut.load("torch_out.wav");
+        typewriting.load("typewriting.wav");
+        windowCreak.load("window_creak.wav");
+        musicBox.load("musicBox.wav");
 
         this.parentFrame = frame;
 
@@ -149,8 +187,8 @@ public class panel extends JPanel implements Runnable {
                     if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH
                             && narPageIndex < NARRATION_PAGES.length) {
                         String fullPage = NARRATION_PAGES[narPageIndex];
+                        
                         if (narCharIndex < fullPage.length()) {
-                            // First click reveals remaining text
                             narCharIndex  = fullPage.length();
                             narrationText = fullPage;
                         } else {
@@ -260,7 +298,11 @@ public class panel extends JPanel implements Runnable {
 
     private void returnToMenu() {
         
-        
+        musicLose.stop();
+        musicWin.stop(); 
+        heartbeat.stop();
+        playerFootsteps.stop();
+
         GameThread = null;
         parentFrame.getContentPane().removeAll();
         LandingPage landingPage = new LandingPage(() -> {
@@ -276,6 +318,7 @@ public class panel extends JPanel implements Runnable {
             gamePanel.narrationAlpha = 0f;
             gamePanel.narrationComplete = true;
             gamePanel.startThread();
+            
             gamePanel.requestFocusInWindow();
         });
         parentFrame.add(landingPage);
@@ -330,7 +373,6 @@ public class panel extends JPanel implements Runnable {
 
                 narrationAlpha = 1f;
                 narrationComplete = false;
-                // Start typewriter from first page
                 narPageIndex   = 0;
                 narCharIndex   = 0;
                 narTickCounter = 0;
@@ -355,24 +397,35 @@ public class panel extends JPanel implements Runnable {
 
         if (showNarration) {
 
-            // Typewriter: reveal characters one by one
+            // Typewriter
             String fullPage = NARRATION_PAGES[narPageIndex];
             if (narCharIndex < fullPage.length()) {
                 narTickCounter++;
+                
                 if (narTickCounter >= NAR_TYPEWRITER_DELAY) {
                     narTickCounter = 0;
                     narCharIndex++;
                     narrationText = fullPage.substring(0, narCharIndex);
+                    
+                    if (!typewriting.isRunning()) {
+                        typewriting.loop();
+                    }
                 }
+                
+            } else {
+                typewriting.stop();
             }
 
             // Space / Enter: skip or advance
             if (keyH.skipPressed) {
+                
                 keyH.skipPressed = false;
+                
                 if (narCharIndex < fullPage.length()) {
-                    // Reveal full current page immediately
+                    typewriting.stop();
                     narCharIndex  = fullPage.length();
                     narrationText = fullPage;
+                    
                 } else {
                     // Advance to next page or close
                     advanceNarration();
@@ -394,7 +447,6 @@ public class panel extends JPanel implements Runnable {
 
         boolean isNight = (dC.currentState == dayCounter.dayNightState.Night);
 
-        // Typewriter tick while dialogue is open, skip everything else
         if (showMonsterDialogue) {
 
             if (dialogueCharIndex < dialogueFullText.length()) {
@@ -406,19 +458,27 @@ public class panel extends JPanel implements Runnable {
                     dialogueTickCounter = 0;
                     dialogueCharIndex++;
                     dialogueText = dialogueFullText.substring(0, dialogueCharIndex);
+                    
+                    if (!typewriting.isRunning()) {
+                        typewriting.loop(); 
+                    }
                 }
+                
+            }else {
+                 typewriting.stop();
             }
+            
             return;
         }
 
         if (isNight && !wasNight) {
             monster.spawnNearEdge();
+            musicBox.loop();
         }
 
-        // Riddle UI pauses the game loop while open
+        //Riddle UI
         if (riddleUI.isOpen) {
             riddleUI.update();
-            return;
         }
 
         player.update();
@@ -426,34 +486,73 @@ public class panel extends JPanel implements Runnable {
         objectM.update();
 
         if (tileM.currentMap == 1) {
+            
             interactionChecker.checkInteraction();
+            
         } else {
             interactionChecker.checkInteriorInteraction();
         }
 
         // Monster knock dialogue
         if (monster.state == Monster.State.KNOCKING && !showMonsterDialogue && !monsterDialogueResponded && monster.actionTimer > 0) {
+            
+            if (knockDelayTimer == 0 && !knockPlayed) {
+                
+                musicBox.stop();
+                knockDelayTimer = 4 * 60; 
+            }
+        }
 
-            showMonsterDialogue = true;
-            dialogueFullText = "Don't choose 'yes', if you don't want me to come!";
-            dialogueText = "";
-            dialogueCharIndex = 0;
-            dialogueTickCounter = 0;
+        if (knockDelayTimer > 0) {
+            
+            knockDelayTimer--;
 
-            onYesAction = () -> {
-                player.takeDamage(25);
-                showMonsterDialogue = false;
-                monsterDialogueResponded = true;
-            };
+            if (knockDelayTimer == 0 && !knockPlayed) {
+                
+                doorKnock.play();
+                knockPlayed = true;
+                knockDelayTimer = (3 * 60); 
+            }
+            else if (knockDelayTimer == 0 && knockPlayed && !showMonsterDialogue && !monsterDialogueResponded) {
+                
+                showMonsterDialogue = true;
+                dialogueFullText = "Hello?! Is anyone in there?! Please, I need help!      \nSomething is out here with me!     \nPlease just open the door! I am just a person, I promise!";
+                dialogueText = "";
+                dialogueCharIndex = 0;
+                dialogueTickCounter = 0;
 
-            onNoAction = () -> {
-                showMonsterDialogue = false;
-                monsterDialogueResponded = true;
-            };
+                onYesAction = () -> {
+                    
+                    isGameOver = true;
+                    gameState = GameState.LOSE;
+                    loseScreen.causeOfDeath = player.hp <= 0 ? "hp" : "time";
+                    loseScreen.reset();
+                    heartbeat.stop();
+                    musicLose.play();
+                };
+
+                onNoAction = () -> {
+                    
+                    showMonsterDialogue = false;
+                    monsterDialogueResponded = true;
+                    knockPlayed = false;
+                    hardKnock.play();
+                    heartbeat.loop();
+                    musicBox.stop();
+                    player.heartbeatTimer = 3*60;
+                    musicBoxDelayTimer = hardKnock.getDurationTicks() + (4 * 60);
+                };
+            }
         }
 
         if (!isNight || monster.state != Monster.State.KNOCKING) {
             monsterDialogueResponded = false;
+            knockDelayTimer = 0;
+            knockPlayed = false;
+        }
+      
+        if (!isNight && wasNight) {
+            musicBox.stop(); 
         }
 
         dC.update();
@@ -463,6 +562,9 @@ public class panel extends JPanel implements Runnable {
             gameState = GameState.LOSE;
             loseScreen.causeOfDeath = player.hp <= 0 ? "hp" : "time";
             loseScreen.reset();
+            heartbeat.stop();
+            musicBox.stop();
+            musicLose.play();
         }
 
         /* Night-end check
@@ -473,6 +575,19 @@ public class panel extends JPanel implements Runnable {
             }
             playerHealedThisNight = false;
         }*/
+        
+        if (musicBoxDelayTimer > 0) {
+            musicBoxDelayTimer--;
+            
+            if (musicBoxDelayTimer == 0) {
+                
+                if (isNight && !musicBox.isRunning()) {
+                    
+                    musicBox.loop(); 
+                }
+            }
+        }
+        
         wasNight = isNight;
     }
 
@@ -493,7 +608,6 @@ public class panel extends JPanel implements Runnable {
             player.draw(g2);
             dC.draw(g2);
             dC.drawOverlay(g2);
-            monster.drawAlert(g2);
         
             drawHUD(g2);
             drawHPBar(g2);
@@ -688,12 +802,12 @@ public class panel extends JPanel implements Runnable {
         int y = screenheight / 2 - h / 2;
 
         int yesX = x + 60;
-        int yesY = y + 105;
+        int yesY = y + 140;
         int yesW = 110;
         int yesH = 32;
 
         int noX = x + 290;
-        int noY = y + 105;
+        int noY = y + 140;
         int noW = 110;
         int noH = 32;
 
@@ -713,16 +827,18 @@ public class panel extends JPanel implements Runnable {
     }
 
     private void drawNarrationPanel(Graphics2D g2) {
+        
         if (!showNarration) {
             return;
         }
-        // During fade-out narPageIndex may equal NARRATION_PAGES.length – draw only the dim overlay
+
         if (narPageIndex >= NARRATION_PAGES.length) {
             Composite orig2 = g2.getComposite();
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, narrationAlpha));
             g2.setColor(new Color(0, 0, 0, 160));
             g2.fillRect(0, 0, screenWidth, screenheight);
             g2.setComposite(orig2);
+            
             return;
         }
 
@@ -755,46 +871,75 @@ public class panel extends JPanel implements Runnable {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.drawString("No Sanctuary", px + 20, py + 28);
 
-        // narration text — starts lower, bigger font, more line height
+        // narration text
         g2.setFont(getImFell(15f));
         g2.setColor(new Color(168, 162, 150));
+        
         int textStartY = py + 84;
         drawWrappedText(g2, narrationText, px + 28, textStartY, NARRATION_W - 56, 26);
 
-        // Bottom accent line above footer
+        // Bottom accent line
         g2.setColor(new Color(55, 50, 46));
         g2.setStroke(new BasicStroke(1f));
         g2.drawLine(px + 20, py + NARRATION_H - 48, px + NARRATION_W - 20, py + NARRATION_H - 48);
 
-        // Footer row: page indicator (left) | skip hint (center) | button (right)
+        // Footer
         int footerY = py + NARRATION_H - 22;
 
-        // Page indicator — left
+        // Page indicator
         g2.setFont(getImFell(12f));
         String pageLabel = (narPageIndex + 1) + " / " + NARRATION_PAGES.length;
+        
         g2.setColor(new Color(110, 105, 98));
         g2.drawString(pageLabel, px + 24, footerY);
 
-        // Skip hint — center
+        // Skip hint
         String hint = "Space · Enter · Click to advance";
         int hintW = g2.getFontMetrics().stringWidth(hint);
+        
         g2.setColor(new Color(90, 86, 80));
         g2.drawString(hint, px + NARRATION_W / 2 - hintW / 2, footerY);
 
-        // Blinking cursor while typewriter is still running
+        // Blinking cursor
         String fullPage = NARRATION_PAGES[narPageIndex];
+        
         if (narCharIndex < fullPage.length()) {
+            
             long blink = (System.currentTimeMillis() / 400) % 2;
+            
             if (blink == 0) {
+                
                 g2.setFont(getImFell(15f));
                 g2.setColor(new Color(160, 155, 145, 180));
-                // approximate cursor X based on last line width
-                int approxX = px + 28 + (g2.getFontMetrics().stringWidth(narrationText) % (NARRATION_W - 56));
-                g2.fillRect(approxX + 2, textStartY - 14, 2, 16);
+                
+                FontMetrics fm = g2.getFontMetrics();
+                int maxWidth = NARRATION_W - 56;
+                String[] words = narrationText.split(" ");
+                String currentLine = "";
+                int lineCount = 0;
+
+                for (String word : words) {
+                    
+                    String test = currentLine.isEmpty() 
+                                ? word 
+                                : currentLine + " " + word;
+                    if (fm.stringWidth(test) > maxWidth) {
+                        lineCount++;
+                        currentLine = word;
+                    } else {
+                        currentLine = test;
+                    }
+                }
+
+                int cursorX = px + 28 + fm.stringWidth(currentLine);
+                int cursorY = textStartY + (lineCount * 26);
+                
+                g2.setColor(new Color(160, 155, 145, 180));
+                g2.fillRect(cursorX + 2, cursorY - 14, 2, 16);
             }
         }
 
-        // Continue button — right aligned
+        // Continue button
         int btnW = 100;
         int btnX = px + NARRATION_W - btnW - 16;
         int btnY = py + NARRATION_H - 48;
@@ -1036,7 +1181,7 @@ public class panel extends JPanel implements Runnable {
         if (showMonsterDialogue) {
 
             int w = 460;
-            int h = 160;
+            int h = 180;
             int x = screenWidth / 2 - w / 2;
             int y = screenheight / 2 - h / 2;
 
@@ -1056,17 +1201,31 @@ public class panel extends JPanel implements Runnable {
             // Dialogue text (typewriter)
             g2.setFont(getImFell(15f));
             g2.setColor(new Color(195, 182, 155));
-            g2.drawString(dialogueText, x + 16, y + 60);
+            FontMetrics dlgFm = g2.getFontMetrics();
+            
+            int lineHeight = 22;
+            int textStartX = x + 16;
+            int textStartY = y + 60;
+
+            String[] lines = dialogueText.split("\n", -1);
+            
+            for (int i = 0; i < lines.length; i++) {
+                
+                g2.drawString(lines[i], textStartX, textStartY + (i * lineHeight));
+            }
 
             if (dialogueCharIndex < dialogueFullText.length()) {
-
+                
                 long blink = (System.currentTimeMillis() / 400) % 2;
-
+                
                 if (blink == 0) {
-
+                    
+                    String lastLine = lines[lines.length - 1];
+                    int cursorX = textStartX + dlgFm.stringWidth(lastLine);
+                    int cursorY = textStartY + ((lines.length - 1) * lineHeight);
+                    
                     g2.setColor(new Color(150, 130, 100));
-                    int cursorX = x + 16 + g2.getFontMetrics().stringWidth(dialogueText);
-                    g2.fillRect(cursorX + 2, y + 44, 2, 16);
+                    g2.fillRect(cursorX + 2, cursorY - 14, 2, 16);
                 }
             }
 
@@ -1077,26 +1236,28 @@ public class panel extends JPanel implements Runnable {
             // YES button
             g2.setFont(getImFell(14f));
             g2.setColor(new Color(140, 170, 110, btnAlpha));
-            g2.drawString("Yes", x + 103, y + 126);
+            g2.drawString("Yes", x + 103, y + 166);
 
             // NO button
             g2.setColor(new Color(180, 100, 90, btnAlpha));
-            g2.drawString("No", x + 336, y + 126);
+            g2.drawString("No", x + 336, y + 166);
 
             g2.setStroke(new BasicStroke(1f));
         }
     }
 
 
-    /** Advance to the next narration page, or begin fade-out if all pages done. */
     private void advanceNarration() {
         narPageIndex++;
+        
         if (narPageIndex >= NARRATION_PAGES.length) {
+            
             narrationFadeOut = true;
+            
         } else {
-            narCharIndex   = 0;
+            narCharIndex = 0;
             narTickCounter = 0;
-            narrationText  = "";
+            narrationText = "";
         }
     }
 

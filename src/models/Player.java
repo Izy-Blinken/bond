@@ -19,6 +19,8 @@ public class Player extends Entity {
     
     // gaano kalapit bago pwedeng mag collect
     private final int collectRange = 50;
+    
+    public int heartbeatTimer = 0;
 
     public Player(panel gp, KeyHandler KeyH) {
         this.gp = gp;
@@ -55,6 +57,22 @@ public class Player extends Entity {
     }
 
     public void update() {
+        
+        if (heartbeatTimer > 0) {
+            heartbeatTimer--;
+        }
+        if (hp < 30) {
+            if (!gp.heartbeat.isRunning()) {
+                gp.heartbeat.loop();
+            }
+        } else if (heartbeatTimer > 0) {
+            if (!gp.heartbeat.isRunning()) {
+                gp.heartbeat.loop();
+            }
+        } else {
+            gp.heartbeat.stop();
+        }
+        
         if (keyH.upPressed || keyH.downPressed || keyH.rightPressed || keyH.leftPressed) {
             if (keyH.upPressed) {
                 direction = "up";
@@ -89,6 +107,10 @@ public class Player extends Entity {
                 if (!collisionOn) collisionOn = gp.cChecker.checkObject(this, gp.objectM.ObjPineTree);
             }
             
+            if (!gp.playerFootsteps.isRunning()) {
+                gp.playerFootsteps.loop();
+            }
+
             if (!collisionOn) {
                 
                 if (keyH.upPressed) {
@@ -106,7 +128,11 @@ public class Player extends Entity {
                 spriteNum = (spriteNum == 1) ? 2 : 1;
                 spriteCounter = 0;
             }
+            
+        }else{
+            gp.playerFootsteps.stop();
         }
+        
 
         // collect pag E pressed - daytime lang
         if (keyH.ePressed) {
@@ -166,8 +192,19 @@ public void takeDamage(int amount) {
 
     if (hp < 0) {
         hp = 0;
+        
     }
     triggerDamage();
+    
+    if (hp == 0) {
+        gp.heartbeat.stop();
+        heartbeatTimer = 0;
+        return;
+    }
+    
+    gp.monsterAttack.play();
+    gp.heartbeat.loop(); 
+    heartbeatTimer = 300;
 }
 
     public void draw(Graphics2D g2) {

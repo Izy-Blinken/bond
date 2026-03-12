@@ -34,8 +34,9 @@ public class LandingPage extends JPanel implements ActionListener {
         setPreferredSize(new Dimension(960, 540));
         setBackground(Color.white);
         setupGame();
+        playBackgroundMusic("/assets/game_music/landingPage_music.wav");
         setImages();
-        playBackgroundMusic("/assets/game_pages/landingPageBGM.wav");
+       
     }
 
     public void setImages() {
@@ -178,7 +179,7 @@ public class LandingPage extends JPanel implements ActionListener {
 
             startBtn.addActionListener(e -> {
                 menuState = "USERNAME";
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 startBtn.setVisible(false);
                 leaderboardBtn.setVisible(false);
                 settingBtn.setVisible(false);
@@ -193,14 +194,14 @@ public class LandingPage extends JPanel implements ActionListener {
 
             usernameBtn.addActionListener(e -> {
                 usernameBtn.setVisible(false);
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 usernameInput.setText("");
                 usernameInput.setVisible(true);
                 repaint();
             });
 
             enterBtn.addActionListener(e -> {
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 removeAll();
                 listener.startGame();
                 bgMusic.stop();
@@ -210,7 +211,7 @@ public class LandingPage extends JPanel implements ActionListener {
             leaderboardBtn.addActionListener(e -> {
 
                 menuState = "LEADERBOARD";
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 startBtn.setVisible(false);
                 leaderboardBtn.setVisible(false);
                 settingBtn.setVisible(false);
@@ -221,7 +222,7 @@ public class LandingPage extends JPanel implements ActionListener {
             settingBtn.addActionListener(e -> {
 
                 menuState = "SETTINGS";
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
 
                 startBtn.setVisible(false);
                 leaderboardBtn.setVisible(false);
@@ -235,11 +236,11 @@ public class LandingPage extends JPanel implements ActionListener {
             });
             exitBtn1.addActionListener(e -> {
                 System.out.print("haha");
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 System.exit(0);
             });
             volumeBtn.addActionListener(e -> {
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 startBtn.setVisible(false);
                 leaderboardBtn.setVisible(false);
                 settingBtn.setVisible(false);
@@ -251,7 +252,7 @@ public class LandingPage extends JPanel implements ActionListener {
             aboutBtn.addActionListener(e -> {
 
                 menuState = "ABOUT";
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 System.out.print("about");
                 startBtn.setVisible(false);
                 leaderboardBtn.setVisible(false);
@@ -263,7 +264,7 @@ public class LandingPage extends JPanel implements ActionListener {
                 repaint();
             });
             creditsBtn.addActionListener(e -> {
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 menuState = "CREDITS";
 
                 startBtn.setVisible(false);
@@ -277,7 +278,7 @@ public class LandingPage extends JPanel implements ActionListener {
             });
 
             exitBtn2.addActionListener(e -> {
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 menuState = "MAIN";
 
                 startBtn.setVisible(true);
@@ -293,7 +294,7 @@ public class LandingPage extends JPanel implements ActionListener {
             });
 
             exitBtn3.addActionListener(e -> {
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 menuState = "MAIN";
 
                 startBtn.setVisible(true);
@@ -305,7 +306,7 @@ public class LandingPage extends JPanel implements ActionListener {
                 repaint();
             });
             exitBtn4.addActionListener(e -> {
-                playSound("/assets/game_pages/click.wav");
+                playSound("/assets/game_pages/mouseClick.wav");
                 menuState = "MAIN";
 
                 startBtn.setVisible(true);

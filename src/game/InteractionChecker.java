@@ -4,61 +4,66 @@ public class InteractionChecker {
 
     panel gp;
 
-    public boolean showDoorPrompt       = false;
-    public boolean showExitPrompt       = false;
-    public boolean showWindowPrompt     = false;
-    public boolean showPortalPrompt     = false;
-    public int     nearWindowNum        = 0;
-    public boolean showTorchPrompt      = false;
-    public boolean showCabinetPrompt    = false;
+    public boolean showDoorPrompt = false;
+    public boolean showExitPrompt = false;
+    public boolean showWindowPrompt = false;
+    public boolean showPortalPrompt = false;
+    public int nearWindowNum = 0;
+    public boolean showTorchPrompt = false;
+    public boolean showCabinetPrompt = false;
     public boolean showAppleTablePrompt = false;
 
-    // --- Riddle ---
     public boolean showRiddlePrompt = false;
-    public int     nearRiddleIndex  = -1;
+    public int nearRiddleIndex = -1;
 
-    public String torchFeedback      = "";
-    public String cabinetFeedback    = "";
+    public String torchFeedback = "";
+    public String cabinetFeedback = "";
     public String appleTableFeedback = "";
 
-    private int torchFeedbackTimer      = 0;
-    private int cabinetFeedbackTimer    = 0;
+    private int torchFeedbackTimer = 0;
+    private int cabinetFeedbackTimer = 0;
     private int appleTableFeedbackTimer = 0;
 
-    private int intDoorX  = 136, intDoorY  = 128;
-    private int intWin1X  = 292, intWin1Y  = 128;
-    private int intWin2X  = 400, intWin2Y  = 128;
-    private int intWin3X  = 528, intWin3Y  = 128;
+    private int intDoorX = 136, intDoorY = 128;
+    private int intWin1X = 292, intWin1Y = 128;
+    private int intWin2X = 400, intWin2Y = 128;
+    private int intWin3X = 528, intWin3Y = 128;
 
     private static final int INTERACT_DIST = 70;
-    private static final int CABINET_DIST  = 120;
-    private static final int RIDDLE_DIST   = 80;
+    private static final int CABINET_DIST = 120;
+    private static final int RIDDLE_DIST = 80;
 
     public InteractionChecker(panel gp) {
         this.gp = gp;
     }
 
-    // ---------------------------------------------------------------
     public void checkInteraction() {
 
-        // --- House door ---
+        // door
         for (int i = 0; i < gp.objectM.ObjHouse.length; i++) {
 
-            if (gp.objectM.ObjHouse[i] == null) continue;
+            if (gp.objectM.ObjHouse[i] == null) {
+                continue;
+            }
 
-            models.ObjHouse house     = (models.ObjHouse) gp.objectM.ObjHouse[i];
+            models.ObjHouse house = (models.ObjHouse) gp.objectM.ObjHouse[i];
             int doorWorldX = gp.objectM.ObjHouse[i].worldX + house.doorOffsetX;
             int doorWorldY = gp.objectM.ObjHouse[i].worldY + house.doorOffsetY;
             int dist = Math.abs(gp.player.worldX - doorWorldX)
                      + Math.abs(gp.player.worldY - doorWorldY);
 
             if (dist < 150) {
+                
                 showDoorPrompt = true;
 
                 if (gp.keyH.interactPressed) {
+                    
                     if (!house.isDoorOpen) {
                         house.toggleDoor();
+                        gp.doorCreak.play();
+                        
                     } else {
+                        
                         gp.switchToInterior();
                         showDoorPrompt = false;
                     }
@@ -68,6 +73,7 @@ public class InteractionChecker {
 
                 if (gp.keyH.closePressed && house.isDoorOpen) {
                     house.toggleDoor();
+                    gp.doorCreak.play();
                     showDoorPrompt = false;
                     gp.keyH.closePressed = false;
                 }
@@ -77,13 +83,16 @@ public class InteractionChecker {
             }
         }
 
-        // --- Riddle tablets ---
+        // riddle panel
         showRiddlePrompt = false;
         nearRiddleIndex  = -1;
 
         if (gp.objectM.riddleObjects != null) {
             for (int i = 0; i < gp.objectM.riddleObjects.length; i++) {
-                if (gp.objectM.riddleObjects[i] == null) continue;
+                
+                if (gp.objectM.riddleObjects[i] == null) {
+                    continue;
+                }
 
                 int dx = Math.abs(gp.player.worldX - gp.objectM.riddleObjects[i].worldX);
                 int dy = Math.abs(gp.player.worldY - gp.objectM.riddleObjects[i].worldY);
@@ -101,8 +110,9 @@ public class InteractionChecker {
             }
         }
 
-        // ── Portal ───────────────────────────────────────────────────────────
+        // Portal 
         if (gp.objectM.portalVisible) {
+            
             models.ObjPortal portal = gp.objectM.portal;
             int pdx = gp.player.worldX - portal.worldX;
             int pdy = gp.player.worldY - portal.worldY;
@@ -110,13 +120,15 @@ public class InteractionChecker {
 
             if (portalDist < models.ObjPortal.INTERACT_RANGE) {
                 showPortalPrompt = true;
+                
                 if (gp.keyH.interactPressed) {
                     gp.keyH.interactPressed = false;
                     long elapsed = (System.currentTimeMillis() - gp.getGameStartTime()) / 1000;
                     gp.winScreen.completionSeconds = (int) elapsed;
                     gp.winScreen.reset();
                     gp.isGameOver = true;
-                    gp.gameState  = panel.GameState.WIN;
+                    gp.gameState = panel.GameState.WIN;
+                    gp.musicWin.loop();
                 }
             } else {
                 showPortalPrompt = false;
@@ -126,12 +138,11 @@ public class InteractionChecker {
         }
     }
 
-    // ---------------------------------------------------------------
     public void checkInteriorInteraction() {
 
-        models.ObjHouse      house      = (models.ObjHouse)      gp.objectM.ObjHouse[0];
-        models.ObjInterior   interior   = gp.objectM.interior;
-        models.ObjCabinet    cabinet    = interior.cabinet;
+        models.ObjHouse house = (models.ObjHouse) gp.objectM.ObjHouse[0];
+        models.ObjInterior interior = gp.objectM.interior;
+        models.ObjCabinet cabinet = interior.cabinet;
         models.ObjAppleTable appleTable = interior.appleTable;
 
         tickFeedback();
@@ -145,6 +156,7 @@ public class InteractionChecker {
 
             if (gp.keyH.closePressed) {
                 house.toggleDoor();
+                gp.doorCreak.play();
                 gp.keyH.closePressed = false;
             }
 
@@ -173,6 +185,7 @@ public class InteractionChecker {
 
                 if (gp.keyH.interactPressed) {
                     house.toggleWindow(nearWindowNum);
+                    gp.windowCreak.play();
                     gp.keyH.interactPressed = false;
                 }
                 break;
@@ -194,8 +207,9 @@ public class InteractionChecker {
 
                 if (gp.keyH.interactPressed) {
                     boolean ok = t.refuel(gp.inventory);
+                    if (ok) gp.torchLight.play();
                     torchFeedback = ok
-                        ? "+3 Wood burned! (" + t.getSecondsLeft() + "s)"
+                        ? "+3 Wood burned! (" + t.getSecondsLeft() + "s)" 
                         : "Need " + models.ObjTorch.WOOD_BATCH + " woods! (Have: " + gp.inventory.wood + ")";
                     torchFeedbackTimer = 120;
                     gp.keyH.interactPressed = false;
@@ -263,14 +277,38 @@ public class InteractionChecker {
         }
     }
 
-    // ---------------------------------------------------------------
     private void tickFeedback() {
-        if (torchFeedbackTimer > 0)      torchFeedbackTimer--;      else torchFeedback      = "";
-        if (cabinetFeedbackTimer > 0)    cabinetFeedbackTimer--;    else cabinetFeedback    = "";
-        if (appleTableFeedbackTimer > 0) appleTableFeedbackTimer--; else appleTableFeedback = "";
+        if (torchFeedbackTimer > 0) {
+            torchFeedbackTimer--;
+            
+        } else {
+            torchFeedback = "";
+        }
+        
+        if (cabinetFeedbackTimer > 0) {
+            cabinetFeedbackTimer--;
+            
+        } else {
+            cabinetFeedback = "";
+        }
+        
+        if (appleTableFeedbackTimer > 0) {
+            appleTableFeedbackTimer--;
+            
+        } else{
+            appleTableFeedback = "";
+        }
     }
 
-    public boolean hasTorchFeedback()      { return !torchFeedback.isEmpty();      }
-    public boolean hasCabinetFeedback()    { return !cabinetFeedback.isEmpty();    }
-    public boolean hasAppleTableFeedback() { return !appleTableFeedback.isEmpty(); }
+    public boolean hasTorchFeedback() { 
+        return !torchFeedback.isEmpty();
+    }
+    
+    public boolean hasCabinetFeedback() {
+        return !cabinetFeedback.isEmpty();   
+    }
+    
+    public boolean hasAppleTableFeedback() {
+        return !appleTableFeedback.isEmpty(); 
+    }
 }

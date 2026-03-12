@@ -151,6 +151,7 @@ public class ObjTorch extends GameObject {
             timerTicks = 0;
             warningActive = false;
             image = frameUnlit;
+            gp.torchOut.play();
         }
     }
 
