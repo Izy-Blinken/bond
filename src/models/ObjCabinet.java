@@ -57,12 +57,14 @@ public class ObjCabinet extends GameObject {
     }
 
     public void toggleUI() {
-
+        // Close other storage UIs if opening this one
+        if (!isOpen && gp.objectM.interior != null && gp.objectM.interior.appleTable != null) {
+            gp.objectM.interior.appleTable.closeUI();
+        }
         isOpen = !isOpen;
     }
 
     public void closeUI() {
-
         isOpen = false;
     }
 
