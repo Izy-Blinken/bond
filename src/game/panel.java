@@ -1228,6 +1228,34 @@ public class panel extends JPanel implements Runnable, LandingPage.LandingPageLi
     }
 
     private void drawHUD(Graphics2D g2) {
+        
+        // Countdown display
+        if (dC.countdownActive) {
+            
+            int seconds = (int) Math.ceil(dC.countdownTimer);
+            String countdownText = "0 : " + (seconds < 10 ? "0" + seconds : seconds);
+            
+             // Last 15 Seconds label
+            g2.setFont(getImFell(18f));
+            String label = "Last 15 Seconds";
+            int lw = g2.getFontMetrics().stringWidth(label);
+            g2.setColor(new Color(180, 0, 0));
+            g2.drawString(label, screenWidth / 2 - lw / 2, 50);
+
+            g2.setFont(getImFell(42f));
+            int tw = g2.getFontMetrics().stringWidth(countdownText);
+
+            // Glow layers
+            g2.setColor(new Color(139, 0, 0, 40));
+            g2.drawString(countdownText, screenWidth / 2 - tw / 2 + 2, 80);
+
+            g2.setColor(new Color(139, 0, 0, 80));
+            g2.drawString(countdownText, screenWidth / 2 - tw / 2 + 1, 79);
+
+            // Main text
+            g2.setColor(new Color(180, 0, 0));
+            g2.drawString(countdownText, screenWidth / 2 - tw / 2, 78);
+        }
 
         int cx = screenWidth / 2;
 

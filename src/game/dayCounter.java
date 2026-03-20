@@ -37,6 +37,14 @@ public class dayCounter {
     // total DayTitle = fade_duration + hold_duration + fade_duration = 6.5f
 
     public float stateCounter = 0f;
+    
+    public boolean countdownActive = false;
+    public float countdownTimer = 15f;
+    private boolean countdownTriggered = false;
+    
+    public boolean showLast15Title = false;
+    private float last15TitleTimer = 0f;
+    private static final float last15Display = 3f;
 
     public dayCounter(panel gp) {
         this.gp = gp;
@@ -112,15 +120,66 @@ public class dayCounter {
                 if (stateCounter >= day_duration) {
                     currentState = dayNightState.Night;
                     stateCounter = 0f;
+                    countdownTriggered = false;
                 }
                 
                 break;
                 
             case Night:
                 
+                if (dayCount >= 3 && !countdownTriggered && stateCounter >= night_duration - 15f) {
+                    
+                    showLast15Title = true;
+                    last15TitleTimer = 0f;
+                    countdownTriggered = true;
+                    countdownActive = true;
+                    countdownTimer = 15f;
+
+                    gp.player.speed -= 1;
+
+                    // Force player outside and lock the door
+                    if (gp.tileM.currentMap == 2) {
+                        
+                        gp.switchToExterior();
+                    }
+                    
+                    models.ObjHouse house = (models.ObjHouse) gp.objectM.ObjHouse[0];
+                    
+                    house.doorLocked = true;
+                    house.isDoorOpen = false;
+                    
+
+                    // Audio
+                    gp.heartbeat.loop();
+                    gp.player.heartbeatTimer = 900;
+                }
+                
+                if (showLast15Title) {
+                    
+                    last15TitleTimer += 0.016f;
+                    
+                    if (last15TitleTimer >= last15Display) {
+                        
+                        showLast15Title = false;
+                    }
+                }
+
+                if (countdownActive) {
+                    
+                    countdownTimer -= 0.016f;
+                    
+                    if (countdownTimer <= 0f) {
+                        
+                        countdownTimer = 0f;
+                        countdownActive = false;
+                    }
+                }
+
                 if (stateCounter >= night_duration) {
+                    
                     currentState = dayNightState.DayTitle;
                     stateCounter = 0f;
+                    countdownTriggered = false;
                 }
                 
                 break;
@@ -132,22 +191,8 @@ public class dayCounter {
                     dayCount++;
                     stateCounter = 0f;
                     
-                    if (dayCount >= 4) {
-                        // Endgame — stay in night, no daytime
-                        currentState = dayNightState.Night;
-                        gp.monster.isEnraged = true;
-                        gp.monster.speed += 1;
-                        gp.player.speed = 2;
-                        gp.switchToExterior();
-                        gp.monster.spawnNearEdge();
-                        gp.musicBox.stop();
-                        gp.heartbeat.loop();
-                        gp.player.heartbeatTimer = 600;
-                        
-                    } else {
-                        currentState = dayNightState.Day;
-                        gp.objectM.respawnResources();
-                    }
+                    currentState = dayNightState.Day;
+                    
                 }
                 break;
         }
@@ -160,12 +205,28 @@ public class dayCounter {
             case Day: break;
 
             case Night: {
+                
                 g2.setColor(new Color(0, 0, 0, 180));
                 g2.fillRect(0, 0, gp.getWidth(), gp.getHeight());
+                
+                if (showLast15Title) {
+                    
+                    float progress = last15TitleTimer / last15Display;
+                    int alpha = (progress < 0.3f) ? (int)(progress / 0.3f * 255) : (progress > 0.7f) ? (int)((1f - (progress - 0.7f) / 0.3f) * 255) : 255;
+                    
+                    g2.setColor(new Color(180, 0, 0, Math.min(255, alpha)));
+                    g2.setFont(imFellLarge);
+                    String t = "Last 15 Seconds";
+                    int tw = g2.getFontMetrics().stringWidth(t);
+                    
+                    g2.drawString(t, gp.screenWidth / 2 - tw / 2, gp.screenheight / 2);
+                }
+                
                 break;
             }
 
             case DayTitle: {
+                
                 int alpha;
                 float t = stateCounter;
 
@@ -188,10 +249,8 @@ public class dayCounter {
 
                 if (t >= fade_duration && alpha > 220) {
                     
-                    String title = (dayCount + 1 >= 4) ? "Endgame" : "Day " + (dayCount + 1);
-                    Color titleColor = (dayCount + 1 >= 4)
-                        ? new Color(180, 60, 60)
-                        : new Color(200, 215, 175);
+                    String title = (dayCount == 2) ?  "Last Day" : "Day " + (dayCount + 1);
+                    Color titleColor = (dayCount == 2) ? new Color(180, 60, 60) : new Color(200, 215, 175) ;
                     
                     drawTransitionTitle(g2, title, titleColor);
                 }

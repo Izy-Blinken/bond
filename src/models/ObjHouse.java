@@ -17,13 +17,14 @@ public class ObjHouse extends GameObject {
     BufferedImage doorClosed, doorOpened;
     BufferedImage windowClosed, windowOpened;
 
-    public boolean isWindow1Open = false;
-    public boolean isWindow2Open = false;
-    public boolean isWindow3Open = false;
+    public boolean isWindow1Open = true;
+    public boolean isWindow2Open = true;
+    public boolean isWindow3Open = true;
 
-
-    public boolean isDoorOpen = false;
-    public boolean isWindowOpen = false;
+    public boolean isDoorOpen = true;
+    public boolean isWindowOpen = true;
+    
+    public boolean doorLocked = false;
 
     // Offsets (relative sa worldX/worldY)
     public int roofOffsetX, roofOffsetY;

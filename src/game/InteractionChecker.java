@@ -101,6 +101,7 @@ public class InteractionChecker {
             models.ObjUndergroundShelter shelter = (models.ObjUndergroundShelter) gp.objectM.ObjUndergroundShelter[i];
 
             if (shelter.used) continue;
+            if (gp.dC.countdownActive) continue;
 
             double dist = getDistance(gp.player.worldX, gp.player.worldY, shelter.worldX, shelter.worldY);
 
@@ -109,6 +110,7 @@ public class InteractionChecker {
                 showShelterPrompt = true;
 
                 if (interactJustPressed) {
+                    
                     shelter.discovered = true;
                     shelter.used = true;
                     gp.keyH.interactPressed = false;
@@ -150,12 +152,12 @@ public class InteractionChecker {
                     
                     gp.keyH.interactPressed = false;
                     
-                    if (!house.isDoorOpen) {
+                    if (!house.isDoorOpen && !house.doorLocked) {
                         
                         house.toggleDoor();
                         gp.doorCreak.play();
                         
-                    } else {
+                    } else if (house.isDoorOpen && !house.doorLocked){
                         
                         gp.switchToInterior();
                         showDoorPrompt = false;
