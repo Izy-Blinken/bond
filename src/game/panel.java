@@ -98,6 +98,8 @@ public class panel extends JPanel implements Runnable, LandingPage.LandingPageLi
 
     public boolean gameWorldFadeIn = false;
     public float gameWorldAlpha = 1f;
+    
+    public int interiorGraceTimer = 0;
 
     public String username;
     public int playerID;
@@ -546,6 +548,10 @@ public class panel extends JPanel implements Runnable, LandingPage.LandingPageLi
         //Riddle UI
         if (riddleUI.isOpen) {
             riddleUI.update();
+        }
+        
+        if(interiorGraceTimer > 0){
+            interiorGraceTimer--;
         }
 
         player.update();
@@ -1464,6 +1470,7 @@ public class panel extends JPanel implements Runnable, LandingPage.LandingPageLi
         tileM.switchMap(2);
         player.worldX = 160;
         player.worldY = 144;
+        interiorGraceTimer = 240;
     }
 
     public void switchToExterior() {
