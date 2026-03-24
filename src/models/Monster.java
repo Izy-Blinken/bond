@@ -64,7 +64,7 @@ public class Monster extends Entity {
         
         try {
             
-            BufferedImage sheet = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/edp character/monster1_universal.png"));
+            BufferedImage sheet = ImageIO.read(getClass().getResourceAsStream("/assets/Charac/edp character/monster5_universal.png"));
 
             int[] walkRows = { 8, 9, 10, 11 };
             int[] slashRows = { 12, 13, 14, 15 };

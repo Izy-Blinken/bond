@@ -346,8 +346,13 @@ public class LandingPage extends JPanel implements ActionListener {
 
             exitBtn1.addActionListener(e -> {
                 
+                int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to exit?", "Exit Confirmation", JOptionPane.YES_NO_OPTION);
                 playSound("/assets/game_pages/mouseClick.wav");
-                System.exit(0);
+                
+                if(choice == JOptionPane.YES_OPTION){
+                    System.exit(0);
+                }
+                
             });
 
             volumeBtn.addActionListener(e -> {
