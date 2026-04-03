@@ -90,14 +90,6 @@ public class AnnouncementFrame extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         getContentPane().setLayout(null);
         jLabel1.setBounds(0, 0, 1000, 600);
-        
-        javax.swing.JLabel lblOrgAcronym = new javax.swing.JLabel();
-        lblOrgAcronym.setBounds(32, 135, 120, 25);
-        lblOrgAcronym.setForeground(java.awt.Color.WHITE);
-        lblOrgAcronym.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 13));
-        lblOrgAcronym.setText(bond.util.SessionManager.getOrgAcronym() + " Admin");
-        getContentPane().add(lblOrgAcronym);
-        getContentPane().setComponentZOrder(lblOrgAcronym, 0);
  
         // ADD ANNOUNCEMENT BTN
         JButton btnAdd = makeInvisibleButton();
@@ -207,6 +199,14 @@ public class AnnouncementFrame extends javax.swing.JFrame {
  
         getContentPane().add(jLabel1);
         loadAnnouncements();
+        
+        javax.swing.JLabel lblOrgAcronym = new javax.swing.JLabel();
+        lblOrgAcronym.setBounds(32, 135, 120, 25);
+        lblOrgAcronym.setForeground(java.awt.Color.WHITE);
+        lblOrgAcronym.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 13));
+        lblOrgAcronym.setText(bond.util.SessionManager.getOrgAcronym() + " Admin");
+        getContentPane().add(lblOrgAcronym);
+        getContentPane().setComponentZOrder(lblOrgAcronym, 0);
         
         // SIDEBAR NAV
         javax.swing.JButton btnDashboard = makeInvisibleButton();
