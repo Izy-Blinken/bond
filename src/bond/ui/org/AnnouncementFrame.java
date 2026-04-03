@@ -96,7 +96,7 @@ public class AnnouncementFrame extends javax.swing.JFrame {
         btnAdd.setBounds(870, 220, 60, 28);
         btnAdd.addActionListener(e -> showAddDialog());
         getContentPane().add(btnAdd);
- 
+
         // ROW1
         JButton editRow1 = makeInvisibleButton();
         editRow1.setBounds(795, 290, 20, 20);

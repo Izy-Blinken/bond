@@ -1,7 +1,7 @@
 package bond.model;
 
 public class Organization {
-    
+
     private int org_id;
     private String org_name;
     private String description;
@@ -13,7 +13,7 @@ public class Organization {
     private String status;
 
     public Organization(int org_id, String org_name, String description, String vision, String mission, String classification, String established_date, String logo_path, String status) {
-        
+
         this.org_id = org_id;
         this.org_name = org_name;
         this.description = description;
@@ -26,39 +26,39 @@ public class Organization {
     }
 
     //getters
-    public int getOrg_id() { 
-        return org_id; 
+    public int getOrg_id() {
+        return org_id;
     }
-    
-    public String getOrg_name() { 
+
+    public String getOrg_name() {
         return org_name;
     }
-    
-    public String getDescription() { 
-        return description; 
+
+    public String getDescription() {
+        return description;
     }
-    
-    public String getVision() { 
-        return vision; 
+
+    public String getVision() {
+        return vision;
     }
-    
+
     public String getMission() {
         return mission;
     }
-    
+
     public String getClassification() {
-        return classification; 
+        return classification;
     }
-    
+
     public String getEstablished_date() {
-        return established_date; 
+        return established_date;
     }
-    
+
     public String getLogo_path() {
         return logo_path;
     }
-    
-    public String getStatus() { 
+
+    public String getStatus() {
         return status;
     }
 }

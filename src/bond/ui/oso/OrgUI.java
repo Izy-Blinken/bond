@@ -9,7 +9,7 @@ package bond.ui.oso;
  * @author ADMIN
  */
 public class OrgUI extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(OrgUI.class.getName());
 
     /**

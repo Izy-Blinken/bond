@@ -1,7 +1,7 @@
 package bond.model;
 
 public class OrgAdmin {
-    
+
     private int org_admin_id;
     private int org_id;
     private int created_by;
@@ -11,7 +11,7 @@ public class OrgAdmin {
     private int is_active;
 
     public OrgAdmin(int org_admin_id, int org_id, int created_by, String username, String password_hash, String email, int is_active) {
-        
+
         this.org_admin_id = org_admin_id;
         this.org_id = org_id;
         this.created_by = created_by;
