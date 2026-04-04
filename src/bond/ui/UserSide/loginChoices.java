@@ -10,14 +10,41 @@ package bond.ui.UserSide;
  */
 public class loginChoices extends javax.swing.JFrame {
 
-    /**
-     * Creates new form loginChoices
-     */
+    private javax.swing.JFrame previousFrame;
+
+    // back method
+    private void setupBackButton() {
+        backBtn.setContentAreaFilled(false);
+        backBtn.setBorderPainted(false);
+        backBtn.setFocusPainted(false);
+        backBtn.setOpaque(false);
+
+        backBtn.setForeground(java.awt.Color.WHITE);
+        backBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        backBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                backBtn.setForeground(new java.awt.Color(200, 230, 210));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                backBtn.setForeground(java.awt.Color.WHITE);
+            }
+        });
+    }
+
     public loginChoices() {
         initComponents();
+
+    }
+
+    public loginChoices(javax.swing.JFrame prev) {
+        initComponents();
+        this.previousFrame = prev;
+        setLocationRelativeTo(null);
+        setupBackButton();
+
         
-        
-       
     }
 
     /**
@@ -117,22 +144,23 @@ public class loginChoices extends javax.swing.JFrame {
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
         // TODO add your handling code here:
-                   new loginChoices().setVisible(true);
+        if (previousFrame != null) {
+            previousFrame.setVisible(true);
+        }
         this.dispose();
 
     }//GEN-LAST:event_backBtnActionPerformed
 
     private void osoAdminBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_osoAdminBtnActionPerformed
         // TODO add your handling code here:
-           new loginAsOso().setVisible(true);
+        new loginAsOso().setVisible(true);
         this.dispose();
-       
+
     }//GEN-LAST:event_osoAdminBtnActionPerformed
 
     private void orgAdminBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orgAdminBtnActionPerformed
         // TODO add your handling code here:
-
-                  new loginAsAdmin().setVisible(true);
+        new loginAsAdmin().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_orgAdminBtnActionPerformed
 

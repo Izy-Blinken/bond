@@ -35,6 +35,11 @@ public class about extends javax.swing.JFrame {
 
     public about() {
         initComponents();
+        setLocationRelativeTo(null);
+        
+javax.swing.SwingUtilities.invokeLater(() -> {
+    aboutScroll.getVerticalScrollBar().setValue(0);
+});
         
        settingsPanel.setVisible(false);
 
@@ -79,7 +84,7 @@ public class about extends javax.swing.JFrame {
         aboutBtn = new javax.swing.JButton();
         studOrgBtn = new javax.swing.JButton();
         dashboardBtn = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        aboutScroll = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         About = new javax.swing.JLabel();
@@ -262,10 +267,10 @@ public class about extends javax.swing.JFrame {
         });
         jPanel1.add(dashboardBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 30, 170, 30));
 
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        aboutScroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setPreferredSize(new java.awt.Dimension(1000, 900));
+        jPanel2.setPreferredSize(new java.awt.Dimension(1000, 1000));
 
         About.setFont(new java.awt.Font("Playfair Display", 1, 24)); // NOI18N
         About.setForeground(new java.awt.Color(28, 94, 56));
@@ -416,12 +421,12 @@ public class about extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addGap(25, 25, 25)
                     .addComponent(jLabel2)
-                    .addGap(0, 933, Short.MAX_VALUE)))
+                    .addGap(0, 964, Short.MAX_VALUE)))
         );
 
-        jScrollPane1.setViewportView(jPanel2);
+        aboutScroll.setViewportView(jPanel2);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 82, 1000, 520));
+        jPanel1.add(aboutScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 82, 1000, 520));
 
         navbar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/navBar_1.png"))); // NOI18N
         jPanel1.add(navbar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, -1));
@@ -465,13 +470,13 @@ public class about extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-                    new loginChoices().setVisible(true);
+                    new loginChoices(this).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-                   new registerAnOrg().setVisible(true);
+                   new registerAnOrg(this).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -516,6 +521,7 @@ public class about extends javax.swing.JFrame {
     private javax.swing.JTextArea aboutBond;
     private javax.swing.JButton aboutBtn;
     private javax.swing.JTextArea aboutOrg;
+    private javax.swing.JScrollPane aboutScroll;
     private javax.swing.JLabel authors;
     private javax.swing.JLabel bond;
     private javax.swing.JPanel darkPanel;
@@ -528,7 +534,6 @@ public class about extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel navbar;

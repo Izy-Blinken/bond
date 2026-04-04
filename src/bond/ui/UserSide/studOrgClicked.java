@@ -10,7 +10,7 @@ package bond.ui.UserSide;
  */
 public class studOrgClicked extends javax.swing.JFrame {
 
-        private void setupHover(javax.swing.JButton btn) {
+    private void setupHover(javax.swing.JButton btn) {
 
         btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btn.setForeground(java.awt.Color.WHITE);
@@ -24,26 +24,31 @@ public class studOrgClicked extends javax.swing.JFrame {
                 btn.setForeground(java.awt.Color.WHITE);
             }
         });
-        
+
         darkPanel1.setBackground(new java.awt.Color(0, 0, 0, 150));
         darkPanel1.setVisible(false);
         settingsPanel1.setVisible(false);
-        
-        }
+
+    }
+
     /**
      * Creates new form studOrgClicked
      */
     public studOrgClicked() {
         initComponents();
-        
-            settingsPanel1.setVisible(false);
-            
-            
-               searchInput1.setOpaque(false);
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            studOrgScroll.getVerticalScrollBar().setValue(0);
+        });
+
+        setLocationRelativeTo(null);
+        settingsPanel1.setVisible(false);
+
+        searchInput1.setOpaque(false);
         searchInput1.setBorder(null);
         searchInput1.setBackground(new java.awt.Color(0, 0, 0, 0));
-        
-          javax.swing.JButton[] buttons = {
+
+        javax.swing.JButton[] buttons = {
             dashboardBtn,
             studOrgBtn,
             aboutBtn,
@@ -84,13 +89,6 @@ public class studOrgClicked extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         darkPanel = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        settingsPanel1 = new javax.swing.JPanel();
-        settings1 = new javax.swing.JPanel();
-        settingsLabel1 = new javax.swing.JLabel();
-        exBtn1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        darkPanel1 = new javax.swing.JPanel();
         searchInput1 = new javax.swing.JTextField();
         searchIcon = new javax.swing.JLabel();
         settingsBtn = new javax.swing.JButton();
@@ -98,7 +96,7 @@ public class studOrgClicked extends javax.swing.JFrame {
         studOrgBtn = new javax.swing.JButton();
         dashboardBtn = new javax.swing.JButton();
         navbar = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        studOrgScroll = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         dark = new javax.swing.JLabel();
@@ -123,6 +121,13 @@ public class studOrgClicked extends javax.swing.JFrame {
         data1 = new javax.swing.JLabel();
         completedBtn2 = new javax.swing.JButton();
         upcomingBtn = new javax.swing.JButton();
+        settingsPanel1 = new javax.swing.JPanel();
+        settings1 = new javax.swing.JPanel();
+        settingsLabel1 = new javax.swing.JLabel();
+        exBtn1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        darkPanel1 = new javax.swing.JPanel();
 
         possitionLbl1.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 18)); // NOI18N
         possitionLbl1.setForeground(new java.awt.Color(28, 94, 56));
@@ -249,92 +254,6 @@ public class studOrgClicked extends javax.swing.JFrame {
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        settingsPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        settingsPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        settings1.setBackground(new java.awt.Color(28, 94, 56));
-
-        settingsLabel1.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 18)); // NOI18N
-        settingsLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        settingsLabel1.setText("SETTINGS");
-
-        exBtn1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/exit_1.png"))); // NOI18N
-        exBtn1.setBorder(null);
-        exBtn1.setBorderPainted(false);
-        exBtn1.setContentAreaFilled(false);
-        exBtn1.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/exitHover_1.png"))); // NOI18N
-        exBtn1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exBtn1ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout settings1Layout = new javax.swing.GroupLayout(settings1);
-        settings1.setLayout(settings1Layout);
-        settings1Layout.setHorizontalGroup(
-            settings1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(settings1Layout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addComponent(settingsLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
-                .addComponent(exBtn1)
-                .addGap(17, 17, 17))
-        );
-        settings1Layout.setVerticalGroup(
-            settings1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(settings1Layout.createSequentialGroup()
-                .addContainerGap(21, Short.MAX_VALUE)
-                .addGroup(settings1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settings1Layout.createSequentialGroup()
-                        .addComponent(exBtn1)
-                        .addGap(25, 25, 25))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settings1Layout.createSequentialGroup()
-                        .addComponent(settingsLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(14, 14, 14))))
-        );
-
-        settingsPanel1.add(settings1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, 0, 250, -1));
-
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/regOrg.png"))); // NOI18N
-        jButton3.setBorder(null);
-        jButton3.setBorderPainted(false);
-        jButton3.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/regOrgHover.png"))); // NOI18N
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        settingsPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 210, 60));
-
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/login.png"))); // NOI18N
-        jButton4.setBorder(null);
-        jButton4.setBorderPainted(false);
-        jButton4.setContentAreaFilled(false);
-        jButton4.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/lohinSettingshover.png"))); // NOI18N
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-        settingsPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 210, -1));
-
-        jPanel3.add(settingsPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 0, 210, 600));
-
-        darkPanel1.setBackground(new java.awt.Color(0, 0, 0));
-
-        javax.swing.GroupLayout darkPanel1Layout = new javax.swing.GroupLayout(darkPanel1);
-        darkPanel1.setLayout(darkPanel1Layout);
-        darkPanel1Layout.setHorizontalGroup(
-            darkPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 810, Short.MAX_VALUE)
-        );
-        darkPanel1Layout.setVerticalGroup(
-            darkPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
-        );
-
-        jPanel3.add(darkPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 600));
-
         searchInput1.setBackground(new java.awt.Color(0, 0, 0));
         searchInput1.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
         searchInput1.setBorder(null);
@@ -413,9 +332,9 @@ public class studOrgClicked extends javax.swing.JFrame {
         navbar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/navBar_1.png"))); // NOI18N
         jPanel3.add(navbar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, -1));
 
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane1.setViewportView(jPanel1);
+        studOrgScroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        studOrgScroll.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        studOrgScroll.setViewportView(jPanel1);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setMinimumSize(new java.awt.Dimension(1000, 2300));
@@ -568,9 +487,95 @@ public class studOrgClicked extends javax.swing.JFrame {
         });
         jPanel1.add(upcomingBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 1760, -1, -1));
 
-        jScrollPane1.setViewportView(jPanel1);
+        studOrgScroll.setViewportView(jPanel1);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 82, 998, 600));
+        jPanel3.add(studOrgScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 82, 998, 600));
+
+        settingsPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        settingsPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        settings1.setBackground(new java.awt.Color(28, 94, 56));
+
+        settingsLabel1.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 18)); // NOI18N
+        settingsLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        settingsLabel1.setText("SETTINGS");
+
+        exBtn1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/exit_1.png"))); // NOI18N
+        exBtn1.setBorder(null);
+        exBtn1.setBorderPainted(false);
+        exBtn1.setContentAreaFilled(false);
+        exBtn1.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/exitHover_1.png"))); // NOI18N
+        exBtn1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exBtn1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout settings1Layout = new javax.swing.GroupLayout(settings1);
+        settings1.setLayout(settings1Layout);
+        settings1Layout.setHorizontalGroup(
+            settings1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(settings1Layout.createSequentialGroup()
+                .addGap(49, 49, 49)
+                .addComponent(settingsLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addComponent(exBtn1)
+                .addGap(17, 17, 17))
+        );
+        settings1Layout.setVerticalGroup(
+            settings1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(settings1Layout.createSequentialGroup()
+                .addContainerGap(21, Short.MAX_VALUE)
+                .addGroup(settings1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settings1Layout.createSequentialGroup()
+                        .addComponent(exBtn1)
+                        .addGap(25, 25, 25))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settings1Layout.createSequentialGroup()
+                        .addComponent(settingsLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(14, 14, 14))))
+        );
+
+        settingsPanel1.add(settings1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, 0, 250, -1));
+
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/regOrg.png"))); // NOI18N
+        jButton3.setBorder(null);
+        jButton3.setBorderPainted(false);
+        jButton3.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/regOrgHover.png"))); // NOI18N
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        settingsPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 210, 60));
+
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/login.png"))); // NOI18N
+        jButton4.setBorder(null);
+        jButton4.setBorderPainted(false);
+        jButton4.setContentAreaFilled(false);
+        jButton4.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/lohinSettingshover.png"))); // NOI18N
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        settingsPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 210, -1));
+
+        jPanel3.add(settingsPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 0, 210, 600));
+
+        darkPanel1.setBackground(new java.awt.Color(0, 0, 0));
+
+        javax.swing.GroupLayout darkPanel1Layout = new javax.swing.GroupLayout(darkPanel1);
+        darkPanel1.setLayout(darkPanel1Layout);
+        darkPanel1Layout.setHorizontalGroup(
+            darkPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 810, Short.MAX_VALUE)
+        );
+        darkPanel1Layout.setVerticalGroup(
+            darkPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 600, Short.MAX_VALUE)
+        );
+
+        jPanel3.add(darkPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 600));
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 600));
 
@@ -583,23 +588,23 @@ public class studOrgClicked extends javax.swing.JFrame {
 
     private void settingsBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsBtnActionPerformed
         darkPanel1.setVisible(true);
-    settingsPanel1.setVisible(true);
-    settingsPanel1.setLocation(750, 0);
+        settingsPanel1.setVisible(true);
+        settingsPanel1.setLocation(750, 0);
     }//GEN-LAST:event_settingsBtnActionPerformed
 
     private void aboutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutBtnActionPerformed
         // TODO add your handling code here:
-           new about().setVisible(true);
+        new about().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_aboutBtnActionPerformed
 
     private void studOrgBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studOrgBtnActionPerformed
-   new studOrg().setVisible(true);
+        new studOrg().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_studOrgBtnActionPerformed
 
     private void dashboardBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardBtnActionPerformed
-   new dashboard().setVisible(true);
+        new dashboard().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_dashboardBtnActionPerformed
 
@@ -627,19 +632,19 @@ public class studOrgClicked extends javax.swing.JFrame {
 
     private void exBtn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exBtn1ActionPerformed
 
-      darkPanel1.setVisible(false);
-    settingsPanel1.setVisible(false);
+        darkPanel1.setVisible(false);
+        settingsPanel1.setVisible(false);
     }//GEN-LAST:event_exBtn1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-                   new registerAnOrg().setVisible(true);
+        new registerAnOrg().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-                    new loginChoices().setVisible(true);
+        new loginChoices().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -705,7 +710,6 @@ public class studOrgClicked extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
@@ -732,6 +736,7 @@ public class studOrgClicked extends javax.swing.JFrame {
     private javax.swing.JLabel statusLbl;
     private javax.swing.JLabel statusLbl1;
     private javax.swing.JButton studOrgBtn;
+    private javax.swing.JScrollPane studOrgScroll;
     private javax.swing.JLabel termLbl;
     private javax.swing.JLabel termLbl1;
     private javax.swing.JButton upcomingBtn;

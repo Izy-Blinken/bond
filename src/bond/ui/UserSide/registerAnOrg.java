@@ -9,8 +9,31 @@ package bond.ui.UserSide;
  * @author denis
  */
 public class registerAnOrg extends javax.swing.JFrame {
-    
-        private void addPlaceholder(javax.swing.text.JTextComponent field, String placeholder) {
+
+    private javax.swing.JFrame previousFrame;
+
+    // back method
+    private void setupBackButton() {
+        backBtn.setContentAreaFilled(false);
+        backBtn.setBorderPainted(false);
+        backBtn.setFocusPainted(false);
+        backBtn.setOpaque(false);
+
+        backBtn.setForeground(new java.awt.Color(28, 94, 56));
+        backBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        backBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                backBtn.setForeground(new java.awt.Color(200, 230, 210));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                backBtn.setForeground(new java.awt.Color(28, 94, 56));
+            }
+        });
+    }
+
+    private void addPlaceholder(javax.swing.text.JTextComponent field, String placeholder) {
         field.setText(placeholder);
         field.setForeground(new java.awt.Color(120, 120, 120));
 
@@ -30,68 +53,92 @@ public class registerAnOrg extends javax.swing.JFrame {
                 }
             }
         });
-        
-         darkPanel.setBackground(new java.awt.Color(0, 0, 0, 150));
-        darkPanel.setVisible(false);
-        settingsPanel.setVisible(false);
-        
-        }
 
-    /**
-     * Creates new form registerAnOrg
-     */
+    }
+
+    private String savedEmail = "";
+    private String savedName = "";
+    private String savedType = "";
+    private String savedAppointed = "";
+    private String savedMission = "";
+    private String savedVision = "";
+    private String savedObjectives = "";
+    private String savedTarget = "";
+    private String savedProposed = "";
+    private String savedAdviser = "";
+
+    // helper methodersss
+    private boolean isValidInput(javax.swing.text.JTextComponent field, String placeholder) {
+        String text = field.getText().trim();
+        return !text.isEmpty() && !text.equals(placeholder);
+    }
+
+    private void clearForm() {
+        emailInput.setText("org@gmail.com");
+        nameInput.setText("Official name");
+        typeInput.setText("e.g. Academic, Cultural");
+        appointedInput.setText("Full name of admin officer");
+
+        missionInput.setText("Describe the organization's mission...");
+        visionInput.setText("Describe the organization's vision...");
+        objectivesInput.setText("List the key objectives...");
+        targetInput.setText("Target members...");
+        proposedInput.setText("List all officers with positions and names...");
+        adviserInput.setText("Faculty adviser name");
+    }
+
+    private void initCustom() {
+    setLocationRelativeTo(null);
+
+    setupBackButton();
+
+    missionInput.setBackground(java.awt.Color.WHITE);
+    visionInput.setBackground(java.awt.Color.WHITE);
+    objectivesInput.setBackground(java.awt.Color.WHITE);
+    proposedInput.setBackground(java.awt.Color.WHITE);
+
+    jScrollPane3.getViewport().setBackground(java.awt.Color.WHITE);
+    jScrollPane4.getViewport().setBackground(java.awt.Color.WHITE);
+    jScrollPane2.getViewport().setBackground(java.awt.Color.WHITE);
+    jScrollPane5.getViewport().setBackground(java.awt.Color.WHITE);
+
+    addPlaceholder(emailInput, "org@gmail.com");
+    addPlaceholder(nameInput, "Official name");
+    addPlaceholder(typeInput, "e.g. Academic, Cultural");
+    addPlaceholder(appointedInput, "Full name of admin officer");
+
+    addPlaceholder(missionInput, "Describe the organization's mission...");
+    addPlaceholder(visionInput, "Describe the organization's vision...");
+    addPlaceholder(objectivesInput, "List the key objectives...");
+    addPlaceholder(targetInput, "Target members...");
+    addPlaceholder(proposedInput, "List all officers with positions and names...");
+    addPlaceholder(adviserInput, "Faculty adviser name");
+}
+    
+    
     public registerAnOrg() {
         initComponents();
         
-           settingsPanel.setVisible(false);
-        
-             addPlaceholder(emailInput, "org@gmail.com");
-        addPlaceholder(nameInput, "Official name");
-        addPlaceholder(typeInput, "e.g. Academic, Cultural");
-        addPlaceholder(appointedInput, "Full name of admin officer");
+         initCustom();
+         setLocationRelativeTo(null);
+        setupBackButton();
 
-        addPlaceholder(missionInput, "Describe the organization's mission...");
-        addPlaceholder(visionInput, "Describe the organization's vision...");
-        addPlaceholder(objectives, "List the key objectives...");
-        addPlaceholder(targetInput, "Target members...");
-        addPlaceholder(proposedInput, "List all officers with positions and names...");
-        addPlaceholder(adviserInput, "Faculty adviser name");
-
-        backBtn.setForeground(new java.awt.Color(120, 120, 120));
-        backBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        backBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                backBtn.setForeground(new java.awt.Color(28, 94, 56));
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                backBtn.setForeground(new java.awt.Color(122, 158, 140));
-            }
-        });
+       
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
+    public registerAnOrg(javax.swing.JFrame prev) {
+        initComponents();
+
+        this.previousFrame = prev;
+        initCustom();
+
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        settingsPanel = new javax.swing.JPanel();
-        settings = new javax.swing.JPanel();
-        settingsLabel = new javax.swing.JLabel();
-        exBtn = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        darkPanel = new javax.swing.JPanel();
-        dashboardBtn = new javax.swing.JButton();
-        studOrgBtn = new javax.swing.JButton();
-        aboutBtn = new javax.swing.JButton();
-        settingsBtn = new javax.swing.JButton();
         navbar = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
@@ -101,7 +148,7 @@ public class registerAnOrg extends javax.swing.JFrame {
         jScrollPane5 = new javax.swing.JScrollPane();
         proposedInput = new javax.swing.JTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
-        objectives = new javax.swing.JTextArea();
+        objectivesInput = new javax.swing.JTextArea();
         targetInput = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         visionInput = new javax.swing.JTextArea();
@@ -119,149 +166,6 @@ public class registerAnOrg extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        settingsPanel.setBackground(new java.awt.Color(255, 255, 255));
-        settingsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        settings.setBackground(new java.awt.Color(28, 94, 56));
-
-        settingsLabel.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 18)); // NOI18N
-        settingsLabel.setForeground(new java.awt.Color(255, 255, 255));
-        settingsLabel.setText("SETTINGS");
-
-        exBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/exit_1.png"))); // NOI18N
-        exBtn.setBorder(null);
-        exBtn.setBorderPainted(false);
-        exBtn.setContentAreaFilled(false);
-        exBtn.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/exitHover_1.png"))); // NOI18N
-        exBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exBtnActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout settingsLayout = new javax.swing.GroupLayout(settings);
-        settings.setLayout(settingsLayout);
-        settingsLayout.setHorizontalGroup(
-            settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(settingsLayout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addComponent(settingsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
-                .addComponent(exBtn)
-                .addGap(17, 17, 17))
-        );
-        settingsLayout.setVerticalGroup(
-            settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(settingsLayout.createSequentialGroup()
-                .addContainerGap(21, Short.MAX_VALUE)
-                .addGroup(settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settingsLayout.createSequentialGroup()
-                        .addComponent(exBtn)
-                        .addGap(25, 25, 25))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settingsLayout.createSequentialGroup()
-                        .addComponent(settingsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(14, 14, 14))))
-        );
-
-        settingsPanel.add(settings, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, 0, 250, -1));
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/regOrg.png"))); // NOI18N
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/regOrgHover.png"))); // NOI18N
-        settingsPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 210, 60));
-
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/login.png"))); // NOI18N
-        jButton2.setBorder(null);
-        jButton2.setBorderPainted(false);
-        jButton2.setContentAreaFilled(false);
-        jButton2.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/lohinSettingshover.png"))); // NOI18N
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        settingsPanel.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 210, -1));
-
-        jPanel1.add(settingsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 0, 210, 600));
-
-        darkPanel.setBackground(new java.awt.Color(0, 0, 0));
-
-        javax.swing.GroupLayout darkPanelLayout = new javax.swing.GroupLayout(darkPanel);
-        darkPanel.setLayout(darkPanelLayout);
-        darkPanelLayout.setHorizontalGroup(
-            darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 810, Short.MAX_VALUE)
-        );
-        darkPanelLayout.setVerticalGroup(
-            darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(darkPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 600));
-
-        dashboardBtn.setBackground(new java.awt.Color(28, 94, 56));
-        dashboardBtn.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 16)); // NOI18N
-        dashboardBtn.setForeground(new java.awt.Color(255, 255, 255));
-        dashboardBtn.setText("DASHBOARD");
-        dashboardBtn.setBorder(null);
-        dashboardBtn.setContentAreaFilled(false);
-        dashboardBtn.setFocusPainted(false);
-        dashboardBtn.setFocusable(false);
-        dashboardBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dashboardBtnActionPerformed(evt);
-            }
-        });
-        jPanel1.add(dashboardBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 30, 170, 30));
-
-        studOrgBtn.setBackground(new java.awt.Color(28, 94, 56));
-        studOrgBtn.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 16)); // NOI18N
-        studOrgBtn.setForeground(new java.awt.Color(255, 255, 255));
-        studOrgBtn.setText("STUDENT ORGS");
-        studOrgBtn.setBorder(null);
-        studOrgBtn.setBorderPainted(false);
-        studOrgBtn.setContentAreaFilled(false);
-        studOrgBtn.setFocusPainted(false);
-        studOrgBtn.setFocusable(false);
-        studOrgBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                studOrgBtnActionPerformed(evt);
-            }
-        });
-        jPanel1.add(studOrgBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 20, -1, 50));
-
-        aboutBtn.setBackground(new java.awt.Color(28, 94, 56));
-        aboutBtn.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 16)); // NOI18N
-        aboutBtn.setForeground(new java.awt.Color(255, 255, 255));
-        aboutBtn.setText("ABOUT");
-        aboutBtn.setBorder(null);
-        aboutBtn.setBorderPainted(false);
-        aboutBtn.setContentAreaFilled(false);
-        aboutBtn.setFocusPainted(false);
-        aboutBtn.setFocusable(false);
-        aboutBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                aboutBtnActionPerformed(evt);
-            }
-        });
-        jPanel1.add(aboutBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 20, -1, 50));
-
-        settingsBtn.setBackground(new java.awt.Color(28, 94, 56));
-        settingsBtn.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 16)); // NOI18N
-        settingsBtn.setForeground(new java.awt.Color(255, 255, 255));
-        settingsBtn.setText("SETTINGS");
-        settingsBtn.setBorder(null);
-        settingsBtn.setBorderPainted(false);
-        settingsBtn.setContentAreaFilled(false);
-        settingsBtn.setFocusable(false);
-        settingsBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                settingsBtnActionPerformed(evt);
-            }
-        });
-        jPanel1.add(settingsBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 20, -1, 50));
 
         navbar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/navBar_1.png"))); // NOI18N
         jPanel1.add(navbar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, -1));
@@ -287,6 +191,11 @@ public class registerAnOrg extends javax.swing.JFrame {
         cancelBtn.setBorderPainted(false);
         cancelBtn.setContentAreaFilled(false);
         cancelBtn.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/cancelHover.png"))); // NOI18N
+        cancelBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelBtnActionPerformed(evt);
+            }
+        });
         jPanel2.add(cancelBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 1070, -1, -1));
 
         adviserInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
@@ -319,19 +228,19 @@ public class registerAnOrg extends javax.swing.JFrame {
         jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         jScrollPane4.setOpaque(false);
 
-        objectives.setColumns(20);
-        objectives.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
-        objectives.setForeground(new java.awt.Color(24, 94, 56));
-        objectives.setLineWrap(true);
-        objectives.setRows(5);
-        objectives.setWrapStyleWord(true);
-        objectives.setBorder(null);
-        objectives.setMargin(new java.awt.Insets(5, 5, 5, 5));
-        objectives.setOpaque(false);
-        objectives.setPreferredSize(new java.awt.Dimension(490, 104));
-        jScrollPane4.setViewportView(objectives);
+        objectivesInput.setColumns(20);
+        objectivesInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
+        objectivesInput.setForeground(new java.awt.Color(24, 94, 56));
+        objectivesInput.setLineWrap(true);
+        objectivesInput.setRows(5);
+        objectivesInput.setWrapStyleWord(true);
+        objectivesInput.setBorder(null);
+        objectivesInput.setMargin(new java.awt.Insets(5, 5, 5, 5));
+        objectivesInput.setOpaque(false);
+        objectivesInput.setPreferredSize(new java.awt.Dimension(490, 104));
+        jScrollPane4.setViewportView(objectivesInput);
 
-        jPanel2.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 540, 390, -1));
+        jPanel2.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 545, 390, 90));
 
         targetInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
         targetInput.setForeground(new java.awt.Color(28, 94, 56));
@@ -356,8 +265,9 @@ public class registerAnOrg extends javax.swing.JFrame {
         visionInput.setPreferredSize(new java.awt.Dimension(490, 104));
         jScrollPane3.setViewportView(visionInput);
 
-        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 380, 390, 100));
+        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 390, 390, 90));
 
+        jScrollPane2.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane2.setBorder(null);
         jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -375,7 +285,7 @@ public class registerAnOrg extends javax.swing.JFrame {
         missionInput.setPreferredSize(new java.awt.Dimension(490, 104));
         jScrollPane2.setViewportView(missionInput);
 
-        jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 230, 390, 100));
+        jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 235, 390, 90));
 
         appointedInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
         appointedInput.setForeground(new java.awt.Color(28, 94, 56));
@@ -399,6 +309,11 @@ public class registerAnOrg extends javax.swing.JFrame {
         nameInput.setForeground(new java.awt.Color(28, 94, 56));
         nameInput.setBorder(null);
         nameInput.setOpaque(true);
+        nameInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nameInputActionPerformed(evt);
+            }
+        });
         jPanel2.add(nameInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 322, 430, 40));
 
         typeInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
@@ -451,111 +366,86 @@ public class registerAnOrg extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void dashboardBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardBtnActionPerformed
-   new dashboard().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_dashboardBtnActionPerformed
-
-    private void studOrgBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studOrgBtnActionPerformed
-   new studOrg().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_studOrgBtnActionPerformed
-
-    private void aboutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutBtnActionPerformed
-        // TODO add your handling code here:
-           new about().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_aboutBtnActionPerformed
-
-    private void settingsBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsBtnActionPerformed
- darkPanel.setVisible(true);
-        settingsPanel.setVisible(true);
-        settingsPanel.setLocation(750, 0);
-    }//GEN-LAST:event_settingsBtnActionPerformed
-
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
-        // TODO add your handling code here:
-
+        if (previousFrame != null) {
+            previousFrame.setVisible(true);
+        }
+        this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
 
     private void emailInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailInputActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_emailInputActionPerformed
 
     private void submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitBtnActionPerformed
-        // TODO add your handling code here:
 
-        String email = emailInput.getText();
-        String name = nameInput.getText();
-        String type = typeInput.getText();
-        String appointed = appointedInput.getText();
+        String email = emailInput.getText().trim();
+        String name = nameInput.getText().trim();
+        String type = typeInput.getText().trim();
+        String appointed = appointedInput.getText().trim();
 
-        String mission = missionInput.getText();
-        String vision = visionInput.getText();
-        String objectivesText = objectives.getText();
-        String target = targetInput.getText();
-        String proposed = proposedInput.getText();
-        String adviser = adviserInput.getText();
+        String mission = missionInput.getText().trim();
+        String vision = visionInput.getText().trim();
+        String objectivesText = objectivesInput.getText().trim();
+        String target = targetInput.getText().trim();
+        String proposed = proposedInput.getText().trim();
+        String adviser = adviserInput.getText().trim();
 
-        boolean isComplete =
-        !email.isEmpty() && !email.equals("org@gmail.com") &&
-        !name.isEmpty() && !name.equals("Official name") &&
-        !type.isEmpty() && !type.equals("e.g. Academic, Cultural") &&
-        !appointed.isEmpty() && !appointed.equals("Full name of admin officer") &&
-        !mission.isEmpty() && !mission.contains("Describe") &&
-        !vision.isEmpty() && !vision.contains("Describe") &&
-        !objectivesText.isEmpty() && !objectivesText.contains("List") &&
-        !target.isEmpty() && !target.contains("Target") &&
-        !proposed.isEmpty() && !proposed.contains("List") &&
-        !adviser.isEmpty() && !adviser.contains("Faculty adviser");
+        if (!isValidInput(emailInput, "org@gmail.com")
+                || !isValidInput(nameInput, "Official name")
+                || !isValidInput(typeInput, "e.g. Academic, Cultural")
+                || !isValidInput(appointedInput, "Full name of admin officer")
+                || !isValidInput(missionInput, "Describe the organization's mission...")
+                || !isValidInput(visionInput, "Describe the organization's vision...")
+                || !isValidInput(objectivesInput, "List the key objectives...")
+                || !isValidInput(targetInput, "Target members...")
+                || !isValidInput(proposedInput, "List all officers with positions and names...")
+                || !isValidInput(adviserInput, "Faculty adviser name")) {
 
-        if (!isComplete) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please complete all fields!");
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Submitted successfully!");
+            return;
         }
+
+        if (!email.contains("@") || !email.contains(".")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Invalid email format!");
+            return;
+        }
+
+        if (!savedEmail.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Organization already registered!");
+            return;
+        }
+
+        savedEmail = email;
+        savedName = name;
+        savedType = type;
+        savedAppointed = appointed;
+        savedMission = mission;
+        savedVision = vision;
+        savedObjectives = objectivesText;
+        savedTarget = target;
+        savedProposed = proposed;
+        savedAdviser = adviser;
+
+        javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!");
+
+        clearForm();
+
     }//GEN-LAST:event_submitBtnActionPerformed
 
-    private void exBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exBtnActionPerformed
+    private void cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtnActionPerformed
+        clearForm();
+    }//GEN-LAST:event_cancelBtnActionPerformed
 
-        darkPanel.setVisible(false);
-        settingsPanel.setVisible(false);
-    }//GEN-LAST:event_exBtnActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void nameInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameInputActionPerformed
         // TODO add your handling code here:
-                    new loginChoices().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_nameInputActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(registerAnOrg.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(registerAnOrg.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(registerAnOrg.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(registerAnOrg.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new registerAnOrg().setVisible(true);
@@ -564,18 +454,12 @@ public class registerAnOrg extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton aboutBtn;
     private javax.swing.JTextField adviserInput;
     private javax.swing.JTextField appointedInput;
     private javax.swing.JButton backBtn;
     private javax.swing.JButton cancelBtn;
-    private javax.swing.JPanel darkPanel;
-    private javax.swing.JButton dashboardBtn;
     private javax.swing.JTextField emailInput;
-    private javax.swing.JButton exBtn;
     private javax.swing.JLabel fill;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -587,14 +471,9 @@ public class registerAnOrg extends javax.swing.JFrame {
     private javax.swing.JTextArea missionInput;
     private javax.swing.JTextField nameInput;
     private javax.swing.JLabel navbar;
-    private javax.swing.JTextArea objectives;
+    private javax.swing.JTextArea objectivesInput;
     private javax.swing.JTextArea proposedInput;
     private javax.swing.JLabel reg;
-    private javax.swing.JPanel settings;
-    private javax.swing.JButton settingsBtn;
-    private javax.swing.JLabel settingsLabel;
-    private javax.swing.JPanel settingsPanel;
-    private javax.swing.JButton studOrgBtn;
     private javax.swing.JButton submitBtn;
     private javax.swing.JTextField targetInput;
     private javax.swing.JTextField typeInput;
