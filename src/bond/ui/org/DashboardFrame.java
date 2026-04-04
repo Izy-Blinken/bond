@@ -3,8 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package bond.ui.org;
+import bond.search.GlobalSearchBar;
+import bond.search.GlobalSearchRegistry;
+import static bond.search.GlobalSearchRegistry.SearchResult.Type.ANNOUNCEMENT;
+import static bond.search.GlobalSearchRegistry.SearchResult.Type.EVENT;
+import static bond.search.GlobalSearchRegistry.SearchResult.Type.MEMBER;
+import Dashboard.Dashboard;
 
-import javax.swing.JButton;
 
 /**
  *
@@ -14,106 +19,208 @@ public class DashboardFrame extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DashboardFrame.class.getName());
 
+     private javax.swing.JButton makeInvisibleButton() {
+        javax.swing.JButton btn = new javax.swing.JButton();
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        return btn;
+    }
+ 
+    private void navigateTo(javax.swing.JFrame targetFrame) {
+        targetFrame.setVisible(true);
+        this.dispose();
+    }
+    
     /**
      * Creates new form DashboardFrame
      */
     public DashboardFrame() {
         initComponents();
-        bond.util.SessionManager.loadSession(); 
+        ActiveTab.setBounds(0, -10, 1000, 600); 
+        
+        javax.swing.JLabel lblBond = new javax.swing.JLabel("BOND");
+        lblBond.setFont(new java.awt.Font("Playfair Display", java.awt.Font.PLAIN, 40));
+        lblBond.setForeground(java.awt.Color.WHITE);
+        lblBond.setBounds(28, 17, 200, 50);
+        getContentPane().add(lblBond);
+        getContentPane().setComponentZOrder(lblBond, 0);
+        lblBond.setName("static");
+
+        javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel("Org Admin");
+        lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 16));
+        lblOrgAdmin.setForeground(java.awt.Color.WHITE);
+        lblOrgAdmin.setBounds(30, 115, 160, 25);
+        getContentPane().add(lblOrgAdmin);
+        getContentPane().setComponentZOrder(lblOrgAdmin, 0);
+        lblOrgAdmin.setName("static");
+
+        javax.swing.JLabel lblDashboard = new javax.swing.JLabel("Dashboard");
+        lblDashboard.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+        lblDashboard.setForeground(java.awt.Color.WHITE);
+        lblDashboard.setBounds(28, 196, 160, 25);
+        getContentPane().add(lblDashboard);
+        getContentPane().setComponentZOrder(lblDashboard, 0);
+        lblDashboard.setName("static");
+
+        javax.swing.JLabel lblEvents = new javax.swing.JLabel("Events");
+        lblEvents.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+        lblEvents.setForeground(java.awt.Color.WHITE);
+        lblEvents.setBounds(28, 238, 160, 25);
+        getContentPane().add(lblEvents);
+        getContentPane().setComponentZOrder(lblEvents, 0);
+        lblEvents.setName("static");
+
+        javax.swing.JLabel lblAnnSidebar = new javax.swing.JLabel("Announcement");
+        lblAnnSidebar.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+        lblAnnSidebar.setForeground(java.awt.Color.WHITE);
+        lblAnnSidebar.setBounds(28, 280, 160, 25);
+        getContentPane().add(lblAnnSidebar);
+        getContentPane().setComponentZOrder(lblAnnSidebar, 0);
+        lblAnnSidebar.setName("static");
+
+        javax.swing.JLabel lblOrgProfile = new javax.swing.JLabel("Organization Profile");
+        lblOrgProfile.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+        lblOrgProfile.setForeground(java.awt.Color.WHITE);
+        lblOrgProfile.setBounds(28, 322, 180, 25);
+        getContentPane().add(lblOrgProfile);
+        getContentPane().setComponentZOrder(lblOrgProfile, 0);
+        lblOrgProfile.setName("static");
+
+        javax.swing.JLabel lblSettings = new javax.swing.JLabel("Settings");
+        lblSettings.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+        lblSettings.setForeground(java.awt.Color.WHITE);
+        lblSettings.setBounds(28, 364, 160, 25);
+        getContentPane().add(lblSettings);
+        getContentPane().setComponentZOrder(lblSettings, 0);
+        lblSettings.setName("static");
+
+        javax.swing.JLabel lblExitAdmin = new javax.swing.JLabel("Exit Admin");
+        lblExitAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+        lblExitAdmin.setForeground(java.awt.Color.RED);
+        lblExitAdmin.setBounds(28, 550, 160, 25);
+        getContentPane().add(lblExitAdmin);
+        getContentPane().setComponentZOrder(lblExitAdmin, 0);
+        lblExitAdmin.setName("static");
+
+
+        javax.swing.ImageIcon sbDefault = new javax.swing.ImageIcon(   
+                getClass().getClassLoader().getResource("bond/assets/orgAdminImages/OrgAdmin_SearchBar.png"));
+        javax.swing.ImageIcon sbHover = new javax.swing.ImageIcon(
+                getClass().getClassLoader().getResource("bond/assets/orgAdminImages/OrgAdmin_SearchBarHover.png"));
+
+        GlobalSearchBar searchBar = new GlobalSearchBar(this, result -> {
+            switch (result.type) {
+                case EVENT:        navigateTo(new EventFrame());        break;
+                case ANNOUNCEMENT: navigateTo(new AnnouncementFrame()); break;
+                case MEMBER:       navigateTo(new OrgProfileFrame());   break;
+            }
+    },
+            () -> SearchBar.setIcon(sbHover),    
+            () -> SearchBar.setIcon(sbDefault)   
+        );
+        
+        searchBar.installInto(getContentPane());
+        bond.util.SessionManager.loadSession();
         this.setSize(1000, 635);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         getContentPane().setLayout(null);
-         
-        //Scroll
+        
         javax.swing.JPanel contentPanel = new javax.swing.JPanel(null);
         contentPanel.setOpaque(false);
         contentPanel.setPreferredSize(new java.awt.Dimension(1000, 750));
-
+ 
         javax.swing.JLabel bgImage = new javax.swing.JLabel();
         bgImage.setIcon(new javax.swing.ImageIcon(
-            getClass().getResource("/bond/assets/orgAdminImages/OrgAdmin_DashboardScroll.png")));
+                getClass().getResource("/bond/assets/orgAdminImages/OrgAdmin_DashboardScroll.png")));
         bgImage.setBounds(0, -60, 1000, 750);
         contentPanel.add(bgImage);
-        
+         
         javax.swing.JLabel lblOrgAcronym = new javax.swing.JLabel();
         lblOrgAcronym.setBounds(32, 135, 120, 25);
         lblOrgAcronym.setForeground(java.awt.Color.WHITE);
-        lblOrgAcronym.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 13));
+        lblOrgAcronym.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
         lblOrgAcronym.setText(bond.util.SessionManager.getOrgAcronym() + " Admin");
         getContentPane().add(lblOrgAcronym);
         getContentPane().setComponentZOrder(lblOrgAcronym, 0);
-
+        
+        javax.swing.JLabel lblDashHeader = new javax.swing.JLabel("Dashboard");
+        lblDashHeader.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 24));
+        lblDashHeader.setForeground(new java.awt.Color(15, 61, 34));
+        lblDashHeader.setBounds(244, 32, 300, 35);
+        contentPanel.add(lblDashHeader);
+        contentPanel.setComponentZOrder(lblDashHeader, 0);
+        lblDashHeader.setName("static");
+        
         javax.swing.JLabel lblOrgOverview = new javax.swing.JLabel();
-        lblOrgOverview.setBounds(243, 48, 720, 30);
+        lblOrgOverview.setBounds(243, 58, 720, 30);
         lblOrgOverview.setForeground(new java.awt.Color(122, 158, 140));
-        lblOrgOverview.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 16));
-        contentPanel.add(lblOrgOverview);                       
+        lblOrgOverview.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 16));
+        contentPanel.add(lblOrgOverview);
         contentPanel.setComponentZOrder(lblOrgOverview, 0);
-
+ 
         javax.swing.JLabel lblTotalMembers = new javax.swing.JLabel("0");
         lblTotalMembers.setBounds(228, 155, 100, 30);
         lblTotalMembers.setForeground(java.awt.Color.BLACK);
-        lblTotalMembers.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 24));
+        lblTotalMembers.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 24));
         lblTotalMembers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         contentPanel.add(lblTotalMembers);
         contentPanel.setComponentZOrder(lblTotalMembers, 0);
-
+ 
         javax.swing.JLabel lblTotalEvents = new javax.swing.JLabel("0");
         lblTotalEvents.setBounds(410, 155, 100, 30);
         lblTotalEvents.setForeground(java.awt.Color.BLACK);
-        lblTotalEvents.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 24));
+        lblTotalEvents.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 24));
         lblTotalEvents.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         contentPanel.add(lblTotalEvents);
         contentPanel.setComponentZOrder(lblTotalEvents, 0);
-
+ 
         javax.swing.JLabel lblTotalPending = new javax.swing.JLabel("0");
         lblTotalPending.setBounds(595, 155, 100, 30);
         lblTotalPending.setForeground(java.awt.Color.BLACK);
-        lblTotalPending.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 24));
+        lblTotalPending.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 24));
         lblTotalPending.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         contentPanel.add(lblTotalPending);
         contentPanel.setComponentZOrder(lblTotalPending, 0);
-
+ 
         javax.swing.JLabel lblTotalAnnouncements = new javax.swing.JLabel("0");
         lblTotalAnnouncements.setBounds(780, 155, 100, 30);
         lblTotalAnnouncements.setForeground(java.awt.Color.BLACK);
-        lblTotalAnnouncements.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 24));
+        lblTotalAnnouncements.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 24));
         lblTotalAnnouncements.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         contentPanel.add(lblTotalAnnouncements);
         contentPanel.setComponentZOrder(lblTotalAnnouncements, 0);
-
-        // RECENT ACTIVITY
-        int[] activityY = {345, 375, 405, 435, 465, 495, 525, 555, 585, 615};
+ 
+        // ── Recent Activity
+        int[] activityY = {345, 375, 406, 437, 469, 503, 533, 564, 594, 627};
         javax.swing.JLabel[] lblActivities = new javax.swing.JLabel[10];
-        javax.swing.JLabel[] lblDates = new javax.swing.JLabel[10];
-
+        javax.swing.JLabel[] lblDates      = new javax.swing.JLabel[10];
+ 
         for (int i = 0; i < 10; i++) {
             lblActivities[i] = new javax.swing.JLabel("-");
             lblActivities[i].setBounds(300, activityY[i], 300, 25);
             lblActivities[i].setForeground(java.awt.Color.BLACK);
-            lblActivities[i].setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
-            lblActivities[i].setToolTipText("");
+            lblActivities[i].setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
             contentPanel.add(lblActivities[i]);
             contentPanel.setComponentZOrder(lblActivities[i], 0);
-
+ 
             lblDates[i] = new javax.swing.JLabel("-");
-            lblDates[i].setBounds(695, activityY[i], 150, 25);
+            lblDates[i].setBounds(730, activityY[i], 150, 25);
             lblDates[i].setForeground(java.awt.Color.BLACK);
-            lblDates[i].setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12));
+            lblDates[i].setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
             contentPanel.add(lblDates[i]);
             contentPanel.setComponentZOrder(lblDates[i], 0);
         }
-
+ 
         contentPanel.setComponentZOrder(bgImage, contentPanel.getComponentCount() - 1);
         loadDashboardData(lblOrgAcronym, lblOrgOverview,
                           lblTotalMembers, lblTotalEvents,
                           lblTotalPending, lblTotalAnnouncements,
                           lblActivities, lblDates);
-
-        contentPanel.setComponentZOrder(bgImage, contentPanel.getComponentCount() - 1);
-
-        // SCROLL PANE
+ 
         javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(contentPanel) {
             @Override
             public void setBorder(javax.swing.border.Border border) {
@@ -157,48 +264,51 @@ public class DashboardFrame extends javax.swing.JFrame {
                 return b;
             }
         });
-
+ 
         getContentPane().add(scrollPane);
-        getContentPane().setComponentZOrder(scrollPane, 0);
-        getContentPane().setComponentZOrder(jLabel1, getContentPane().getComponentCount() - 1);
-
-        // SIDEBAR NAV
+        int total = getContentPane().getComponentCount();
+        getContentPane().setComponentZOrder(jLabel1,   total - 1);
+        getContentPane().setComponentZOrder(SearchBar,   total - 2);
+        getContentPane().setComponentZOrder(ActiveTab, total - 3);
+ 
+        // ── Sidebar Navigation ────────────────────────────────
         javax.swing.JButton btnEvents = makeInvisibleButton();
         btnEvents.setBounds(0, 230, 210, 40);
         btnEvents.addActionListener(e -> navigateTo(new EventFrame()));
         getContentPane().add(btnEvents);
         getContentPane().setComponentZOrder(btnEvents, 0);
-
+ 
         javax.swing.JButton btnAnnouncement = makeInvisibleButton();
         btnAnnouncement.setBounds(0, 270, 210, 40);
         btnAnnouncement.addActionListener(e -> navigateTo(new AnnouncementFrame()));
         getContentPane().add(btnAnnouncement);
         getContentPane().setComponentZOrder(btnAnnouncement, 0);
-
+ 
         javax.swing.JButton btnOrgProfile = makeInvisibleButton();
         btnOrgProfile.setBounds(0, 313, 210, 40);
         btnOrgProfile.addActionListener(e -> navigateTo(new OrgProfileFrame()));
         getContentPane().add(btnOrgProfile);
         getContentPane().setComponentZOrder(btnOrgProfile, 0);
-
+ 
         javax.swing.JButton btnSettings = makeInvisibleButton();
         btnSettings.setBounds(0, 355, 210, 40);
         btnSettings.addActionListener(e -> navigateTo(new SettingsFrame()));
         getContentPane().add(btnSettings);
         getContentPane().setComponentZOrder(btnSettings, 0);
-
+ 
         javax.swing.JButton btnExitAdmin = makeInvisibleButton();
         btnExitAdmin.setBounds(20, 540, 90, 40);
-        btnExitAdmin.addActionListener(e -> {
+        btnExitAdmin.addActionListener(e -> {   
             int confirm = javax.swing.JOptionPane.showConfirmDialog(
                 this, "Are you sure you want to exit admin?",
                 "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-                // navigateTo(new LoginFrame());
+                 navigateTo(new Dashboard());
             }
         });
         getContentPane().add(btnExitAdmin);
         getContentPane().setComponentZOrder(btnExitAdmin, 0);
+ 
     }
     
     private void loadDashboardData(
@@ -220,7 +330,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         if (rs.next()) {
             String orgName = rs.getString("name");
             lblOrgOverview.setText("Overview of " + orgName);
-            lblOrgOverview.setToolTipText("Overview of " + orgName);          
+            lblOrgOverview.setToolTipText("Overview of " + orgName);
         }
 
         // Total members (approved)
@@ -247,41 +357,62 @@ public class DashboardFrame extends javax.swing.JFrame {
         ).executeQuery();
         if (rsA.next()) lblTotalAnnouncements.setText(String.valueOf(rsA.getInt(1)));
 
-        // Recent activity 
-        java.sql.ResultSet rsAct = conn.prepareStatement(
-            "SELECT name, created_at FROM members WHERE org_id = 1 " +
-            "ORDER BY created_at DESC LIMIT 10"
-        ).executeQuery();
+        // Recent activity
         int i = 0;
-        while (rsAct.next() && i < 10) {
-            String activity = rsAct.getString("name") + " joined";
-            String date = rsAct.getString("created_at");
-            lblActivities[i].setText(activity);
-            lblActivities[i].setToolTipText(activity); // hover for full text
-            lblDates[i].setText(date != null ? date.substring(0, 10) : "-");
-            i++;
-        }
+
+        // Members
+        try {
+            java.sql.ResultSet rsAct = conn.prepareStatement(
+                "SELECT name FROM members WHERE org_id = 1 ORDER BY member_id DESC LIMIT 5"
+            ).executeQuery();
+            while (rsAct.next() && i < 10) {
+                String activity = rsAct.getString("name") + " — joined";
+                lblActivities[i].setText(activity);
+                lblActivities[i].setToolTipText(activity);
+                lblDates[i].setText("-");
+                i++;
+            }
+        } catch (Exception ex) { ex.printStackTrace(); }
+
+        // Events
+        try {
+            java.sql.ResultSet rsEv = conn.prepareStatement(
+                "SELECT name, date FROM events WHERE org_id = 1 ORDER BY date DESC LIMIT 5"
+            ).executeQuery();
+            while (rsEv.next() && i < 10) {
+                String activity = rsEv.getString("name") + " — event added";
+                String date = rsEv.getString("date");
+                lblActivities[i].setText(activity);
+                lblActivities[i].setToolTipText(activity);
+                lblDates[i].setText(date != null ? date : "-");
+                i++;
+            }
+        } catch (Exception ex) { ex.printStackTrace(); }
+
+        // Announcements
+        try {
+            java.sql.ResultSet rsAn = conn.prepareStatement(
+                "SELECT title, date FROM announcements WHERE org_id = 1 ORDER BY date DESC LIMIT 5"
+            ).executeQuery();
+            while (rsAn.next() && i < 10) {
+                String activity = rsAn.getString("title") + " — announcement posted";
+                String date = rsAn.getString("date");
+                lblActivities[i].setText(activity);
+                lblActivities[i].setToolTipText(activity);
+                lblDates[i].setText(date != null ? date : "-");
+                i++;
+            }
+        } catch (Exception ex) { ex.printStackTrace(); }
 
         conn.close();
+
     } catch (Exception ex) {
-        System.out.println("Dashboard load error: " + ex.getMessage());
+        ex.printStackTrace();
     }
+
+    GlobalSearchRegistry.getInstance().reload();
 }
-
-    private javax.swing.JButton makeInvisibleButton() {
-        javax.swing.JButton btn = new javax.swing.JButton();
-        btn.setOpaque(false);
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
-        return btn;
-    }
-
-    private void navigateTo(javax.swing.JFrame targetFrame) {
-        targetFrame.setVisible(true);
-        this.dispose();
-    }
+    
     
 
     /**
@@ -293,16 +424,30 @@ public class DashboardFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        ActiveTab = new javax.swing.JLabel();
+        SearchBar = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
+        ActiveTab.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/orgAdminImages/OrgAdmin_DashboardActiveTab.png"))); // NOI18N
+        ActiveTab.setText("jLabel3");
+        ActiveTab.setPreferredSize(new java.awt.Dimension(1000, 600));
+        getContentPane().add(ActiveTab);
+        ActiveTab.setBounds(0, 0, 1000, 600);
+
+        SearchBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/orgAdminImages/OrgAdmin_SearchBar.png"))); // NOI18N
+        SearchBar.setText("jLabel2");
+        SearchBar.setPreferredSize(new java.awt.Dimension(1000, 600));
+        getContentPane().add(SearchBar);
+        SearchBar.setBounds(0, 0, 1000, 600);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/orgAdminImages/OrgAdmin_Dashboard.png"))); // NOI18N
-        jLabel1.setText("jLabel1");
+        jLabel1.setText("jLabel2");
         jLabel1.setPreferredSize(new java.awt.Dimension(1000, 600));
         getContentPane().add(jLabel1);
-        jLabel1.setBounds(0, 0, 1042, 600);
+        jLabel1.setBounds(0, 0, 1000, 600);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -343,6 +488,8 @@ public class DashboardFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ActiveTab;
+    private javax.swing.JLabel SearchBar;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }
