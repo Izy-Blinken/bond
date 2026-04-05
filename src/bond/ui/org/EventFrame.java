@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
-import Dashboard.Dashboard;
+import bond.ui.UserSide.dashboard;
 
 /**
  *
@@ -84,7 +84,7 @@ public class EventFrame extends javax.swing.JFrame {
     }
 
     bond.dao.EventDAO dao = new bond.dao.EventDAO();
-    java.util.List<bond.model.Event> events = dao.getAllEvents(1);
+    java.util.List<bond.model.Event> events = dao.getAllEvents(bond.util.SessionManager.getCurrentOrgId());
 
     int[] rowY = {290, 340, 390, 440, 490};
 
@@ -301,7 +301,7 @@ public class EventFrame extends javax.swing.JFrame {
                 this, "Are you sure you want to exit admin?",
                 "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-                navigateTo(new Dashboard());
+                navigateTo(new dashboard());
             }
         });
         getContentPane().add(btnExitAdmin);
@@ -411,9 +411,9 @@ public class EventFrame extends javax.swing.JFrame {
                     return;
                 }
  
-                bond.model.Event event = new bond.model.Event(1, name, date, desc);
+                bond.model.Event event = new bond.model.Event(bond.util.SessionManager.getCurrentOrgId(), name, date, desc);
                 boolean saved = new bond.dao.EventDAO().addEvent(event);
- 
+
                 if (saved) {
                     javax.swing.JOptionPane.showMessageDialog(dialog, "Event added successfully!");
                     overlay.dispose();
@@ -439,8 +439,8 @@ public class EventFrame extends javax.swing.JFrame {
  
     private void showEditDialog(int rowIndex) {
         bond.dao.EventDAO eventDao = new bond.dao.EventDAO();
-        java.util.List<bond.model.Event> events = eventDao.getAllEvents(1);
- 
+        java.util.List<bond.model.Event> events = eventDao.getAllEvents(bond.util.SessionManager.getCurrentOrgId()); 
+        
         if (rowIndex >= events.size()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "No event found for this row!", "Warning",
@@ -580,8 +580,8 @@ public class EventFrame extends javax.swing.JFrame {
  
     private void showDeleteDialog(int rowIndex) {
         bond.dao.EventDAO eventDao = new bond.dao.EventDAO();
-        java.util.List<bond.model.Event> events = eventDao.getAllEvents(1);
- 
+        java.util.List<bond.model.Event> events = eventDao.getAllEvents(bond.util.SessionManager.getCurrentOrgId()); 
+        
         if (rowIndex >= events.size()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "No event found for this row!", "Warning",

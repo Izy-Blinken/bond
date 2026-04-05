@@ -15,7 +15,70 @@ public class osoOrganizations extends javax.swing.JFrame {
      */
     public osoOrganizations() {
         initComponents();
-           setLocationRelativeTo(null);
+        setLocationRelativeTo(null);
+        loadOrganizations();
+    }
+
+    private void loadOrganizations() {
+
+        jPanel2.removeAll();
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.ResultSet rs = conn.prepareStatement("SELECT org_id, org_name, classification, status FROM organization ORDER BY org_name ASC").executeQuery();
+
+            int y = 130;
+
+            while (rs.next()) {
+
+                int id = rs.getInt("org_id");
+                String name = rs.getString("org_name");
+                String classification = rs.getString("classification");
+                String status = rs.getString("status");
+
+                javax.swing.JLabel lblName = new javax.swing.JLabel(name);
+                lblName.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 18));
+                lblName.setForeground(new java.awt.Color(28, 94, 56));
+                lblName.setBounds(130, y + 20, 400, 30);
+                jPanel2.add(lblName);
+
+                javax.swing.JLabel lblInfo = new javax.swing.JLabel(classification);
+                lblInfo.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+                lblInfo.setForeground(new java.awt.Color(28, 94, 56));
+                lblInfo.setBounds(130, y + 50, 400, 20);
+                jPanel2.add(lblInfo);
+
+                javax.swing.JLabel lblStatus = new javax.swing.JLabel("●  " + status);
+                lblStatus.setForeground(new java.awt.Color(28, 94, 56));
+                lblStatus.setBounds(670, y + 40, 100, 20);
+                jPanel2.add(lblStatus);
+
+                javax.swing.JButton btn = new javax.swing.JButton();
+                btn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/orgsFrame.png")));
+                btn.setBorder(null);
+                btn.setBorderPainted(false);
+                btn.setContentAreaFilled(false);
+                btn.setBounds(30, y, 750, 100);
+                final int orgId = id;
+                btn.addActionListener(e -> {
+                    bond.ui.osoAdmin.osoOrgInfos frame = new bond.ui.osoAdmin.osoOrgInfos(orgId);
+                    frame.setVisible(true);
+                    this.dispose();
+                });
+                jPanel2.add(btn);
+
+                y += 110;
+            }
+
+            jPanel2.setPreferredSize(new java.awt.Dimension(780, y + 20));
+            jPanel2.revalidate();
+            jPanel2.repaint();
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Load orgs error: " + ex.getMessage());
+        }
     }
 
     /**

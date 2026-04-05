@@ -8,8 +8,7 @@ import bond.search.GlobalSearchRegistry;
 import static bond.search.GlobalSearchRegistry.SearchResult.Type.ANNOUNCEMENT;
 import static bond.search.GlobalSearchRegistry.SearchResult.Type.EVENT;
 import static bond.search.GlobalSearchRegistry.SearchResult.Type.MEMBER;
-import Dashboard.Dashboard;
-
+import bond.ui.UserSide.dashboard;
 
 /**
  *
@@ -18,7 +17,7 @@ import Dashboard.Dashboard;
 public class DashboardFrame extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DashboardFrame.class.getName());
-
+ 
      private javax.swing.JButton makeInvisibleButton() {
         javax.swing.JButton btn = new javax.swing.JButton();
         btn.setOpaque(false);
@@ -48,7 +47,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblBond);
         getContentPane().setComponentZOrder(lblBond, 0);
         lblBond.setName("static");
-
+ 
         javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel("Org Admin");
         lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 16));
         lblOrgAdmin.setForeground(java.awt.Color.WHITE);
@@ -56,7 +55,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblOrgAdmin);
         getContentPane().setComponentZOrder(lblOrgAdmin, 0);
         lblOrgAdmin.setName("static");
-
+ 
         javax.swing.JLabel lblDashboard = new javax.swing.JLabel("Dashboard");
         lblDashboard.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
         lblDashboard.setForeground(java.awt.Color.WHITE);
@@ -64,7 +63,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblDashboard);
         getContentPane().setComponentZOrder(lblDashboard, 0);
         lblDashboard.setName("static");
-
+ 
         javax.swing.JLabel lblEvents = new javax.swing.JLabel("Events");
         lblEvents.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
         lblEvents.setForeground(java.awt.Color.WHITE);
@@ -72,7 +71,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblEvents);
         getContentPane().setComponentZOrder(lblEvents, 0);
         lblEvents.setName("static");
-
+ 
         javax.swing.JLabel lblAnnSidebar = new javax.swing.JLabel("Announcement");
         lblAnnSidebar.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
         lblAnnSidebar.setForeground(java.awt.Color.WHITE);
@@ -80,7 +79,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblAnnSidebar);
         getContentPane().setComponentZOrder(lblAnnSidebar, 0);
         lblAnnSidebar.setName("static");
-
+ 
         javax.swing.JLabel lblOrgProfile = new javax.swing.JLabel("Organization Profile");
         lblOrgProfile.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
         lblOrgProfile.setForeground(java.awt.Color.WHITE);
@@ -88,7 +87,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblOrgProfile);
         getContentPane().setComponentZOrder(lblOrgProfile, 0);
         lblOrgProfile.setName("static");
-
+ 
         javax.swing.JLabel lblSettings = new javax.swing.JLabel("Settings");
         lblSettings.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
         lblSettings.setForeground(java.awt.Color.WHITE);
@@ -96,7 +95,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblSettings);
         getContentPane().setComponentZOrder(lblSettings, 0);
         lblSettings.setName("static");
-
+ 
         javax.swing.JLabel lblExitAdmin = new javax.swing.JLabel("Exit Admin");
         lblExitAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
         lblExitAdmin.setForeground(java.awt.Color.RED);
@@ -104,18 +103,18 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().add(lblExitAdmin);
         getContentPane().setComponentZOrder(lblExitAdmin, 0);
         lblExitAdmin.setName("static");
-
-
+ 
+ 
         javax.swing.ImageIcon sbDefault = new javax.swing.ImageIcon(   
                 getClass().getClassLoader().getResource("bond/assets/orgAdminImages/OrgAdmin_SearchBar.png"));
         javax.swing.ImageIcon sbHover = new javax.swing.ImageIcon(
                 getClass().getClassLoader().getResource("bond/assets/orgAdminImages/OrgAdmin_SearchBarHover.png"));
-
+ 
         GlobalSearchBar searchBar = new GlobalSearchBar(this, result -> {
             switch (result.type) {
-                case EVENT:        navigateTo(new EventFrame());        break;
+                case EVENT: navigateTo(new EventFrame()); break;
                 case ANNOUNCEMENT: navigateTo(new AnnouncementFrame()); break;
-                case MEMBER:       navigateTo(new OrgProfileFrame());   break;
+                case MEMBER: navigateTo(new OrgProfileFrame()); break;
             }
     },
             () -> SearchBar.setIcon(sbHover),    
@@ -303,7 +302,7 @@ public class DashboardFrame extends javax.swing.JFrame {
                 this, "Are you sure you want to exit admin?",
                 "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-                 navigateTo(new Dashboard());
+                 navigateTo(new dashboard());
             }
         });
         getContentPane().add(btnExitAdmin);
@@ -320,98 +319,90 @@ public class DashboardFrame extends javax.swing.JFrame {
         javax.swing.JLabel lblTotalAnnouncements,
         javax.swing.JLabel[] lblActivities,
         javax.swing.JLabel[] lblDates) {
-    try {
-        java.sql.Connection conn = bond.db.DBConnection.getConnection();
 
-        // Org name
-        java.sql.ResultSet rs = conn.prepareStatement(
-            "SELECT name FROM organizations WHERE org_id = 1"
-        ).executeQuery();
-        if (rs.next()) {
-            String orgName = rs.getString("name");
-            lblOrgOverview.setText("Overview of " + orgName);
-            lblOrgOverview.setToolTipText("Overview of " + orgName);
-        }
-
-        // Total members (approved)
-        java.sql.ResultSet rsM = conn.prepareStatement(
-            "SELECT COUNT(*) FROM members WHERE org_id = 1 AND status = 'Approved'"
-        ).executeQuery();
-        if (rsM.next()) lblTotalMembers.setText(String.valueOf(rsM.getInt(1)));
-
-        // Total events
-        java.sql.ResultSet rsE = conn.prepareStatement(
-            "SELECT COUNT(*) FROM events WHERE org_id = 1"
-        ).executeQuery();
-        if (rsE.next()) lblTotalEvents.setText(String.valueOf(rsE.getInt(1)));
-
-        // Pending members
-        java.sql.ResultSet rsP = conn.prepareStatement(
-            "SELECT COUNT(*) FROM members WHERE org_id = 1 AND status = 'Pending'"
-        ).executeQuery();
-        if (rsP.next()) lblTotalPending.setText(String.valueOf(rsP.getInt(1)));
-
-        // Total announcements
-        java.sql.ResultSet rsA = conn.prepareStatement(
-            "SELECT COUNT(*) FROM announcements WHERE org_id = 1"
-        ).executeQuery();
-        if (rsA.next()) lblTotalAnnouncements.setText(String.valueOf(rsA.getInt(1)));
-
-        // Recent activity
-        int i = 0;
-
-        // Members
         try {
-            java.sql.ResultSet rsAct = conn.prepareStatement(
-                "SELECT name FROM members WHERE org_id = 1 ORDER BY member_id DESC LIMIT 5"
-            ).executeQuery();
-            while (rsAct.next() && i < 10) {
-                String activity = rsAct.getString("name") + " — joined";
-                lblActivities[i].setText(activity);
-                lblActivities[i].setToolTipText(activity);
-                lblDates[i].setText("-");
-                i++;
+
+            int orgId = bond.util.SessionManager.getCurrentOrgId();
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+
+            java.sql.PreparedStatement ps0 = conn.prepareStatement(
+                "SELECT org_name FROM organization WHERE org_id = ?"
+            );
+            ps0.setInt(1, orgId);
+            java.sql.ResultSet rs = ps0.executeQuery();
+            if (rs.next()) {
+                String orgName = rs.getString("org_name");
+                lblOrgOverview.setText("Overview of " + orgName);
+                lblOrgOverview.setToolTipText("Overview of " + orgName);
             }
-        } catch (Exception ex) { ex.printStackTrace(); }
 
-        // Events
-        try {
-            java.sql.ResultSet rsEv = conn.prepareStatement(
-                "SELECT name, date FROM events WHERE org_id = 1 ORDER BY date DESC LIMIT 5"
-            ).executeQuery();
+            java.sql.PreparedStatement ps1 = conn.prepareStatement(
+                "SELECT COUNT(*) FROM members WHERE org_id = ?"
+            );
+            ps1.setInt(1, orgId);
+            java.sql.ResultSet rsM = ps1.executeQuery();
+            if (rsM.next()) {
+                lblTotalMembers.setText(String.valueOf(rsM.getInt(1)));
+            }
+
+            java.sql.PreparedStatement ps2 = conn.prepareStatement(
+                "SELECT COUNT(*) FROM event WHERE org_id = ?"
+            );
+            ps2.setInt(1, orgId);
+            java.sql.ResultSet rsE = ps2.executeQuery();
+            if (rsE.next()) {
+                lblTotalEvents.setText(String.valueOf(rsE.getInt(1)));
+            }
+
+            java.sql.PreparedStatement ps3 = conn.prepareStatement(
+                "SELECT COUNT(*) FROM announcement WHERE org_id = ?"
+            );
+            ps3.setInt(1, orgId);
+            java.sql.ResultSet rsA = ps3.executeQuery();
+            if (rsA.next()) {
+                lblTotalAnnouncements.setText(String.valueOf(rsA.getInt(1)));
+            }
+
+            lblTotalPending.setText("0");
+
+            int i = 0;
+
+            java.sql.PreparedStatement ps4 = conn.prepareStatement(
+                "SELECT title, event_date FROM event WHERE org_id = ? ORDER BY event_date DESC LIMIT 5"
+            );
+            ps4.setInt(1, orgId);
+            java.sql.ResultSet rsEv = ps4.executeQuery();
             while (rsEv.next() && i < 10) {
-                String activity = rsEv.getString("name") + " — event added";
-                String date = rsEv.getString("date");
+                String activity = rsEv.getString("title") + " — event added";
+                String date = rsEv.getString("event_date");
                 lblActivities[i].setText(activity);
                 lblActivities[i].setToolTipText(activity);
                 lblDates[i].setText(date != null ? date : "-");
                 i++;
             }
-        } catch (Exception ex) { ex.printStackTrace(); }
 
-        // Announcements
-        try {
-            java.sql.ResultSet rsAn = conn.prepareStatement(
-                "SELECT title, date FROM announcements WHERE org_id = 1 ORDER BY date DESC LIMIT 5"
-            ).executeQuery();
+            java.sql.PreparedStatement ps5 = conn.prepareStatement(
+                "SELECT title, created_at FROM announcement WHERE org_id = ? ORDER BY created_at DESC LIMIT 5"
+            );
+            ps5.setInt(1, orgId);
+            java.sql.ResultSet rsAn = ps5.executeQuery();
             while (rsAn.next() && i < 10) {
                 String activity = rsAn.getString("title") + " — announcement posted";
-                String date = rsAn.getString("date");
+                String date = rsAn.getString("created_at");
                 lblActivities[i].setText(activity);
                 lblActivities[i].setToolTipText(activity);
                 lblDates[i].setText(date != null ? date : "-");
                 i++;
             }
-        } catch (Exception ex) { ex.printStackTrace(); }
 
-        conn.close();
+            conn.close();
 
-    } catch (Exception ex) {
-        ex.printStackTrace();
+        } catch (Exception ex) {
+            System.out.println("Dashboard load error: " + ex.getMessage());
+        }
+
+        GlobalSearchRegistry.getInstance().reload();
     }
-
-    GlobalSearchRegistry.getInstance().reload();
-}
     
     
 

@@ -9,7 +9,7 @@ import bond.search.GlobalSearchRegistry;
 import java.awt.Cursor;
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import Dashboard.Dashboard;
+import bond.ui.UserSide.dashboard;
 import java.awt.Dimension;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -71,8 +71,7 @@ public class AnnouncementFrame extends javax.swing.JFrame {
         }
 
         bond.dao.AnnouncementDAO dao = new bond.dao.AnnouncementDAO();
-        java.util.List<bond.model.Announcement> list = dao.getAllAnnouncements(1);
-
+        java.util.List<bond.model.Announcement> list = dao.getAllAnnouncements(bond.util.SessionManager.getCurrentOrgId());
         int[] yPositions = {290, 315, 340, 365, 390, 415, 440, 465, 490, 515};
 
         for (int i = 0; i < Math.min(list.size(), 10); i++) {
@@ -339,7 +338,7 @@ public class AnnouncementFrame extends javax.swing.JFrame {
                     this, "Are you sure you want to exit admin?",
                     "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {               
-                navigateTo(new Dashboard());
+                navigateTo(new dashboard());
             }
         });
         getContentPane().add(btnExitAdmin);
@@ -455,9 +454,9 @@ public class AnnouncementFrame extends javax.swing.JFrame {
                     return;
                 }
  
-                bond.model.Announcement ann = new bond.model.Announcement(1, title, "", date);
+                bond.model.Announcement ann = new bond.model.Announcement(bond.util.SessionManager.getCurrentOrgId(), title, "", date);
                 boolean saved = new bond.dao.AnnouncementDAO().addAnnouncement(ann);
- 
+
                 if (saved) {
                     javax.swing.JOptionPane.showMessageDialog(dialog, "Announcement added!");
                     overlay.dispose();
@@ -483,8 +482,8 @@ public class AnnouncementFrame extends javax.swing.JFrame {
  
      private void showEditDialog(int rowIndex) {
         bond.dao.AnnouncementDAO annDao = new bond.dao.AnnouncementDAO();
-        java.util.List<bond.model.Announcement> list = annDao.getAllAnnouncements(1);
- 
+        java.util.List<bond.model.Announcement> list = annDao.getAllAnnouncements(bond.util.SessionManager.getCurrentOrgId()); 
+        
         if (rowIndex >= list.size()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "No announcement found for this row!", "Warning",
@@ -606,8 +605,8 @@ public class AnnouncementFrame extends javax.swing.JFrame {
 
     private void showDeleteDialog(int rowIndex) {
         bond.dao.AnnouncementDAO annDao = new bond.dao.AnnouncementDAO();
-        java.util.List<bond.model.Announcement> list = annDao.getAllAnnouncements(1);
- 
+        java.util.List<bond.model.Announcement> list = annDao.getAllAnnouncements(bond.util.SessionManager.getCurrentOrgId()); 
+        
         if (rowIndex >= list.size()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "No announcement found for this row!", "Warning",

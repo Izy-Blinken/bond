@@ -34,7 +34,10 @@ public class studOrgClicked extends javax.swing.JFrame {
     /**
      * Creates new form studOrgClicked
      */
-    public studOrgClicked() {
+    private int orgId;
+
+    public studOrgClicked(int orgId) {
+        this.orgId = orgId;
         initComponents();
 
         javax.swing.SwingUtilities.invokeLater(() -> {
@@ -59,6 +62,57 @@ public class studOrgClicked extends javax.swing.JFrame {
             setupHover(btn);
         }
 
+        loadOrgData();
+    }
+
+    public studOrgClicked() {
+        this(0);
+    }
+
+    private void loadOrgData() {
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+
+            // org info
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT org_name, mission, vision FROM organization WHERE org_id = ?"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                missionArea.setText(rs.getString("mission"));
+                visionArea.setText(rs.getString("vision"));
+            }
+
+            // events
+            java.sql.PreparedStatement ps2 = conn.prepareStatement(
+                "SELECT title, event_date, venue, status FROM event WHERE org_id = ? ORDER BY event_date DESC LIMIT 2"
+            );
+            ps2.setInt(1, orgId);
+            java.sql.ResultSet rs2 = ps2.executeQuery();
+
+            if (rs2.next()) {
+                eventsLb2.setText(rs2.getString("title"));
+                dateLbl.setText(rs2.getString("event_date"));
+                locationLbl.setText(rs2.getString("venue"));
+                statusLbl.setText(rs2.getString("status"));
+            }
+
+            if (rs2.next()) {
+                eventsLb3.setText(rs2.getString("title"));
+                dateLbl1.setText(rs2.getString("event_date"));
+                locationLbl1.setText(rs2.getString("venue"));
+                statusLbl1.setText(rs2.getString("status"));
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Load org data error: " + ex.getMessage());
+        }
     }
 
     /**
@@ -614,14 +668,71 @@ public class studOrgClicked extends javax.swing.JFrame {
 
     private void allBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allBtnActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_allBtnActionPerformed
 
     private void completedBtn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_completedBtn2ActionPerformed
         // TODO add your handling code here:
+         try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT title, event_date, venue, status FROM event WHERE org_id = ? AND status = 'Completed' ORDER BY event_date DESC LIMIT 2"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                eventsLb2.setText(rs.getString("title"));
+                dateLbl.setText(rs.getString("event_date"));
+                locationLbl.setText(rs.getString("venue"));
+                statusLbl.setText(rs.getString("status"));
+            }
+
+            if (rs.next()) {
+                eventsLb3.setText(rs.getString("title"));
+                dateLbl1.setText(rs.getString("event_date"));
+                locationLbl1.setText(rs.getString("venue"));
+                statusLbl1.setText(rs.getString("status"));
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Completed events error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_completedBtn2ActionPerformed
 
     private void upcomingBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upcomingBtnActionPerformed
         // TODO add your handling code here:
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT title, event_date, venue, status FROM event WHERE org_id = ? AND status = 'Upcoming' ORDER BY event_date ASC LIMIT 2"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                eventsLb2.setText(rs.getString("title"));
+                dateLbl.setText(rs.getString("event_date"));
+                locationLbl.setText(rs.getString("venue"));
+                statusLbl.setText(rs.getString("status"));
+            }
+
+            if (rs.next()) {
+                eventsLb3.setText(rs.getString("title"));
+                dateLbl1.setText(rs.getString("event_date"));
+                locationLbl1.setText(rs.getString("venue"));
+                statusLbl1.setText(rs.getString("status"));
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Upcoming events error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_upcomingBtnActionPerformed
 
     private void exBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exBtnActionPerformed

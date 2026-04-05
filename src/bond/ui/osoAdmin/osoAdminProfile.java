@@ -15,7 +15,55 @@ public class osoAdminProfile extends javax.swing.JFrame {
      */
     public osoAdminProfile() {
         initComponents();
-           setLocationRelativeTo(null);
+        setLocationRelativeTo(null);
+        loadProfile();
+        setupSaveBtn();
+    }
+
+    private void loadProfile() {
+
+        try {
+
+            bond.model.OsoAdmin admin = bond.util.SessionManager.getCurrentOsoAdmin();
+            fullnameInput.setText(admin.getUsername());
+            emailInput.setText(admin.getEmail());
+            roleInput.setText("OSO Administrator");
+            roleInput.setEditable(false);
+
+        } catch (Exception ex) {
+            System.out.println("Load profile error: " + ex.getMessage());
+        }
+    }
+
+    private void setupSaveBtn() {
+
+        orgInfoBtn.addActionListener(e -> {
+
+            String username = fullnameInput.getText().trim();
+            String email = emailInput.getText().trim();
+
+            if (username.isEmpty() || email.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Username and email cannot be empty.");
+                return;
+            }
+
+            try {
+
+                java.sql.Connection conn = bond.db.DBConnection.getConnection();
+                java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE oso_admin SET username = ?, email = ? WHERE oso_admin_id = ?"
+                );
+                ps.setString(1, username);
+                ps.setString(2, email);
+                ps.setInt(3, bond.util.SessionManager.getCurrentOsoAdmin().getOso_admin_id());
+                ps.executeUpdate();
+                conn.close();
+                javax.swing.JOptionPane.showMessageDialog(this, "Profile updated successfully!");
+
+            } catch (Exception ex) {
+                System.out.println("Save profile error: " + ex.getMessage());
+            }
+        });
     }
 
     /**

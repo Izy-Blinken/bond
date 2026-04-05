@@ -10,7 +10,7 @@ import java.awt.Cursor;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import Dashboard.Dashboard;
+import bond.ui.UserSide.dashboard;
 
 /**
  *
@@ -413,7 +413,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
                 this, "Are you sure you want to exit admin?",
                 "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-                navigateTo(new Dashboard());
+                navigateTo(new dashboard());
             }
         });
         getContentPane().add(btnExitAdmin);
@@ -451,15 +451,20 @@ public class OrgProfileFrame extends javax.swing.JFrame {
     private void loadOrgProfile() {
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
-            java.sql.ResultSet rs = conn.prepareStatement(
-                "SELECT * FROM organizations WHERE org_id = 1"
-            ).executeQuery();
+            int orgId = bond.util.SessionManager.getCurrentOrgId();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT org_name, classification, mission, vision FROM organization WHERE org_id = ?"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
-                emailField.setText(rs.getString("name"));
-                typeField.setText(rs.getString("type"));
+
+                emailField.setText(rs.getString("org_name"));
+                typeField.setText(rs.getString("classification"));
                 missionField.setText(rs.getString("mission"));
                 visionField.setText(rs.getString("vision"));
-                adviserField.setText(rs.getString("adviser"));
+                adviserField.setText("");
             }
             conn.close();
         } catch (Exception ex) {
@@ -525,13 +530,14 @@ public class OrgProfileFrame extends javax.swing.JFrame {
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             java.sql.PreparedStatement ps = conn.prepareStatement(
-                "UPDATE organizations SET name=?, type=?, mission=?, vision=?, adviser=? WHERE org_id=1"
+                "UPDATE organization SET org_name=?, classification=?, mission=?, vision=? WHERE org_id=?"
             );
             ps.setString(1, name);
             ps.setString(2, type);
             ps.setString(3, mission);
             ps.setString(4, vision);
-            ps.setString(5, adviser);
+            ps.setInt(5, bond.util.SessionManager.getCurrentOrgId());
+            
             boolean updated = ps.executeUpdate() > 0;
             conn.close();
  
@@ -550,7 +556,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
  
    private void loadMembers() {
     bond.dao.MemberDAO dao = new bond.dao.MemberDAO();
-    java.util.List<bond.model.Member> all = dao.getAllMembers(1);
+    java.util.List<bond.model.Member> all = dao.getAllMembers(bond.util.SessionManager.getCurrentOrgId());
 
     java.util.List<java.awt.Component> toRemove = new java.util.ArrayList<>();
     for (java.awt.Component c : contentPanel.getComponents()) {
@@ -706,7 +712,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
                 }
  
                 bond.model.Member member = new bond.model.Member();
-                member.setOrgId(1);
+                member.setOrgId(bond.util.SessionManager.getCurrentOrgId());
                 member.setName(fullName);
                 member.setRole(role);
                 member.setCourse(course);

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package bond.dao;
 
 import bond.db.DBConnection;
@@ -12,23 +8,19 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Erica
- */
 public class EventDAO {
-    // ADD
+
+    // Add
     public boolean addEvent(Event e) {
-        String sql = "INSERT INTO events " +
-                     "(org_id, name, date, description, status) " +
-                     "VALUES (?, ?, ?, ?, 'Pending')";
+        String sql = "INSERT INTO event (org_id, academic_year_id, posted_by, title, description, event_date, status) " +
+                     "VALUES (?, 1, 1, ?, ?, ?, 'Upcoming')";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, e.getOrgId());
             ps.setString(2, e.getName());
-            ps.setString(3, e.getDate());
-            ps.setString(4, e.getDescription());
+            ps.setString(3, e.getDescription());
+            ps.setString(4, e.getDate());
             boolean result = ps.executeUpdate() > 0;
             conn.close();
             return result;
@@ -38,11 +30,9 @@ public class EventDAO {
         }
     }
 
-    // EDIT
+    // Edit
     public boolean updateEvent(Event e) {
-        String sql = "UPDATE events SET name=?, " +
-                     "date=?, description=? " +
-                     "WHERE event_id=?";
+        String sql = "UPDATE event SET title=?, event_date=?, description=? WHERE event_id=?";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -59,9 +49,9 @@ public class EventDAO {
         }
     }
 
-    // DELETE
+    // Delete
     public boolean deleteEvent(int eventId) {
-        String sql = "DELETE FROM events WHERE event_id=?";
+        String sql = "DELETE FROM event WHERE event_id=?";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -75,10 +65,10 @@ public class EventDAO {
         }
     }
 
-    // GET ALL
+    // Get all for an org
     public List<Event> getAllEvents(int orgId) {
         List<Event> list = new ArrayList<>();
-        String sql = "SELECT * FROM events WHERE org_id=?";
+        String sql = "SELECT * FROM event WHERE org_id=? ORDER BY event_date DESC";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -88,8 +78,8 @@ public class EventDAO {
                 Event e = new Event();
                 e.setEventId(rs.getInt("event_id"));
                 e.setOrgId(rs.getInt("org_id"));
-                e.setName(rs.getString("name"));
-                e.setDate(rs.getString("date"));
+                e.setName(rs.getString("title"));
+                e.setDate(rs.getString("event_date"));
                 e.setDescription(rs.getString("description"));
                 e.setStatus(rs.getString("status"));
                 list.add(e);

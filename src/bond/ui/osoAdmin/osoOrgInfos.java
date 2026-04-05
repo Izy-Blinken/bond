@@ -54,13 +54,157 @@ public class osoOrgInfos extends javax.swing.JFrame {
 
     }
 
-    public osoOrgInfos() {
-        initComponents();
+    private int orgId;
 
-           setLocationRelativeTo(null);
+    public osoOrgInfos(int orgId) {
+        this.orgId = orgId;
+        initComponents();
+        setLocationRelativeTo(null);
         setupUI();
         setupTabs();
+        loadOrgInfo();
+    }
 
+    public osoOrgInfos() {
+        this(0);
+    }
+    
+    private int selectedMemberId = -1;
+    private int selectedFormId = -1;
+
+    private void loadMembers() {
+
+        jPanel3.removeAll();
+
+        javax.swing.JLabel header = new javax.swing.JLabel();
+        header.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/membersTable.png")));
+        header.setBounds(20, 10, 660, 190);
+        jPanel3.add(header);
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT member_id, full_name, role, joined_date FROM members WHERE org_id = ? ORDER BY member_id ASC"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            int y = 60;
+            while (rs.next()) {
+
+                int mId = rs.getInt("member_id");
+                String name = rs.getString("full_name");
+                String role = rs.getString("role");
+                String date = rs.getString("joined_date");
+
+                javax.swing.JLabel lbl = new javax.swing.JLabel(name + " — " + role + " (" + date + ")");
+                lbl.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lbl.setForeground(new java.awt.Color(28, 94, 56));
+                lbl.setBounds(30, y, 500, 20);
+                lbl.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                lbl.addMouseListener(new java.awt.event.MouseAdapter() {
+
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        selectedMemberId = mId;
+                    }
+                });
+                jPanel3.add(lbl);
+                y += 25;
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Load members error: " + ex.getMessage());
+        }
+
+        jPanel3.revalidate();
+        jPanel3.repaint();
+    }
+
+    private void loadPendingForms() {
+
+        jPanel4.removeAll();
+
+        javax.swing.JLabel header = new javax.swing.JLabel();
+        header.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/pendingTable.png")));
+        header.setBounds(20, 10, 660, 50);
+        jPanel4.add(header);
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT form_id, proposed_org_name, contact_email, review_status FROM registration_form WHERE review_status = 'Pending' ORDER BY form_id ASC"
+            );
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            int y = 60;
+            while (rs.next()) {
+
+                int fId = rs.getInt("form_id");
+                String orgN = rs.getString("proposed_org_name");
+                String email = rs.getString("contact_email");
+
+                javax.swing.JLabel lbl = new javax.swing.JLabel(orgN + " — " + email);
+                lbl.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lbl.setForeground(new java.awt.Color(28, 94, 56));
+                lbl.setBounds(30, y, 500, 20);
+                lbl.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                lbl.addMouseListener(new java.awt.event.MouseAdapter() {
+
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        selectedFormId = fId;
+                    }
+                });
+                jPanel4.add(lbl);
+                y += 25;
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Load pending forms error: " + ex.getMessage());
+        }
+
+        jPanel4.revalidate();
+        jPanel4.repaint();
+    }
+
+    private void loadOrgInfo() {
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT org_name, classification, status FROM organization WHERE org_id = ?"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                orgName.setText(rs.getString("org_name"));
+                memberCount.setText(rs.getString("classification"));
+                activeOrinactive.setSelected(rs.getString("status").equals("Inactive"));
+            }
+
+            java.sql.PreparedStatement ps2 = conn.prepareStatement(
+                "SELECT COUNT(*) FROM members WHERE org_id = ?"
+            );
+            ps2.setInt(1, orgId);
+            java.sql.ResultSet rs2 = ps2.executeQuery();
+
+            if (rs2.next()) {
+                int count = rs2.getInt(1);
+                memberCount.setText(memberCount.getText() + " · " + count + " members");
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Load org info error: " + ex.getMessage());
+        }
     }
 
     /**
@@ -321,22 +465,118 @@ public class osoOrgInfos extends javax.swing.JFrame {
 
     private void activeOrinactiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_activeOrinactiveActionPerformed
         // TODO add your handling code here:
+        String newStatus = activeOrinactive.isSelected() ? "Inactive" : "Active";
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "UPDATE organization SET status = ? WHERE org_id = ?"
+            );
+            ps.setString(1, newStatus);
+            ps.setInt(2, orgId);
+            ps.executeUpdate();
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Toggle status error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_activeOrinactiveActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        if (selectedMemberId == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Select a member first.");
+            return;
+        }
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM members WHERE member_id = ?"
+            );
+            ps.setInt(1, selectedMemberId);
+            ps.executeUpdate();
+            conn.close();
+            selectedMemberId = -1;
+            loadMembers();
+
+        } catch (Exception ex) {
+            System.out.println("Approve member error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
+        if (selectedMemberId == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Select a member first.");
+            return;
+        }
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM members WHERE member_id = ?"
+            );
+            ps.setInt(1, selectedMemberId);
+            ps.executeUpdate();
+            conn.close();
+            selectedMemberId = -1;
+            loadMembers();
+
+        } catch (Exception ex) {
+            System.out.println("Reject member error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
+        if (selectedFormId == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Select a pending form first.");
+            return;
+        }
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "UPDATE registration_form SET review_status = 'Rejected' WHERE form_id = ?"
+            );
+            ps.setInt(1, selectedFormId);
+            ps.executeUpdate();
+            conn.close();
+            selectedFormId = -1;
+            loadPendingForms();
+
+        } catch (Exception ex) {
+            System.out.println("Reject form error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
+        if (selectedFormId == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Select a pending form first.");
+            return;
+        }
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "UPDATE registration_form SET review_status = 'Approved' WHERE form_id = ?"
+            );
+            ps.setInt(1, selectedFormId);
+            ps.executeUpdate();
+            conn.close();
+            selectedFormId = -1;
+            loadPendingForms();
+
+        } catch (Exception ex) {
+            System.out.println("Approve form error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**

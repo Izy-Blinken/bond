@@ -15,7 +15,42 @@ public class osoDashboard extends javax.swing.JFrame {
      */
     public osoDashboard() {
         initComponents();
-           setLocationRelativeTo(null);
+        setLocationRelativeTo(null);
+        loadStats();
+    }
+    
+    private void loadStats() {
+        
+        
+        try {
+            
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+
+            java.sql.ResultSet rs1 = conn.prepareStatement("SELECT COUNT(*) FROM organization WHERE status = 'Active'").executeQuery();
+            if (rs1.next()){
+                totalOrgsCOUNT.setText(String.valueOf(rs1.getInt(1)));
+            }
+
+            java.sql.ResultSet rs2 = conn.prepareStatement("SELECT COUNT(*) FROM members").executeQuery();
+            if (rs2.next()){
+                totalmemCOUNT.setText(String.valueOf(rs2.getInt(1)));
+            }
+
+            java.sql.ResultSet rs3 = conn.prepareStatement("SELECT COUNT(*) FROM event").executeQuery();
+            if (rs3.next()){
+                eventsCOUNT.setText(String.valueOf(rs3.getInt(1)));
+            }
+
+            java.sql.ResultSet rs4 = conn.prepareStatement("SELECT COUNT(*) FROM registration_form WHERE status = 'Pending'").executeQuery();
+            if (rs4.next()){
+                pendingsCOUNT.setText(Integer.toString(rs4.getInt(1)));
+            }
+
+            conn.close();
+            
+        } catch (Exception ex) {
+            System.out.println("Load stats error: " + ex.getMessage());
+        }
     }
 
     /**

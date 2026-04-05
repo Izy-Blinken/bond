@@ -15,7 +15,54 @@ public class osoSettings extends javax.swing.JFrame {
      */
     public osoSettings() {
         initComponents();
-           setLocationRelativeTo(null);
+        setLocationRelativeTo(null);
+        setupUpdateBtn();
+    }
+
+    private void setupUpdateBtn() {
+
+        orgInfoBtn.addActionListener(e -> {
+
+            String currentPass = fullnameInput1.getText().trim();
+            String newPass = emailInput1.getText().trim();
+
+            if (currentPass.isEmpty() || newPass.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Fields cannot be empty.");
+                return;
+            }
+
+            try {
+
+                int adminId = bond.util.SessionManager.getCurrentOsoAdmin().getOso_admin_id();
+                java.sql.Connection conn = bond.db.DBConnection.getConnection();
+                java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "SELECT password_hash FROM oso_admin WHERE oso_admin_id = ?"
+                );
+                ps.setInt(1, adminId);
+                java.sql.ResultSet rs = ps.executeQuery();
+
+                if (rs.next() && rs.getString("password_hash").equals(currentPass)) {
+
+                    java.sql.PreparedStatement ps2 = conn.prepareStatement(
+                        "UPDATE oso_admin SET password_hash = ? WHERE oso_admin_id = ?"
+                    );
+                    ps2.setString(1, newPass);
+                    ps2.setInt(2, adminId);
+                    ps2.executeUpdate();
+                    javax.swing.JOptionPane.showMessageDialog(this, "Password updated successfully!");
+                    fullnameInput1.setText("");
+                    emailInput1.setText("");
+
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Current password is incorrect.");
+                }
+
+                conn.close();
+
+            } catch (Exception ex) {
+                System.out.println("Update password error: " + ex.getMessage());
+            }
+        });
     }
 
     /**

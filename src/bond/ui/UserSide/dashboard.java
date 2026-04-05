@@ -356,6 +356,9 @@ public class dashboard extends javax.swing.JFrame {
 
     private void searchInput1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchInput1ActionPerformed
 
+        String query = searchInput1.getText().trim();
+        new studOrg().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_searchInput1ActionPerformed
 
     private void exBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exBtnActionPerformed
@@ -366,7 +369,7 @@ public class dashboard extends javax.swing.JFrame {
     private void registerAnOrgBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerAnOrgBtnActionPerformed
      
         new registerAnOrg(this).setVisible(true);
-this.setVisible(false);
+        this.setVisible(false);
     }//GEN-LAST:event_registerAnOrgBtnActionPerformed
 
     private void loginAsOsoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginAsOsoActionPerformed
@@ -376,8 +379,24 @@ this.setVisible(false);
     }//GEN-LAST:event_loginAsOsoActionPerformed
 
     private void org1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_org1ActionPerformed
-        new studOrgClicked().setVisible(true);
-        this.dispose();
+        
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.ResultSet rs = conn.prepareStatement(
+                "SELECT org_id FROM organization WHERE is_featured = 1 ORDER BY org_id ASC LIMIT 1"
+            ).executeQuery();
+
+            if (rs.next()) {
+                new studOrgClicked(rs.getInt("org_id")).setVisible(true);
+                this.dispose();
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Featured org error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_org1ActionPerformed
 
     /**

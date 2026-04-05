@@ -86,6 +86,31 @@ public class registerAnOrg extends javax.swing.JFrame {
         proposedInput.setText("List all officers with positions and names...");
         adviserInput.setText("Faculty adviser name");
     }
+    
+    private javax.swing.JComboBox<String> typeDropdown;
+
+    private void setupTypeDropdown() {
+
+        String[] types = {
+            "Academic",
+            "Civic & Cultural",
+            "Religious",
+            "Media & Publications",
+            "Sports & Recreation"
+        };
+
+        typeDropdown = new javax.swing.JComboBox<>(types);
+        typeDropdown.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14));
+        typeDropdown.setForeground(new java.awt.Color(28, 94, 56));
+        typeDropdown.setBorder(null);
+        typeDropdown.setBounds(typeInput.getBounds());
+        typeDropdown.setBackground(java.awt.Color.WHITE);
+
+        typeInput.setVisible(false);
+        typeInput.getParent().add(typeDropdown);
+        typeInput.getParent().revalidate();
+        typeInput.getParent().repaint();
+    }
 
     private void initCustom() {
     setLocationRelativeTo(null);
@@ -119,9 +144,9 @@ public class registerAnOrg extends javax.swing.JFrame {
     public registerAnOrg() {
         initComponents();
         
-         initCustom();
-         setLocationRelativeTo(null);
-        setupBackButton();
+        initComponents();
+        initCustom();
+        setupTypeDropdown();
 
        
     }
@@ -131,6 +156,7 @@ public class registerAnOrg extends javax.swing.JFrame {
 
         this.previousFrame = prev;
         initCustom();
+        setupTypeDropdown();
 
     }
 
@@ -381,7 +407,7 @@ public class registerAnOrg extends javax.swing.JFrame {
 
         String email = emailInput.getText().trim();
         String name = nameInput.getText().trim();
-        String type = typeInput.getText().trim();
+        String type = (String) typeDropdown.getSelectedItem();
         String appointed = appointedInput.getText().trim();
 
         String mission = missionInput.getText().trim();
@@ -416,20 +442,32 @@ public class registerAnOrg extends javax.swing.JFrame {
             return;
         }
 
-        savedEmail = email;
-        savedName = name;
-        savedType = type;
-        savedAppointed = appointed;
-        savedMission = mission;
-        savedVision = vision;
-        savedObjectives = objectivesText;
-        savedTarget = target;
-        savedProposed = proposed;
-        savedAdviser = adviser;
+        try {
 
-        javax.swing.JOptionPane.showMessageDialog(this, "Registration successful!");
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO registration_form (org_name, classification, mission, vision, objectives, target_members, proposed_officers, adviser, admin_email, submitted_by, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')"
+            );
+            ps.setString(1, name);
+            ps.setString(2, type);
+            ps.setString(3, mission);
+            ps.setString(4, vision);
+            ps.setString(5, objectivesText);
+            ps.setString(6, target);
+            ps.setString(7, proposed);
+            ps.setString(8, adviser);
+            ps.setString(9, email);
+            ps.setString(10, appointed);
+            ps.executeUpdate();
+            conn.close();
 
-        clearForm();
+            javax.swing.JOptionPane.showMessageDialog(this, "Registration submitted successfully!");
+            clearForm();
+
+        } catch (Exception ex) {
+            System.out.println("Submit error: " + ex.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(this, "Submission failed. Please try again.");
+        }
 
     }//GEN-LAST:event_submitBtnActionPerformed
 

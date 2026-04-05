@@ -9,6 +9,8 @@ package bond.ui.UserSide;
  * @author denis
  */
 public class studOrg extends javax.swing.JFrame {
+    
+    private int[] orgIds = new int[5];
 
     private void setupHover(javax.swing.JButton btn) {
 
@@ -33,26 +35,57 @@ public class studOrg extends javax.swing.JFrame {
 
     public studOrg() {
         initComponents();
-        
-
-        
-
         setLocationRelativeTo(null);
         searchInput1.setOpaque(false);
         searchInput1.setBorder(null);
         searchInput1.setBackground(new java.awt.Color(0, 0, 0, 0));
-
         javax.swing.JButton[] buttons = {
             dashboardBtn,
             studOrgBtn,
             aboutBtn,
             settingsBtn
         };
-
         for (javax.swing.JButton btn : buttons) {
             setupHover(btn);
         }
+        loadOrgs();
+    }
 
+    
+    private void loadOrgs() {
+            loadOrgs("");
+    }
+
+    private void loadOrgs(String query) {
+
+        javax.swing.JButton[] orgs = {org1, org2, org3, org4, org5};
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT org_id FROM organization WHERE status = 'Active' AND org_name LIKE ? ORDER BY org_id ASC LIMIT 5"
+            );
+            ps.setString(1, "%" + query + "%");
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            int i = 0;
+            while (rs.next() && i < 5) {
+                orgIds[i] = rs.getInt("org_id");
+                orgs[i].setVisible(true);
+                i++;
+            }
+
+            while (i < 5) {
+                orgs[i].setVisible(false);
+                i++;
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Load orgs error: " + ex.getMessage());
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -432,7 +465,10 @@ public class studOrg extends javax.swing.JFrame {
     }//GEN-LAST:event_dashboardBtnActionPerformed
 
     private void searchInput1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchInput1ActionPerformed
-
+        String query = searchInput1.getText().trim();
+        if (!query.isEmpty()) {
+            loadOrgs(query);
+        }
     }//GEN-LAST:event_searchInput1ActionPerformed
 
     private void exBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exBtnActionPerformed
@@ -441,11 +477,13 @@ public class studOrg extends javax.swing.JFrame {
     }//GEN-LAST:event_exBtnActionPerformed
 
     private void bitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bitBtnActionPerformed
-
+            loadOrgs("BIT");
+    
     }//GEN-LAST:event_bitBtnActionPerformed
 
     private void allBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allBtnActionPerformed
-
+        searchInput1.setText("");
+        loadOrgs();
     }//GEN-LAST:event_allBtnActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

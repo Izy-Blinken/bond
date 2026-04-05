@@ -9,8 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import Dashboard.Dashboard;
-
+import bond.ui.UserSide.dashboard;
 /**
  *
  * @author Erica
@@ -316,7 +315,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 this, "Are you sure you want to exit admin?",
                 "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-               navigateTo(new Dashboard());
+               navigateTo(new dashboard());
             }
         });
         getContentPane().add(btnExitAdmin);
@@ -366,11 +365,16 @@ public class SettingsFrame extends javax.swing.JFrame {
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
 
-            java.sql.ResultSet rs = conn.prepareStatement(
-                "SELECT full_name, email FROM admins WHERE admin_id = 1"
-            ).executeQuery();
+            int adminId = bond.util.SessionManager.getCurrentAdminId();
+            int orgId = bond.util.SessionManager.getCurrentOrgId();
+
+            java.sql.PreparedStatement ps1 = conn.prepareStatement(
+                "SELECT username, email FROM org_admin WHERE org_admin_id = ?"
+            );
+            ps1.setInt(1, adminId);
+            java.sql.ResultSet rs = ps1.executeQuery();
             if (rs.next()) {
-                String name  = rs.getString("full_name");
+                String name  = rs.getString("username");
                 String email = rs.getString("email");
                 fullNameField.setText(name);
                 emailField.setText(email);
@@ -378,11 +382,13 @@ public class SettingsFrame extends javax.swing.JFrame {
                 lblAdminName.setToolTipText(name);
             }
 
-            java.sql.ResultSet rs2 = conn.prepareStatement(
-                "SELECT name FROM organizations WHERE org_id = 1"
-            ).executeQuery();
+            java.sql.PreparedStatement ps2 = conn.prepareStatement(
+                "SELECT org_name FROM organization WHERE org_id = ?"
+            );
+            ps2.setInt(1, orgId);
+            java.sql.ResultSet rs2 = ps2.executeQuery();
             if (rs2.next()) {
-                String org = rs2.getString("name");
+                String org = rs2.getString("org_name");
                 lblOrgName.setText(org);
                 lblOrgName.setToolTipText(org);
             }
@@ -396,20 +402,27 @@ public class SettingsFrame extends javax.swing.JFrame {
     private void saveSettings(String fullName, String email, String newPassword) {
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            int adminId = bond.util.SessionManager.getCurrentAdminId();
+
             if (newPassword != null) {
                 java.sql.PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE admins SET full_name=?, email=?, password=? WHERE admin_id=1");
+                    "UPDATE org_admin SET username=?, email=?, password_hash=? WHERE org_admin_id=?"
+                );
                 ps.setString(1, fullName);
                 ps.setString(2, email);
                 ps.setString(3, newPassword);
+                ps.setInt(4, adminId);
                 ps.executeUpdate();
             } else {
                 java.sql.PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE admins SET full_name=?, email=? WHERE admin_id=1");
+                    "UPDATE org_admin SET username=?, email=? WHERE org_admin_id=?"
+                );
                 ps.setString(1, fullName);
                 ps.setString(2, email);
+                ps.setInt(3, adminId);
                 ps.executeUpdate();
             }
+            
             conn.close();
             javax.swing.JOptionPane.showMessageDialog(this, "Settings saved successfully!");
         } catch (Exception ex) {

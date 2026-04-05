@@ -16,19 +16,20 @@ public class loginAsOso extends javax.swing.JFrame {
         backBtn.setBorderPainted(false);
         backBtn.setFocusPainted(false);
         backBtn.setOpaque(false);
-
+ 
         backBtn.setForeground(java.awt.Color.WHITE);
         backBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
+ 
         backBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 backBtn.setForeground(new java.awt.Color(200, 230, 210));
             }
-
+ 
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 backBtn.setForeground(java.awt.Color.WHITE);
             }
         });
+
     }
 
     // method for placeholders
@@ -38,10 +39,10 @@ public class loginAsOso extends javax.swing.JFrame {
         usernameInput.setOpaque(false);
         usernameInput.setBorder(null);
         usernameInput.setBackground(new java.awt.Color(0, 0, 0, 0));
-
+ 
         usernameInput.setText("Enter your username");
         usernameInput.setForeground(new java.awt.Color(120, 120, 120));
-
+ 
         usernameInput.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (usernameInput.getText().equals("Enter your username")) {
@@ -49,7 +50,7 @@ public class loginAsOso extends javax.swing.JFrame {
                     usernameInput.setForeground(new java.awt.Color(28, 94, 56));
                 }
             }
-
+ 
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (usernameInput.getText().isEmpty()) {
                     usernameInput.setText("Enter your username");
@@ -62,7 +63,7 @@ public class loginAsOso extends javax.swing.JFrame {
         passwordInput.setText("Enter your password");
         passwordInput.setEchoChar((char) 0);
         passwordInput.setForeground(new java.awt.Color(120, 120, 120));
-
+ 
         passwordInput.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (String.valueOf(passwordInput.getPassword()).equals("Enter your password")) {
@@ -71,7 +72,7 @@ public class loginAsOso extends javax.swing.JFrame {
                     passwordInput.setForeground(new java.awt.Color(28, 94, 56));
                 }
             }
-
+ 
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (String.valueOf(passwordInput.getPassword()).isEmpty()) {
                     passwordInput.setText("Enter your password");
@@ -194,34 +195,23 @@ public class loginAsOso extends javax.swing.JFrame {
 
     private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
         // SAMPLE ACCOUNT (for testing whehe)
-        String savedUsername = "admin";
-        String savedPassword = "1234";
-
         String username = usernameInput.getText().trim();
         String password = String.valueOf(passwordInput.getPassword()).trim();
-
-        /*
-    if (username.equals("Enter your username") || password.equals("Enter your password")
-            || username.isEmpty() || password.isEmpty()) {
-
-        javax.swing.JOptionPane.showMessageDialog(this, "Please enter username and password!");
-        return;
-    }
-         */
-
- /*
-    if (savedUsername == null || savedUsername.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "No account found! Please register first.");
-        return;
-    }
-         */
-        if (username.equals(savedUsername) && password.equals(savedPassword)) {
-
-            javax.swing.JOptionPane.showMessageDialog(this, "Login Successful!");
+ 
+        if (username.isEmpty() || username.equals("Enter your username")
+                || password.isEmpty() || password.equals("Enter your password")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter username and password.");
+            return;
+        }
+ 
+        bond.model.OsoAdmin admin = new bond.dao.OsoAdminDAO().login(username, password);
+ 
+        if (admin != null) {
+            bond.util.SessionManager.loginOso(admin);
+            new bond.ui.osoAdmin.osoDashboard().setVisible(true);
             this.dispose();
-
         } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials!");
+            javax.swing.JOptionPane.showMessageDialog(this, "Invalid credentials.");
         }
     }//GEN-LAST:event_loginActionPerformed
 
