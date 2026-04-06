@@ -35,11 +35,15 @@ public class studOrgClicked extends javax.swing.JFrame {
      * Creates new form studOrgClicked
      */
     private int orgId;
+    private javax.swing.JLabel eventTitle1 = new javax.swing.JLabel("");
+private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
 
     public studOrgClicked(int orgId) {
+        this.setLocationRelativeTo(null);
         this.orgId = orgId;
         initComponents();
 
+        
         javax.swing.SwingUtilities.invokeLater(() -> {
             studOrgScroll.getVerticalScrollBar().setValue(0);
         });
@@ -70,14 +74,12 @@ public class studOrgClicked extends javax.swing.JFrame {
     }
 
     private void loadOrgData() {
-
         try {
-
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
 
-            // org info
+            // Load org name + description + mission + vision
             java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT org_name, mission, vision FROM organization WHERE org_id = ?"
+                "SELECT org_name, description, mission, vision FROM organization WHERE org_id = ?"
             );
             ps.setInt(1, orgId);
             java.sql.ResultSet rs = ps.executeQuery();
@@ -85,26 +87,40 @@ public class studOrgClicked extends javax.swing.JFrame {
             if (rs.next()) {
                 missionArea.setText(rs.getString("mission"));
                 visionArea.setText(rs.getString("vision"));
+
+                // Add org name label dynamically over the bar.png header area
+                javax.swing.JLabel lblOrgName = new javax.swing.JLabel(rs.getString("org_name"));
+                lblOrgName.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 28));
+                lblOrgName.setForeground(java.awt.Color.WHITE);
+                lblOrgName.setBounds(80, 150, 800, 40);
+                jPanel1.add(lblOrgName);
+                jPanel1.setComponentZOrder(lblOrgName, 0);
+
+                // Add description label below name
+                javax.swing.JLabel lblDesc = new javax.swing.JLabel("<html>" + rs.getString("description") + "</html>");
+                lblDesc.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 14));
+                lblDesc.setForeground(java.awt.Color.WHITE);
+                lblDesc.setBounds(80, 200, 800, 60);
+                jPanel1.add(lblDesc);
+                jPanel1.setComponentZOrder(lblDesc, 0);
+
+                jPanel1.revalidate();
+                jPanel1.repaint();
             }
 
-            // events
+            // Load events using computed status
             java.sql.PreparedStatement ps2 = conn.prepareStatement(
-                "SELECT title, event_date, venue, status FROM event WHERE org_id = ? ORDER BY event_date DESC LIMIT 2"
+                "SELECT title, event_date, venue, " +
+                "CASE WHEN event_date < CURDATE() THEN 'Completed' ELSE 'Upcoming' END AS status " +
+                "FROM event WHERE org_id = ? ORDER BY event_date DESC LIMIT 2"
             );
             ps2.setInt(1, orgId);
             java.sql.ResultSet rs2 = ps2.executeQuery();
 
             if (rs2.next()) {
-                eventsLb2.setText(rs2.getString("title"));
-                dateLbl.setText(rs2.getString("event_date"));
-                locationLbl.setText(rs2.getString("venue"));
-                statusLbl.setText(rs2.getString("status"));
-            }
-
-            if (rs2.next()) {
                 eventsLb3.setText(rs2.getString("title"));
                 dateLbl1.setText(rs2.getString("event_date"));
-                locationLbl1.setText(rs2.getString("venue"));
+                locationLbl1.setText(rs2.getString("venue") != null ? rs2.getString("venue") : "—");
                 statusLbl1.setText(rs2.getString("status"));
             }
 
@@ -114,6 +130,16 @@ public class studOrgClicked extends javax.swing.JFrame {
             System.out.println("Load org data error: " + ex.getMessage());
         }
     }
+
+    private void addRow(String text, int x, int y, int w) {
+        javax.swing.JLabel lbl = new javax.swing.JLabel(text != null ? text : "—");
+        lbl.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+        lbl.setForeground(new java.awt.Color(40, 40, 40));
+        jPanel1.add(lbl, new org.netbeans.lib.awtextra.AbsoluteConstraints(x, y, w, 20));
+        jPanel1.setComponentZOrder(lbl, 0);
+    }
+
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -638,6 +664,16 @@ public class studOrgClicked extends javax.swing.JFrame {
 
     private void searchInput1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchInput1ActionPerformed
         // TODO add your handling code here:
+        searchInput1.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { doSearch(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { doSearch(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { doSearch(); }
+            private void doSearch() {
+                // TODO: filter displayed org list by searchInput1.getText()
+                // For now at minimum: System.out.println("search: " + searchInput1.getText());
+            }
+        });
+        
     }//GEN-LAST:event_searchInput1ActionPerformed
 
     private void settingsBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsBtnActionPerformed
@@ -664,6 +700,7 @@ public class studOrgClicked extends javax.swing.JFrame {
 
     private void completedBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_completedBtnActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_completedBtnActionPerformed
 
     private void allBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allBtnActionPerformed
@@ -673,65 +710,54 @@ public class studOrgClicked extends javax.swing.JFrame {
 
     private void completedBtn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_completedBtn2ActionPerformed
         // TODO add your handling code here:
-         try {
-
-            java.sql.Connection conn = bond.db.DBConnection.getConnection();
-            java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT title, event_date, venue, status FROM event WHERE org_id = ? AND status = 'Completed' ORDER BY event_date DESC LIMIT 2"
-            );
-            ps.setInt(1, orgId);
-            java.sql.ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                eventsLb2.setText(rs.getString("title"));
-                dateLbl.setText(rs.getString("event_date"));
-                locationLbl.setText(rs.getString("venue"));
-                statusLbl.setText(rs.getString("status"));
-            }
-
-            if (rs.next()) {
-                eventsLb3.setText(rs.getString("title"));
-                dateLbl1.setText(rs.getString("event_date"));
-                locationLbl1.setText(rs.getString("venue"));
-                statusLbl1.setText(rs.getString("status"));
-            }
-
-            conn.close();
-
-        } catch (Exception ex) {
-            System.out.println("Completed events error: " + ex.getMessage());
-        }
+        try {
+          java.sql.Connection conn = bond.db.DBConnection.getConnection();
+          java.sql.PreparedStatement ps = conn.prepareStatement(
+              "SELECT title, event_date, venue, 'Completed' AS status " +
+              "FROM event WHERE org_id = ? AND event_date < CURDATE() ORDER BY event_date DESC LIMIT 2"
+          );
+          ps.setInt(1, orgId);
+          java.sql.ResultSet rs = ps.executeQuery();
+          eventsLb3.setText(""); dateLbl1.setText(""); locationLbl1.setText(""); statusLbl1.setText("");
+          
+          if (rs.next()) {
+              eventsLb3.setText(rs.getString("title"));
+              dateLbl1.setText(rs.getString("event_date"));
+              locationLbl1.setText(rs.getString("venue") != null ? rs.getString("venue") : "—");
+              statusLbl1.setText(rs.getString("status"));
+          }
+          conn.close();
+          
+      } catch (Exception ex) { 
+          System.out.println("Completed error: " + ex.getMessage()); 
+      }
     }//GEN-LAST:event_completedBtn2ActionPerformed
 
     private void upcomingBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upcomingBtnActionPerformed
         // TODO add your handling code here:
-        try {
-
+            try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT title, event_date, venue, status FROM event WHERE org_id = ? AND status = 'Upcoming' ORDER BY event_date ASC LIMIT 2"
+                "SELECT title, event_date, venue, " +
+                "CASE WHEN event_date < CURDATE() THEN 'Completed' ELSE 'Upcoming' END AS status " +
+                "FROM event WHERE org_id = ? AND event_date >= CURDATE() ORDER BY event_date ASC LIMIT 2"
             );
+            
             ps.setInt(1, orgId);
             java.sql.ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                eventsLb2.setText(rs.getString("title"));
-                dateLbl.setText(rs.getString("event_date"));
-                locationLbl.setText(rs.getString("venue"));
-                statusLbl.setText(rs.getString("status"));
-            }
-
+            eventsLb3.setText(""); dateLbl1.setText(""); locationLbl1.setText(""); statusLbl1.setText("");
+            
             if (rs.next()) {
                 eventsLb3.setText(rs.getString("title"));
                 dateLbl1.setText(rs.getString("event_date"));
-                locationLbl1.setText(rs.getString("venue"));
+                locationLbl1.setText(rs.getString("venue") != null ? rs.getString("venue") : "—");
                 statusLbl1.setText(rs.getString("status"));
             }
-
+            
             conn.close();
-
+            
         } catch (Exception ex) {
-            System.out.println("Upcoming events error: " + ex.getMessage());
+            System.out.println("Upcoming error: " + ex.getMessage()); 
         }
     }//GEN-LAST:event_upcomingBtnActionPerformed
 

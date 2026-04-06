@@ -15,9 +15,11 @@ public class osoAdminProfile extends javax.swing.JFrame {
      */
     public osoAdminProfile() {
         initComponents();
-        setLocationRelativeTo(null);
+        
+        this.setLocationRelativeTo(null);
         loadProfile();
         setupSaveBtn();
+        setupExitButton();
     }
 
     private void loadProfile() {
@@ -64,6 +66,30 @@ public class osoAdminProfile extends javax.swing.JFrame {
                 System.out.println("Save profile error: " + ex.getMessage());
             }
         });
+    }
+    
+     private void setupExitButton() {
+
+        javax.swing.JButton btnExit = new javax.swing.JButton("Exit Admin");
+        btnExit.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnExit.setForeground(new java.awt.Color(200, 40, 40));
+        btnExit.setBackground(new java.awt.Color(248, 250, 249));
+        btnExit.setBorderPainted(false);
+        btnExit.setFocusPainted(false);
+        btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExit.setBounds(10, 540, 130, 30);
+        btnExit.addActionListener(e -> {
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(
+                this, "Exit OSO Admin?", "Exit",
+                javax.swing.JOptionPane.YES_NO_OPTION);
+            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                bond.util.SessionManager.logout();
+                new bond.ui.UserSide.loginChoices().setVisible(true);
+                this.dispose();
+            }
+        });
+        jPanel1.add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 540, 150, 30));
+        jPanel1.setComponentZOrder(btnExit, 0);
     }
 
     /**

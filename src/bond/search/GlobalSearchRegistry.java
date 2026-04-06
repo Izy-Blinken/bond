@@ -51,9 +51,12 @@ public class GlobalSearchRegistry {
         announcements.clear();
         members.clear();
         try {
-            events.addAll(new EventDAO().getAllEvents(1));
-            announcements.addAll(new AnnouncementDAO().getAllAnnouncements(1));
-            members.addAll(new MemberDAO().getAllMembers(1));
+            int orgId = bond.util.SessionManager.getCurrentOrgId();
+            if (orgId > 0) {
+                events.addAll(new EventDAO().getAllEvents(orgId));
+                announcements.addAll(new AnnouncementDAO().getAllAnnouncements(orgId));
+                members.addAll(new MemberDAO().getAllMembers(orgId));
+            }
         } catch (Exception ignored) {}
     }
 

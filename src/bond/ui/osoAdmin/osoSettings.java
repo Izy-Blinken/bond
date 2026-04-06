@@ -15,16 +15,19 @@ public class osoSettings extends javax.swing.JFrame {
      */
     public osoSettings() {
         initComponents();
-        setLocationRelativeTo(null);
+        
+        this.setLocationRelativeTo(null);setLocationRelativeTo(null);
         setupUpdateBtn();
+        setupExitButton();
+
     }
 
     private void setupUpdateBtn() {
 
         orgInfoBtn.addActionListener(e -> {
 
-            String currentPass = fullnameInput1.getText().trim();
-            String newPass = emailInput1.getText().trim();
+            String currentPass = emailInput1.getText().trim();
+            String newPass = fullnameInput1.getText().trim();
 
             if (currentPass.isEmpty() || newPass.isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Fields cannot be empty.");
@@ -41,12 +44,13 @@ public class osoSettings extends javax.swing.JFrame {
                 ps.setInt(1, adminId);
                 java.sql.ResultSet rs = ps.executeQuery();
 
-                if (rs.next() && rs.getString("password_hash").equals(currentPass)) {
+                if (rs.next() && rs.getString("password_hash").equals(hashPassword(currentPass))) {
 
                     java.sql.PreparedStatement ps2 = conn.prepareStatement(
                         "UPDATE oso_admin SET password_hash = ? WHERE oso_admin_id = ?"
                     );
-                    ps2.setString(1, newPass);
+                    ps2.setString(1, hashPassword(newPass));
+                    
                     ps2.setInt(2, adminId);
                     ps2.executeUpdate();
                     javax.swing.JOptionPane.showMessageDialog(this, "Password updated successfully!");
@@ -64,7 +68,41 @@ public class osoSettings extends javax.swing.JFrame {
             }
         });
     }
+    
+     private void setupExitButton() {
 
+        javax.swing.JButton btnExit = new javax.swing.JButton("Exit Admin");
+        btnExit.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnExit.setForeground(new java.awt.Color(200, 40, 40));
+        btnExit.setBackground(new java.awt.Color(248, 250, 249));
+        btnExit.setBorderPainted(false);
+        btnExit.setFocusPainted(false);
+        btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExit.setBounds(10, 540, 130, 30);
+        btnExit.addActionListener(e -> {
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(
+                this, "Exit OSO Admin?", "Exit",
+                javax.swing.JOptionPane.YES_NO_OPTION);
+            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                bond.util.SessionManager.logout();
+                new bond.ui.UserSide.loginChoices().setVisible(true);
+                this.dispose();
+            }
+        });
+        jPanel1.add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 540, 150, 30));
+        jPanel1.setComponentZOrder(btnExit, 0);
+    }
+
+     private String hashPassword(String plain) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(plain.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (Exception e) { return plain; }
+    }
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

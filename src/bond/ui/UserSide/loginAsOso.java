@@ -85,7 +85,7 @@ public class loginAsOso extends javax.swing.JFrame {
 
     public loginAsOso() {
         initComponents();
-        setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);
         setupBackButton();
         setupPlaceholders();
     }
@@ -216,7 +216,7 @@ public class loginAsOso extends javax.swing.JFrame {
     }//GEN-LAST:event_loginActionPerformed
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
-        new loginChoices().setVisible(true);
+        new loginChoices(new bond.ui.UserSide.dashboard()).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
 

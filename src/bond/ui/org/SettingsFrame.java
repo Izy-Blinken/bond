@@ -75,9 +75,10 @@ public class SettingsFrame extends javax.swing.JFrame {
      * Creates new form SettingsFrame
      */
     public SettingsFrame() {
-    initComponents();
-    ActiveTab.setBounds(0, 7, 1000, 600); 
-    javax.swing.JLabel lblBond = new javax.swing.JLabel("BOND");
+        this.setLocationRelativeTo(null);
+        initComponents();
+        ActiveTab.setBounds(0, 7, 1000, 600); 
+        javax.swing.JLabel lblBond = new javax.swing.JLabel("BOND");
         lblBond.setFont(new java.awt.Font("Playfair Display", java.awt.Font.PLAIN, 40));
         lblBond.setForeground(java.awt.Color.WHITE);
         lblBond.setBounds(28, 17, 200, 50);
@@ -155,9 +156,9 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         GlobalSearchBar searchBar = new GlobalSearchBar(this, result -> {
             switch (result.type) {
-                case EVENT:        navigateTo(new EventFrame());        break;
+                case EVENT: navigateTo(new EventFrame()); break;
                 case ANNOUNCEMENT: navigateTo(new AnnouncementFrame()); break;
-                case MEMBER:       navigateTo(new OrgProfileFrame());   break;
+                case MEMBER: navigateTo(new OrgProfileFrame()); break;
             }
     },
             () -> SearchBar.setIcon(sbHover),   
@@ -201,7 +202,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         lblOrgName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
         contentPanel.add(lblOrgName);
 
-        JTextField fullNameField = makeTextField(290, 230, 350, 40, "Full Name");
+        JTextField fullNameField = makeTextField(290, 230, 350, 40, "Username");
         contentPanel.add(fullNameField);
 
         JTextField emailField = makeTextField(290, 295, 350, 40, "Email");

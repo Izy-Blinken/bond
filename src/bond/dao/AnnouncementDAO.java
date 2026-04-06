@@ -13,13 +13,17 @@ public class AnnouncementDAO {
     // Add
     public boolean addAnnouncement(Announcement a) {
         String sql = "INSERT INTO announcement (org_id, academic_year_id, posted_by, title, content, created_at) " +
-                     "VALUES (?, 1, 1, ?, ?, NOW())";
+                     "VALUES (?, 1, ?, ?, ?, ?)";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
+            
             ps.setInt(1, a.getOrgId());
-            ps.setString(2, a.getTitle());
-            ps.setString(3, a.getContent());
+            ps.setInt(2, bond.util.SessionManager.getCurrentAdminId());
+            ps.setString(3, a.getTitle());
+            ps.setString(4, a.getContent());
+            ps.setString(5, a.getDate());
+            
             boolean result = ps.executeUpdate() > 0;
             conn.close();
             return result;

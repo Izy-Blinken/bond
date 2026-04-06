@@ -29,7 +29,7 @@ public class dashboard extends javax.swing.JFrame {
     public dashboard() {
         initComponents();
 
-        setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);
         settingsPanel.setVisible(false);
 
         searchInput1.setOpaque(false);
@@ -374,8 +374,9 @@ public class dashboard extends javax.swing.JFrame {
 
     private void loginAsOsoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginAsOsoActionPerformed
 
-        new loginChoices(this).setVisible(true);
-        this.dispose();
+        this.setVisible(false);
+        loginChoices lc = new loginChoices(this);
+        lc.setVisible(true);
     }//GEN-LAST:event_loginAsOsoActionPerformed
 
     private void org1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_org1ActionPerformed

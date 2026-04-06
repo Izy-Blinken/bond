@@ -15,8 +15,10 @@ public class osoDashboard extends javax.swing.JFrame {
      */
     public osoDashboard() {
         initComponents();
-        setLocationRelativeTo(null);
+        
+        this.setLocationRelativeTo(null);
         loadStats();
+        setupExitButton();
     }
     
     private void loadStats() {
@@ -27,30 +29,98 @@ public class osoDashboard extends javax.swing.JFrame {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
 
             java.sql.ResultSet rs1 = conn.prepareStatement("SELECT COUNT(*) FROM organization WHERE status = 'Active'").executeQuery();
-            if (rs1.next()){
+            if (rs1.next()) {
                 totalOrgsCOUNT.setText(String.valueOf(rs1.getInt(1)));
             }
 
             java.sql.ResultSet rs2 = conn.prepareStatement("SELECT COUNT(*) FROM members").executeQuery();
-            if (rs2.next()){
+            if (rs2.next()) {
                 totalmemCOUNT.setText(String.valueOf(rs2.getInt(1)));
             }
 
             java.sql.ResultSet rs3 = conn.prepareStatement("SELECT COUNT(*) FROM event").executeQuery();
-            if (rs3.next()){
+            if (rs3.next()) {
                 eventsCOUNT.setText(String.valueOf(rs3.getInt(1)));
             }
 
-            java.sql.ResultSet rs4 = conn.prepareStatement("SELECT COUNT(*) FROM registration_form WHERE status = 'Pending'").executeQuery();
-            if (rs4.next()){
-                pendingsCOUNT.setText(Integer.toString(rs4.getInt(1)));
+            java.sql.ResultSet rs4 = conn.prepareStatement("SELECT COUNT(*) FROM registration_form WHERE review_status = 'Pending'").executeQuery();
+            if (rs4.next()) {
+                pendingsCOUNT.setText(String.valueOf(rs4.getInt(1)));
             }
 
+            
+            // load registered orgs dynamically below stats
+            java.sql.PreparedStatement psOrg = conn.prepareStatement(
+                "SELECT org_name, classification, status FROM organization ORDER BY org_name ASC"
+            );
+            java.sql.ResultSet rsOrg = psOrg.executeQuery();
+
+            int baseY = 320;
+            while (rsOrg.next()) {
+                String oName   = rsOrg.getString("org_name");
+                String oClass  = rsOrg.getString("classification");
+                String oStatus = rsOrg.getString("status");
+
+                javax.swing.JLabel lName = new javax.swing.JLabel(oName);
+                lName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
+                lName.setForeground(new java.awt.Color(28, 94, 56));
+                jPanel1.add(lName, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, baseY, 300, 20));
+
+                javax.swing.JLabel lClass = new javax.swing.JLabel(oClass);
+                lClass.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
+                lClass.setForeground(new java.awt.Color(100, 140, 120));
+                jPanel1.add(lClass, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, baseY + 18, 280, 16));
+
+                java.awt.Color sc = "Active".equals(oStatus)
+                    ? new java.awt.Color(28, 94, 56)
+                    : new java.awt.Color(180, 30, 30);
+                javax.swing.JLabel lStatus = new javax.swing.JLabel("● " + oStatus);
+                lStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                lStatus.setForeground(sc);
+                jPanel1.add(lStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, baseY + 8, 120, 20));
+
+                baseY += 50;
+            }
+
+            int finalH = Math.max(750, baseY + 30);
+            jPanel1.setPreferredSize(new java.awt.Dimension(798, finalH));
+            jPanel1.revalidate();
+            jPanel1.repaint();
+
+
             conn.close();
+            
+            regOrgPanel.setVisible(false);
+            jPanel1.revalidate();
+            jPanel1.repaint();
             
         } catch (Exception ex) {
             System.out.println("Load stats error: " + ex.getMessage());
         }
+    }
+    
+    private void setupExitButton() {
+
+        javax.swing.JButton btnExit = new javax.swing.JButton("Exit Admin");
+        btnExit.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnExit.setForeground(new java.awt.Color(200, 40, 40));
+        btnExit.setBackground(new java.awt.Color(248, 250, 249));
+        btnExit.setBorderPainted(false);
+        btnExit.setFocusPainted(false);
+        btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExit.setBounds(10, 540, 130, 30);
+        btnExit.addActionListener(e -> {
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(
+                this, "Exit OSO Admin?", "Exit",
+                javax.swing.JOptionPane.YES_NO_OPTION);
+            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                bond.util.SessionManager.logout();
+                new bond.ui.UserSide.loginChoices().setVisible(true);
+                this.dispose();
+            }
+        });
+        jPanel2.add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 540, 150, 30));
+        jPanel2.setComponentZOrder(btnExit, 0);
     }
 
     /**

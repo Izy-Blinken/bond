@@ -128,6 +128,8 @@ public class EventFrame extends javax.swing.JFrame {
 }
  
     public EventFrame() {
+        this.setLocationRelativeTo(null);
+        
         initComponents();    
         ActiveTab.setBounds(0, -2, 1000, 600); 
         javax.swing.JLabel lblBond = new javax.swing.JLabel("BOND");
@@ -219,9 +221,9 @@ public class EventFrame extends javax.swing.JFrame {
 
         GlobalSearchBar searchBar = new GlobalSearchBar(this, result -> {
             switch (result.type) {
-                case EVENT:        navigateTo(new EventFrame());        break;
+                case EVENT: navigateTo(new EventFrame()); break;
                 case ANNOUNCEMENT: navigateTo(new AnnouncementFrame()); break;
-                case MEMBER:       navigateTo(new OrgProfileFrame());   break;
+                case MEMBER: navigateTo(new OrgProfileFrame()); break;
             }
     },
             () -> SearchBar.setIcon(sbHover),    // onFocusGained

@@ -37,6 +37,7 @@ public class DashboardFrame extends javax.swing.JFrame {
      * Creates new form DashboardFrame
      */
     public DashboardFrame() {
+        this.setLocationRelativeTo(null);
         initComponents();
         ActiveTab.setBounds(0, -10, 1000, 600); 
         

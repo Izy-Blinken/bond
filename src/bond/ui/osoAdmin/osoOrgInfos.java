@@ -63,6 +63,11 @@ public class osoOrgInfos extends javax.swing.JFrame {
         setupUI();
         setupTabs();
         loadOrgInfo();
+        tabBtn.addChangeListener(e -> {
+            int idx = tabBtn.getSelectedIndex();
+            if (idx == 1) loadMembers();
+            else if (idx == 2) loadPendingForms();
+        });
     }
 
     public osoOrgInfos() {
@@ -72,20 +77,21 @@ public class osoOrgInfos extends javax.swing.JFrame {
     private int selectedMemberId = -1;
     private int selectedFormId = -1;
 
-    private void loadMembers() {
+   private void loadMembers() {
 
         jPanel3.removeAll();
 
-        javax.swing.JLabel header = new javax.swing.JLabel();
-        header.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/membersTable.png")));
-        header.setBounds(20, 10, 660, 190);
-        jPanel3.add(header);
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/membersTable.png")));
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 660, 190));
+        jPanel3.setComponentZOrder(jLabel5, jPanel3.getComponentCount() - 1);
 
+        int[] rowY = {52, 92, 132, 172, 212};
+        int i = 0;
         try {
 
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT member_id, full_name, role, joined_date FROM members WHERE org_id = ? ORDER BY member_id ASC"
+                "SELECT member_id, name, role, status FROM members WHERE org_id = ? ORDER BY member_id ASC"
             );
             ps.setInt(1, orgId);
             java.sql.ResultSet rs = ps.executeQuery();
@@ -94,23 +100,39 @@ public class osoOrgInfos extends javax.swing.JFrame {
             while (rs.next()) {
 
                 int mId = rs.getInt("member_id");
-                String name = rs.getString("full_name");
+                String name = rs.getString("name");
                 String role = rs.getString("role");
-                String date = rs.getString("joined_date");
+                String date = rs.getString("status");
 
-                javax.swing.JLabel lbl = new javax.swing.JLabel(name + " — " + role + " (" + date + ")");
-                lbl.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
-                lbl.setForeground(new java.awt.Color(28, 94, 56));
-                lbl.setBounds(30, y, 500, 20);
-                lbl.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-                lbl.addMouseListener(new java.awt.event.MouseAdapter() {
+                javax.swing.JLabel lblName = new javax.swing.JLabel(name);
+                lblName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lblName.setForeground(new java.awt.Color(28, 94, 56));
+                jPanel3.add(lblName, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, rowY[i] + 10, 180, 20));
 
+                javax.swing.JLabel lblRole = new javax.swing.JLabel(role != null ? role : "—");
+                lblRole.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lblRole.setForeground(new java.awt.Color(28, 94, 56));
+                jPanel3.add(lblRole, new org.netbeans.lib.awtextra.AbsoluteConstraints(215, rowY[i] + 10, 150, 20));
+
+                javax.swing.JLabel lblStatus = new javax.swing.JLabel("Active");
+                lblStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lblStatus.setForeground(new java.awt.Color(28, 94, 56));
+                jPanel3.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, rowY[i] + 10, 100, 20));
+
+                final int mid = mId;
+                javax.swing.JLabel lblSelect = new javax.swing.JLabel("▶ Select");
+                lblSelect.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                lblSelect.setForeground(new java.awt.Color(28, 94, 56));
+                lblSelect.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                lblSelect.addMouseListener(new java.awt.event.MouseAdapter() {
                     public void mouseClicked(java.awt.event.MouseEvent e) {
-                        selectedMemberId = mId;
+                        selectedMemberId = mid;
+                        lblSelect.setForeground(new java.awt.Color(200, 40, 40));
                     }
                 });
-                jPanel3.add(lbl);
-                y += 25;
+                jPanel3.add(lblSelect, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, rowY[i] + 10, 80, 20));
+
+                i++;
             }
 
             conn.close();
@@ -127,39 +149,59 @@ public class osoOrgInfos extends javax.swing.JFrame {
 
         jPanel4.removeAll();
 
-        javax.swing.JLabel header = new javax.swing.JLabel();
-        header.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/pendingTable.png")));
-        header.setBounds(20, 10, 660, 50);
-        jPanel4.add(header);
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/pendingTable.png")));
+        jPanel4.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 660, 190));
+        jPanel4.setComponentZOrder(jLabel6, jPanel4.getComponentCount() - 1);
 
         try {
 
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT form_id, proposed_org_name, contact_email, review_status FROM registration_form WHERE review_status = 'Pending' ORDER BY form_id ASC"
+                "SELECT form_id, proposed_org_name, contact_email, review_status FROM registration_form ORDER BY form_id DESC"
             );
             java.sql.ResultSet rs = ps.executeQuery();
 
-            int y = 60;
-            while (rs.next()) {
+            int[] rowY = {52, 92, 132};
+            int i = 0;
 
+            while (rs.next() && i < 3) {
                 int fId = rs.getInt("form_id");
-                String orgN = rs.getString("proposed_org_name");
-                String email = rs.getString("contact_email");
+                String orgN   = rs.getString("proposed_org_name");
+                String email  = rs.getString("contact_email");
+                String status = rs.getString("review_status");
 
-                javax.swing.JLabel lbl = new javax.swing.JLabel(orgN + " — " + email);
-                lbl.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
-                lbl.setForeground(new java.awt.Color(28, 94, 56));
-                lbl.setBounds(30, y, 500, 20);
-                lbl.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-                lbl.addMouseListener(new java.awt.event.MouseAdapter() {
+                javax.swing.JLabel lblName = new javax.swing.JLabel(orgN);
+                lblName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lblName.setForeground(new java.awt.Color(28, 94, 56));
+                jPanel4.add(lblName, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, rowY[i] + 10, 200, 20));
 
+                javax.swing.JLabel lblEmail = new javax.swing.JLabel(email);
+                lblEmail.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
+                lblEmail.setForeground(new java.awt.Color(100, 140, 120));
+                jPanel4.add(lblEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, rowY[i] + 10, 200, 20));
+
+                java.awt.Color sc = "Approved".equals(status) ? new java.awt.Color(28, 94, 56)
+                        : "Rejected".equals(status) ? new java.awt.Color(180, 30, 30)
+                        : new java.awt.Color(180, 130, 0);
+                javax.swing.JLabel lblStatus = new javax.swing.JLabel(status);
+                lblStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                lblStatus.setForeground(sc);
+                jPanel4.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, rowY[i] + 10, 90, 20));
+
+                final int fid = fId;
+                javax.swing.JLabel lblSelect = new javax.swing.JLabel("▶ Select");
+                lblSelect.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                lblSelect.setForeground(new java.awt.Color(28, 94, 56));
+                lblSelect.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                lblSelect.addMouseListener(new java.awt.event.MouseAdapter() {
                     public void mouseClicked(java.awt.event.MouseEvent e) {
-                        selectedFormId = fId;
+                        selectedFormId = fid;
+                        lblSelect.setForeground(new java.awt.Color(200, 40, 40));
                     }
                 });
-                jPanel4.add(lbl);
-                y += 25;
+                jPanel4.add(lblSelect, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, rowY[i] + 10, 80, 20));
+
+                i++;
             }
 
             conn.close();
@@ -205,6 +247,30 @@ public class osoOrgInfos extends javax.swing.JFrame {
         } catch (Exception ex) {
             System.out.println("Load org info error: " + ex.getMessage());
         }
+    }
+    
+     private void setupExitButton() {
+
+        javax.swing.JButton btnExit = new javax.swing.JButton("Exit Admin");
+        btnExit.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnExit.setForeground(new java.awt.Color(200, 40, 40));
+        btnExit.setBackground(new java.awt.Color(248, 250, 249));
+        btnExit.setBorderPainted(false);
+        btnExit.setFocusPainted(false);
+        btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExit.setBounds(10, 540, 130, 30);
+        btnExit.addActionListener(e -> {
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(
+                this, "Exit OSO Admin?", "Exit",
+                javax.swing.JOptionPane.YES_NO_OPTION);
+            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                bond.util.SessionManager.logout();
+                new bond.ui.UserSide.loginChoices().setVisible(true);
+                this.dispose();
+            }
+        });
+        jPanel2.add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 540, 150, 30));
+        jPanel2.setComponentZOrder(btnExit, 0);
     }
 
     /**
@@ -475,11 +541,17 @@ public class osoOrgInfos extends javax.swing.JFrame {
             );
             ps.setString(1, newStatus);
             ps.setInt(2, orgId);
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
             conn.close();
 
+            if (rows > 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Status updated to: " + newStatus);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Failed. org_id = " + orgId, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+
         } catch (Exception ex) {
-            System.out.println("Toggle status error: " + ex.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_activeOrinactiveActionPerformed
 

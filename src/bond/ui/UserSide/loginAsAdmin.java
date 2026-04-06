@@ -81,7 +81,7 @@ public class loginAsAdmin extends javax.swing.JFrame {
     public loginAsAdmin() {
         initComponents();
 
-        setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);
         setupBackButton();
         setupPlaceholders();
 
@@ -198,7 +198,7 @@ public class loginAsAdmin extends javax.swing.JFrame {
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
 
-        new loginChoices().setVisible(true);
+        new loginChoices(new bond.ui.UserSide.dashboard()).setVisible(true);
         this.dispose();
 
     }//GEN-LAST:event_backBtnActionPerformed

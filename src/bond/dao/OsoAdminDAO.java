@@ -12,13 +12,16 @@ public class OsoAdminDAO {
     // Login check (plaintext — no hashing in this version)
     public OsoAdmin login(String username, String password) {
         String sql = "SELECT * FROM oso_admin WHERE username = ? AND password_hash = ?";
+        
         try {
             Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, hashPassword(password));
             ResultSet rs = ps.executeQuery();
+            
             if (rs.next()) {
+                
                 return new OsoAdmin(
                     rs.getInt("oso_admin_id"),
                     rs.getString("username"),
@@ -36,6 +39,7 @@ public class OsoAdminDAO {
     // Update password
     public boolean updatePassword(int osoAdminId, String newPassword) {
         String sql = "UPDATE oso_admin SET password_hash = ? WHERE oso_admin_id = ?";
+        
         try {
             Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
@@ -44,6 +48,7 @@ public class OsoAdminDAO {
             int rows = ps.executeUpdate();
             con.close();
             return rows > 0;
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -66,4 +71,19 @@ public class OsoAdminDAO {
         }
         return false;
     }
+    
+    private String hashPassword(String plain) {
+        
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(plain.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (Exception e) {
+            return plain;
+        }
+        
+    }
+
 }

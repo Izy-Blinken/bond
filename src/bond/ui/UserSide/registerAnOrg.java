@@ -76,7 +76,6 @@ public class registerAnOrg extends javax.swing.JFrame {
     private void clearForm() {
         emailInput.setText("org@gmail.com");
         nameInput.setText("Official name");
-        typeInput.setText("e.g. Academic, Cultural");
         appointedInput.setText("Full name of admin officer");
 
         missionInput.setText("Describe the organization's mission...");
@@ -87,30 +86,6 @@ public class registerAnOrg extends javax.swing.JFrame {
         adviserInput.setText("Faculty adviser name");
     }
     
-    private javax.swing.JComboBox<String> typeDropdown;
-
-    private void setupTypeDropdown() {
-
-        String[] types = {
-            "Academic",
-            "Civic & Cultural",
-            "Religious",
-            "Media & Publications",
-            "Sports & Recreation"
-        };
-
-        typeDropdown = new javax.swing.JComboBox<>(types);
-        typeDropdown.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14));
-        typeDropdown.setForeground(new java.awt.Color(28, 94, 56));
-        typeDropdown.setBorder(null);
-        typeDropdown.setBounds(typeInput.getBounds());
-        typeDropdown.setBackground(java.awt.Color.WHITE);
-
-        typeInput.setVisible(false);
-        typeInput.getParent().add(typeDropdown);
-        typeInput.getParent().revalidate();
-        typeInput.getParent().repaint();
-    }
 
     private void initCustom() {
     setLocationRelativeTo(null);
@@ -129,7 +104,6 @@ public class registerAnOrg extends javax.swing.JFrame {
 
     addPlaceholder(emailInput, "org@gmail.com");
     addPlaceholder(nameInput, "Official name");
-    addPlaceholder(typeInput, "e.g. Academic, Cultural");
     addPlaceholder(appointedInput, "Full name of admin officer");
 
     addPlaceholder(missionInput, "Describe the organization's mission...");
@@ -144,10 +118,10 @@ public class registerAnOrg extends javax.swing.JFrame {
     public registerAnOrg() {
         initComponents();
         
-        initComponents();
+        this.setLocationRelativeTo(null);
         initCustom();
-        setupTypeDropdown();
-
+        jPanel2.setComponentZOrder(orgTypeDropdown, 0);
+        orgTypeDropdown.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
        
     }
 
@@ -156,7 +130,6 @@ public class registerAnOrg extends javax.swing.JFrame {
 
         this.previousFrame = prev;
         initCustom();
-        setupTypeDropdown();
 
     }
 
@@ -175,6 +148,7 @@ public class registerAnOrg extends javax.swing.JFrame {
         proposedInput = new javax.swing.JTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         objectivesInput = new javax.swing.JTextArea();
+        orgTypeDropdown = new javax.swing.JComboBox<>();
         targetInput = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         visionInput = new javax.swing.JTextArea();
@@ -183,7 +157,6 @@ public class registerAnOrg extends javax.swing.JFrame {
         appointedInput = new javax.swing.JTextField();
         emailInput = new javax.swing.JTextField();
         nameInput = new javax.swing.JTextField();
-        typeInput = new javax.swing.JTextField();
         fill = new javax.swing.JLabel();
         reg = new javax.swing.JLabel();
         backBtn = new javax.swing.JButton();
@@ -268,6 +241,16 @@ public class registerAnOrg extends javax.swing.JFrame {
 
         jPanel2.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 545, 390, 90));
 
+        orgTypeDropdown.setForeground(new java.awt.Color(28, 94, 56));
+        orgTypeDropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Academic", "Civic & Cultural", "Religious", "Media & Publications", "Sports & Recreation" }));
+        orgTypeDropdown.setBorder(null);
+        orgTypeDropdown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                orgTypeDropdownActionPerformed(evt);
+            }
+        });
+        jPanel2.add(orgTypeDropdown, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 415, 430, 40));
+
         targetInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
         targetInput.setForeground(new java.awt.Color(28, 94, 56));
         targetInput.setBorder(null);
@@ -342,12 +325,6 @@ public class registerAnOrg extends javax.swing.JFrame {
         });
         jPanel2.add(nameInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 322, 430, 40));
 
-        typeInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
-        typeInput.setForeground(new java.awt.Color(28, 94, 56));
-        typeInput.setBorder(null);
-        typeInput.setOpaque(true);
-        jPanel2.add(typeInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 417, 430, 40));
-
         fill.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
         fill.setForeground(new java.awt.Color(122, 158, 140));
         fill.setText("Fill out the form below. Submissions are reviewed by the OSO Admin.");
@@ -407,7 +384,7 @@ public class registerAnOrg extends javax.swing.JFrame {
 
         String email = emailInput.getText().trim();
         String name = nameInput.getText().trim();
-        String type = (String) typeDropdown.getSelectedItem();
+        String type = (String) orgTypeDropdown.getSelectedItem();
         String appointed = appointedInput.getText().trim();
 
         String mission = missionInput.getText().trim();
@@ -419,7 +396,6 @@ public class registerAnOrg extends javax.swing.JFrame {
 
         if (!isValidInput(emailInput, "org@gmail.com")
                 || !isValidInput(nameInput, "Official name")
-                || !isValidInput(typeInput, "e.g. Academic, Cultural")
                 || !isValidInput(appointedInput, "Full name of admin officer")
                 || !isValidInput(missionInput, "Describe the organization's mission...")
                 || !isValidInput(visionInput, "Describe the organization's vision...")
@@ -446,17 +422,17 @@ public class registerAnOrg extends javax.swing.JFrame {
 
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             java.sql.PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO registration_form (org_name, classification, mission, vision, objectives, target_members, proposed_officers, adviser, admin_email, submitted_by, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')"
+                "INSERT INTO registration_form (proposed_org_name, proposed_classification, contact_email, mission, vision, objectives, target_members, proposed_officers, adviser, appointed_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             ps.setString(1, name);
             ps.setString(2, type);
-            ps.setString(3, mission);
-            ps.setString(4, vision);
-            ps.setString(5, objectivesText);
-            ps.setString(6, target);
-            ps.setString(7, proposed);
-            ps.setString(8, adviser);
-            ps.setString(9, email);
+            ps.setString(3, email);
+            ps.setString(4, mission);
+            ps.setString(5, vision);
+            ps.setString(6, objectivesText);
+            ps.setString(7, target);
+            ps.setString(8, proposed);
+            ps.setString(9, adviser);
             ps.setString(10, appointed);
             ps.executeUpdate();
             conn.close();
@@ -478,6 +454,10 @@ public class registerAnOrg extends javax.swing.JFrame {
     private void nameInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameInputActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_nameInputActionPerformed
+
+    private void orgTypeDropdownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orgTypeDropdownActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_orgTypeDropdownActionPerformed
 
     /**
      * @param args the command line arguments
@@ -510,11 +490,11 @@ public class registerAnOrg extends javax.swing.JFrame {
     private javax.swing.JTextField nameInput;
     private javax.swing.JLabel navbar;
     private javax.swing.JTextArea objectivesInput;
+    private javax.swing.JComboBox<String> orgTypeDropdown;
     private javax.swing.JTextArea proposedInput;
     private javax.swing.JLabel reg;
     private javax.swing.JButton submitBtn;
     private javax.swing.JTextField targetInput;
-    private javax.swing.JTextField typeInput;
     private javax.swing.JTextArea visionInput;
     // End of variables declaration//GEN-END:variables
 }

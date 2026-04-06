@@ -15,13 +15,200 @@ public class osoOrganizations extends javax.swing.JFrame {
      */
     public osoOrganizations() {
         initComponents();
-        setLocationRelativeTo(null);
+        
+        this.setLocationRelativeTo(null);
         loadOrganizations();
+        setupExitButton();
     }
+    
+    private void showCreateAdminDialog(int orgId, String orgName) {
 
+        javax.swing.JDialog dialog = new javax.swing.JDialog(this, "Assign Org Admin — " + orgName, true);
+        dialog.setSize(480, 400);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(null);
+        dialog.getContentPane().setBackground(new java.awt.Color(248, 250, 249));
+
+        javax.swing.JPanel header = new javax.swing.JPanel(null);
+        header.setBackground(new java.awt.Color(28, 94, 56));
+        header.setBounds(0, 0, 480, 65);
+        dialog.add(header);
+
+        javax.swing.JLabel lblTitle = new javax.swing.JLabel("Assign Org Admin");
+        lblTitle.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 18));
+        lblTitle.setForeground(java.awt.Color.WHITE);
+        lblTitle.setBounds(20, 10, 300, 28);
+        header.add(lblTitle);
+
+        javax.swing.JLabel lblSub = new javax.swing.JLabel(orgName);
+        lblSub.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        lblSub.setForeground(new java.awt.Color(180, 220, 200));
+        lblSub.setBounds(20, 38, 400, 18);
+        header.add(lblSub);
+
+        // check if org already has admin
+        try {
+            java.sql.Connection chkConn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement chkPs = chkConn.prepareStatement(
+                "SELECT username FROM org_admin WHERE org_id = ?"
+            );
+            chkPs.setInt(1, orgId);
+            java.sql.ResultSet chkRs = chkPs.executeQuery();
+            if (chkRs.next()) {
+                javax.swing.JLabel lblExisting = new javax.swing.JLabel(
+                    "Current admin: " + chkRs.getString("username"));
+                lblExisting.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+                lblExisting.setForeground(new java.awt.Color(180, 100, 0));
+                lblExisting.setBounds(20, 78, 440, 20);
+                dialog.add(lblExisting);
+            }
+            chkConn.close();
+        } catch (Exception ex) {
+            System.out.println("Check admin error: " + ex.getMessage());
+        }
+
+        // officer dropdown
+        javax.swing.JLabel lblOfficer = new javax.swing.JLabel("Select Officer (will be linked as admin)");
+        lblOfficer.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        lblOfficer.setForeground(new java.awt.Color(28, 94, 56));
+        lblOfficer.setBounds(20, 108, 360, 20);
+        dialog.add(lblOfficer);
+
+        javax.swing.JComboBox<String> officerCombo = new javax.swing.JComboBox<>();
+        officerCombo.setBounds(20, 132, 440, 28);
+        officerCombo.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        officerCombo.setBackground(java.awt.Color.WHITE);
+
+        java.util.List<int[]> officerIds = new java.util.ArrayList<>();
+        try {
+            java.sql.Connection conn2 = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps2 = conn2.prepareStatement(
+                "SELECT o.officer_id, o.full_name, o.position FROM officer o " +
+                "LEFT JOIN org_admin oa ON oa.officer_id = o.officer_id " +
+                "WHERE o.org_id = ? AND oa.officer_id IS NULL"
+            );
+            ps2.setInt(1, orgId);
+            java.sql.ResultSet rs2 = ps2.executeQuery();
+            while (rs2.next()) {
+                officerCombo.addItem(rs2.getString("full_name") + " — " + rs2.getString("position"));
+                officerIds.add(new int[]{rs2.getInt("officer_id")});
+            }
+            conn2.close();
+        } catch (Exception ex) {
+            System.out.println("Load officers error: " + ex.getMessage());
+        }
+
+        if (officerCombo.getItemCount() == 0) {
+            officerCombo.addItem("No available officers");
+        }
+        dialog.add(officerCombo);
+
+        javax.swing.JLabel lblUser = new javax.swing.JLabel("Username");
+        lblUser.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        lblUser.setForeground(new java.awt.Color(28, 94, 56));
+        lblUser.setBounds(20, 172, 200, 20);
+        dialog.add(lblUser);
+
+        javax.swing.JTextField userInput = new javax.swing.JTextField();
+        userInput.setBounds(20, 194, 200, 28);
+        userInput.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        userInput.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(180, 210, 195)));
+        dialog.add(userInput);
+
+        javax.swing.JLabel lblEmail = new javax.swing.JLabel("Email");
+        lblEmail.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        lblEmail.setForeground(new java.awt.Color(28, 94, 56));
+        lblEmail.setBounds(240, 172, 200, 20);
+        dialog.add(lblEmail);
+
+        javax.swing.JTextField emailInput = new javax.swing.JTextField();
+        emailInput.setBounds(240, 194, 220, 28);
+        emailInput.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        emailInput.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(180, 210, 195)));
+        dialog.add(emailInput);
+
+        javax.swing.JLabel lblPass = new javax.swing.JLabel("Password");
+        lblPass.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        lblPass.setForeground(new java.awt.Color(28, 94, 56));
+        lblPass.setBounds(20, 234, 200, 20);
+        dialog.add(lblPass);
+
+        javax.swing.JPasswordField passInput = new javax.swing.JPasswordField();
+        passInput.setBounds(20, 256, 440, 28);
+        passInput.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        passInput.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(180, 210, 195)));
+        dialog.add(passInput);
+
+        javax.swing.JButton btnCreate = new javax.swing.JButton("Create Account");
+        btnCreate.setBounds(290, 306, 170, 32);
+        btnCreate.setBackground(new java.awt.Color(28, 94, 56));
+        btnCreate.setForeground(java.awt.Color.WHITE);
+        btnCreate.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnCreate.setBorderPainted(false);
+        btnCreate.setFocusPainted(false);
+        btnCreate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCreate.addActionListener(e -> {
+
+            String username = userInput.getText().trim();
+            String email    = emailInput.getText().trim();
+            String password = new String(passInput.getPassword()).trim();
+
+            if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(dialog, "All fields are required.");
+                return;
+            }
+
+            if (officerIds.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(dialog, "No officer selected.");
+                return;
+            }
+
+            int selectedOfficerId = officerIds.get(officerCombo.getSelectedIndex())[0];
+
+            try {
+
+                java.sql.Connection conn3 = bond.db.DBConnection.getConnection();
+                java.sql.PreparedStatement ps3 = conn3.prepareStatement(
+                    "INSERT INTO org_admin (org_id, officer_id, created_by, username, password_hash, email) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)"
+                );
+                ps3.setInt(1, orgId);
+                ps3.setInt(2, selectedOfficerId);
+                ps3.setInt(3, bond.util.SessionManager.getCurrentOsoAdmin().getOso_admin_id());
+                ps3.setString(4, username);
+                ps3.setString(5, password);
+                ps3.setString(6, email);
+                ps3.executeUpdate();
+                conn3.close();
+
+                javax.swing.JOptionPane.showMessageDialog(dialog,
+                    "Org Admin account created.\nUsername: " + username + "\nPassword: " + password);
+                dialog.dispose();
+
+            } catch (Exception ex) {
+                System.out.println("Create admin error: " + ex.getMessage());
+                javax.swing.JOptionPane.showMessageDialog(dialog,
+                    "Failed: " + ex.getMessage());
+            }
+        });
+        dialog.add(btnCreate);
+
+        javax.swing.JButton btnCancel = new javax.swing.JButton("Cancel");
+        btnCancel.setBounds(200, 306, 80, 32);
+        btnCancel.setBackground(new java.awt.Color(180, 210, 195));
+        btnCancel.setForeground(new java.awt.Color(28, 94, 56));
+        btnCancel.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnCancel.setBorderPainted(false);
+        btnCancel.setFocusPainted(false);
+        btnCancel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCancel.addActionListener(e -> dialog.dispose());
+        dialog.add(btnCancel);
+
+        dialog.setVisible(true);
+    }
+    
+    
     private void loadOrganizations() {
-
-        jPanel2.removeAll();
 
         try {
 
@@ -41,32 +228,44 @@ public class osoOrganizations extends javax.swing.JFrame {
                 lblName.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 18));
                 lblName.setForeground(new java.awt.Color(28, 94, 56));
                 lblName.setBounds(130, y + 20, 400, 30);
-                jPanel2.add(lblName);
+                jPanel2.add(lblName, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, y + 20, 400, 30));
 
                 javax.swing.JLabel lblInfo = new javax.swing.JLabel(classification);
                 lblInfo.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
                 lblInfo.setForeground(new java.awt.Color(28, 94, 56));
                 lblInfo.setBounds(130, y + 50, 400, 20);
-                jPanel2.add(lblInfo);
+                jPanel2.add(lblInfo, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, y + 50, 400, 20));
 
                 javax.swing.JLabel lblStatus = new javax.swing.JLabel("●  " + status);
                 lblStatus.setForeground(new java.awt.Color(28, 94, 56));
                 lblStatus.setBounds(670, y + 40, 100, 20);
-                jPanel2.add(lblStatus);
-
+                jPanel2.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, y + 40, 100, 20));
                 javax.swing.JButton btn = new javax.swing.JButton();
                 btn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/orgsFrame.png")));
                 btn.setBorder(null);
                 btn.setBorderPainted(false);
                 btn.setContentAreaFilled(false);
-                btn.setBounds(30, y, 750, 100);
+                btn.setBounds(30, y, 600, 100);
                 final int orgId = id;
                 btn.addActionListener(e -> {
                     bond.ui.osoAdmin.osoOrgInfos frame = new bond.ui.osoAdmin.osoOrgInfos(orgId);
                     frame.setVisible(true);
                     this.dispose();
                 });
-                jPanel2.add(btn);
+                jPanel2.add(btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, y, 600, 100));
+                
+                javax.swing.JButton btnCreateAdmin = new javax.swing.JButton("+ Assign Admin");
+                btnCreateAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                btnCreateAdmin.setForeground(java.awt.Color.WHITE);
+                btnCreateAdmin.setBackground(new java.awt.Color(28, 94, 56));
+                btnCreateAdmin.setBorderPainted(false);
+                btnCreateAdmin.setFocusPainted(false);
+                btnCreateAdmin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                btnCreateAdmin.setBounds(638, y + 37, 122, 26);
+                final int thisOrgId = id;
+                final String thisOrgName = name;
+                btnCreateAdmin.addActionListener(e2 -> showCreateAdminDialog(thisOrgId, thisOrgName));
+                jPanel2.add(btnCreateAdmin, new org.netbeans.lib.awtextra.AbsoluteConstraints(638, y + 37, 122, 26));
 
                 y += 110;
             }
@@ -77,10 +276,169 @@ public class osoOrganizations extends javax.swing.JFrame {
             conn.close();
 
         } catch (Exception ex) {
-            System.out.println("Load orgs error: " + ex.getMessage());
+             ex.printStackTrace();
+        }
+
+        loadPendingRegistrations();
+    }
+
+    private void loadPendingRegistrations() {
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.ResultSet rs = conn.prepareStatement(
+                "SELECT form_id, proposed_org_name, proposed_classification, contact_email, review_status FROM registration_form ORDER BY form_id DESC"
+            ).executeQuery();
+
+            int baseY = 0;
+
+            // count existing children to know where to start Y
+            for (java.awt.Component c : jPanel2.getComponents()) {
+                baseY = Math.max(baseY, c.getY() + c.getHeight());
+            }
+
+            baseY += 30;
+
+            javax.swing.JLabel sectionTitle = new javax.swing.JLabel("Registration Submissions");
+            sectionTitle.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 18));
+            sectionTitle.setForeground(new java.awt.Color(28, 94, 56));
+            sectionTitle.setBounds(50, baseY, 400, 30);
+            jPanel2.add(sectionTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, baseY, 400, 30));
+
+            baseY += 40;
+
+            boolean hasRows = false;
+
+            while (rs.next()) {
+
+                hasRows = true;
+                int fId = rs.getInt("form_id");
+                String orgN = rs.getString("proposed_org_name");
+                String classif = rs.getString("proposed_classification");
+                String email = rs.getString("contact_email");
+                String status = rs.getString("review_status");
+
+                javax.swing.JLabel lblOrg = new javax.swing.JLabel(orgN + " — " + classif);
+                lblOrg.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
+                lblOrg.setForeground(new java.awt.Color(28, 94, 56));
+                lblOrg.setBounds(60, baseY + 10, 400, 20);
+                jPanel2.add(lblOrg, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, baseY + 10, 400, 20));
+
+                javax.swing.JLabel lblEmail = new javax.swing.JLabel(email);
+                lblEmail.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
+                lblEmail.setForeground(new java.awt.Color(100, 130, 110));
+                lblEmail.setBounds(60, baseY + 30, 350, 18);
+                jPanel2.add(lblEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, baseY + 30, 350, 18));
+
+                java.awt.Color statusColor = status.equals("Approved") ? new java.awt.Color(28, 94, 56)
+                        : status.equals("Rejected") ? new java.awt.Color(180, 30, 30)
+                        : new java.awt.Color(180, 130, 0);
+
+                javax.swing.JLabel lblStatus = new javax.swing.JLabel("● " + status);
+                lblStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                lblStatus.setForeground(statusColor);
+                lblStatus.setBounds(500, baseY + 20, 120, 20);
+                jPanel2.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, baseY + 20, 120, 20));
+
+                if (status.equals("Pending")) {
+
+                    javax.swing.JButton approveBtn = new javax.swing.JButton("Approve");
+                    approveBtn.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                    approveBtn.setForeground(java.awt.Color.WHITE);
+                    approveBtn.setBackground(new java.awt.Color(28, 94, 56));
+                    approveBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(4, 10, 4, 10));
+                    approveBtn.setFocusPainted(false);
+                    approveBtn.setBounds(630, baseY + 12, 80, 28);
+                    final int formId = fId;
+                    approveBtn.addActionListener(e -> {
+                        updateFormStatus(formId, "Approved");
+                    });
+                    jPanel2.add(approveBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, baseY + 12, 80, 28));
+
+                    javax.swing.JButton rejectBtn = new javax.swing.JButton("Reject");
+                    rejectBtn.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                    rejectBtn.setForeground(java.awt.Color.WHITE);
+                    rejectBtn.setBackground(new java.awt.Color(180, 30, 30));
+                    rejectBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(4, 10, 4, 10));
+                    rejectBtn.setFocusPainted(false);
+                    rejectBtn.setBounds(715, baseY + 12, 70, 28);
+                    rejectBtn.addActionListener(e -> {
+                        updateFormStatus(formId, "Rejected");
+                    });
+                    jPanel2.add(rejectBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(715, baseY + 12, 70, 28));
+                }
+
+                baseY += 70;
+            }
+
+            if (!hasRows) {
+                javax.swing.JLabel none = new javax.swing.JLabel("No registration submissions yet.");
+                none.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                none.setForeground(new java.awt.Color(150, 150, 150));
+                none.setBounds(60, baseY, 300, 20);
+                jPanel2.add(none, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, baseY, 300, 20));
+                baseY += 30;
+            }
+
+            jPanel2.setPreferredSize(new java.awt.Dimension(780, baseY + 60));
+            jPanel2.revalidate();
+            jPanel2.repaint();
+            conn.close();
+
+        } catch (Exception ex) {
+             ex.printStackTrace();
         }
     }
 
+    private void updateFormStatus(int formId, String newStatus) {
+
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "UPDATE registration_form SET review_status = ? WHERE form_id = ?"
+            );
+            ps.setString(1, newStatus);
+            ps.setInt(2, formId);
+            ps.executeUpdate();
+            conn.close();
+
+            javax.swing.JOptionPane.showMessageDialog(this, "Registration " + newStatus + ".");
+
+            // reload
+            jPanel2.removeAll();
+            loadOrganizations();
+
+        } catch (Exception ex) {
+            System.out.println("Update form status error: " + ex.getMessage());
+        }
+    }
+
+     private void setupExitButton() {
+
+        javax.swing.JButton btnExit = new javax.swing.JButton("Exit Admin");
+        btnExit.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnExit.setForeground(new java.awt.Color(200, 40, 40));
+        btnExit.setBackground(new java.awt.Color(248, 250, 249));
+        btnExit.setBorderPainted(false);
+        btnExit.setFocusPainted(false);
+        btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExit.setBounds(10, 540, 130, 30);
+        btnExit.addActionListener(e -> {
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(
+                this, "Exit OSO Admin?", "Exit",
+                javax.swing.JOptionPane.YES_NO_OPTION);
+            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                bond.util.SessionManager.logout();
+                new bond.ui.UserSide.loginChoices().setVisible(true);
+                this.dispose();
+            }
+        });
+        jPanel2.add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 540, 150, 30));
+        jPanel2.setComponentZOrder(btnExit, 0);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

@@ -454,7 +454,7 @@ public class AnnouncementFrame extends javax.swing.JFrame {
                     return;
                 }
  
-                bond.model.Announcement ann = new bond.model.Announcement(bond.util.SessionManager.getCurrentOrgId(), title, "", date);
+                bond.model.Announcement ann = new bond.model.Announcement(bond.util.SessionManager.getCurrentOrgId(), title, "", date.isEmpty() ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) : date);
                 boolean saved = new bond.dao.AnnouncementDAO().addAnnouncement(ann);
 
                 if (saved) {

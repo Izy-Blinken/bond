@@ -21,14 +21,14 @@ public class OrgProfileFrame extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(OrgProfileFrame.class.getName());
     
     private javax.swing.JPanel contentPanel;
-    private JTextField  emailField;
-    private JTextField  typeField;
-    private JTextArea   missionField;
-    private JTextArea   visionField;
-    private JTextField  adviserField;
-    private JButton     btnEdit;
-    private JButton     btnSave;
-    private JButton     btnCancel;
+    private JTextField emailField;
+    private JTextField typeField;
+    private JTextArea missionField;
+    private JTextArea visionField;
+    private JTextField adviserField;
+    private JButton btnEdit;
+    private JButton btnSave;
+    private JButton btnCancel;
  
  
     private JButton makeInvisibleButton() {
@@ -58,7 +58,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
      * Creates new form OrgProfileFrame
      */
     public OrgProfileFrame() {
-        
+        this.setLocationRelativeTo(null);
         initComponents();
         ActiveTab.setBounds(0, 4, 1000, 600); 
         javax.swing.JLabel lblBond = new javax.swing.JLabel("BOND");
@@ -320,6 +320,23 @@ public class OrgProfileFrame extends javax.swing.JFrame {
         btnAddMember.setBounds(800, 521, 126, 30);
         btnAddMember.addActionListener(e -> showAddMemberDialog());
         contentPanel.add(btnAddMember);
+        
+        javax.swing.ImageIcon iconOfficerNormal = loadScaledIcon(
+            "bond/assets/orgAdminImages/OrgProf_btnAdd.png", 140, 30);
+
+        JButton btnManageOfficers = new JButton("Manage Officers");
+        btnManageOfficers.setOpaque(true);
+        btnManageOfficers.setContentAreaFilled(true);
+        btnManageOfficers.setBorderPainted(false);
+        btnManageOfficers.setFocusPainted(false);
+        btnManageOfficers.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnManageOfficers.setBackground(new java.awt.Color(28, 94, 56));
+        btnManageOfficers.setForeground(java.awt.Color.WHITE);
+        btnManageOfficers.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnManageOfficers.setBounds(800, 460, 140, 30);
+        btnManageOfficers.addActionListener(e -> showOfficerDialog());
+        contentPanel.add(btnManageOfficers);
+        contentPanel.setComponentZOrder(btnManageOfficers, 0);
        
         contentPanel.setComponentZOrder(btnEdit,   0);
         contentPanel.setComponentZOrder(btnSave,   1);
@@ -514,10 +531,13 @@ public class OrgProfileFrame extends javax.swing.JFrame {
     }
  
     private void saveProfile() {
-        String name    = emailField.getText().trim();
-        String type    = typeField.getText().trim();
+        System.out.println("Saving org_id: " + bond.util.SessionManager.getCurrentOrgId());
+
+        
+        String name = emailField.getText().trim();
+        String type = typeField.getText().trim();
         String mission = missionField.getText().trim();
-        String vision  = visionField.getText().trim();
+        String vision = visionField.getText().trim();
         String adviser = adviserField.getText().trim();
  
         if (name.isEmpty()) {
@@ -554,38 +574,45 @@ public class OrgProfileFrame extends javax.swing.JFrame {
         }
     }
  
-   private void loadMembers() {
-    bond.dao.MemberDAO dao = new bond.dao.MemberDAO();
-    java.util.List<bond.model.Member> all = dao.getAllMembers(bond.util.SessionManager.getCurrentOrgId());
+private void loadMembers() {
 
-    java.util.List<java.awt.Component> toRemove = new java.util.ArrayList<>();
-    for (java.awt.Component c : contentPanel.getComponents()) {
-        if ("memberRow".equals(c.getName())) toRemove.add(c);
+        java.util.List<bond.model.Member> all = new bond.dao.MemberDAO().getAllMembers(
+            bond.util.SessionManager.getCurrentOrgId());
+
+        java.util.List<java.awt.Component> toRemove = new java.util.ArrayList<>();
+        for (java.awt.Component c : contentPanel.getComponents()) {
+            if ("memberRow".equals(c.getName())) toRemove.add(c);
+        }
+        for (java.awt.Component c : toRemove) contentPanel.remove(c);
+
+        int startY = 596;
+        int rowH   = 24;
+
+        for (int i = 0; i < all.size(); i++) {
+
+            bond.model.Member m = all.get(i);
+            int y = startY + (i * rowH);
+
+            javax.swing.JLabel lblName = makeMemberLabel(m.getName(), 320, y, 200);
+            contentPanel.add(lblName);
+            contentPanel.setComponentZOrder(lblName, 0);
+
+            javax.swing.JLabel lblRole = makeMemberLabel(m.getRole(), 575, y, 180);
+            contentPanel.add(lblRole);
+            contentPanel.setComponentZOrder(lblRole, 0);
+
+            javax.swing.JLabel lblCourse = makeMemberLabel(
+                m.getCourse() != null && !m.getCourse().isEmpty() ? m.getCourse() : "—",
+                795, y, 100);
+            contentPanel.add(lblCourse);
+            contentPanel.setComponentZOrder(lblCourse, 0);
+        }
+
+        int newHeight = Math.max(995, 596 + (all.size() * rowH) + 40);
+        contentPanel.setPreferredSize(new java.awt.Dimension(1000, newHeight));
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
-    for (java.awt.Component c : toRemove) contentPanel.remove(c);
-
-    int[] rowY = {596, 620, 644, 668, 692, 716, 740, 764, 788, 812};
-
-    for (int i = 0; i < Math.min(all.size(), 10); i++) {
-        bond.model.Member m = all.get(i);
-        int y = rowY[i];
-
-        javax.swing.JLabel lblName = makeMemberLabel(m.getName(), 320, y, 150);
-        contentPanel.add(lblName);
-        contentPanel.setComponentZOrder(lblName, 0);
-
-        javax.swing.JLabel lblRole = makeMemberLabel(m.getRole(), 575, y, 150);
-        contentPanel.add(lblRole);
-        contentPanel.setComponentZOrder(lblRole, 0);
-
-        javax.swing.JLabel lblCourse = makeMemberLabel(m.getCourse(), 795, y, 100);
-        contentPanel.add(lblCourse);
-        contentPanel.setComponentZOrder(lblCourse, 0);
-    }
-
-    contentPanel.revalidate();
-    contentPanel.repaint();
-}
  
     private javax.swing.JLabel makeMemberLabel(String text, int x, int y, int w) {
         javax.swing.JLabel lbl = new javax.swing.JLabel(text);
@@ -596,13 +623,18 @@ public class OrgProfileFrame extends javax.swing.JFrame {
         return lbl;
     }
  
+    
     private void showAddMemberDialog() {
+        
         javax.swing.JWindow overlay = new javax.swing.JWindow(this);
         overlay.setSize(1000, 600);
+        
         overlay.setLocation(
             this.getLocationOnScreen().x,
             this.getLocationOnScreen().y + 35);
+        
         overlay.setBackground(new java.awt.Color(0, 0, 0, 120));
+        
         javax.swing.JPanel overlayPanel = new javax.swing.JPanel() {
             @Override
             protected void paintComponent(java.awt.Graphics g) {
@@ -610,6 +642,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
                 g.fillRect(0, 0, getWidth(), getHeight());
             }
         };
+        
         overlayPanel.setOpaque(false);
         overlay.add(overlayPanel);
         overlay.setVisible(true);
@@ -701,8 +734,8 @@ public class OrgProfileFrame extends javax.swing.JFrame {
             btnAdd.setBounds(590, 432, 100, 30);
             btnAdd.addActionListener(e -> {
                 String fullName = fullNameField.getText().trim();
-                String role     = roleField.getText().trim();
-                String course   = courseCombo.getSelectedItem().toString();
+                String role = roleField.getText().trim();
+                String course = courseCombo.getSelectedItem().toString();
  
                 if (fullName.isEmpty() || role.isEmpty()) {
                     javax.swing.JOptionPane.showMessageDialog(dialog,
@@ -718,13 +751,17 @@ public class OrgProfileFrame extends javax.swing.JFrame {
                 member.setCourse(course);
  
                 boolean saved = new bond.dao.MemberDAO().addMember(member);
- 
+
                 if (saved) {
                     javax.swing.JOptionPane.showMessageDialog(dialog, "Member added successfully!");
                     overlay.dispose();
                     dialog.dispose();
-                    loadMembers();
-                    GlobalSearchRegistry.getInstance().reload();
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        loadMembers();
+                        contentPanel.revalidate();
+                        contentPanel.repaint();
+                    });
+                    
                 } else {
                     javax.swing.JOptionPane.showMessageDialog(dialog,
                         "Failed to add member!", "Error",
@@ -735,19 +772,298 @@ public class OrgProfileFrame extends javax.swing.JFrame {
  
             panel.add(imgLabel);
             dialog.add(panel);
+            panel.setComponentZOrder(imgLabel, panel.getComponentCount() - 1); // already done for imgLabel
+            panel.setComponentZOrder(courseCombo, 0);
         }
  
         dialog.setVisible(true);
         overlay.dispose();
     }
     
-    
+    private void showOfficerDialog() {
+
+        javax.swing.JDialog dialog = new javax.swing.JDialog(this, "Manage Officers", true);
+        dialog.setSize(720, 560);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(null);
+        dialog.getContentPane().setBackground(new java.awt.Color(248, 250, 249));
+
+        // header bar
+        javax.swing.JPanel header = new javax.swing.JPanel(null);
+        header.setBackground(new java.awt.Color(28, 94, 56));
+        header.setBounds(0, 0, 700, 70);
+        dialog.add(header);
+
+        javax.swing.JLabel lblTitle = new javax.swing.JLabel("Officer Management");
+        lblTitle.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 20));
+        lblTitle.setForeground(java.awt.Color.WHITE);
+        lblTitle.setBounds(24, 18, 320, 34);
+        header.add(lblTitle);
+
+        javax.swing.JLabel lblSub = new javax.swing.JLabel("Current academic year officers");
+        lblSub.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        lblSub.setForeground(new java.awt.Color(180, 220, 200));
+        lblSub.setBounds(24, 44, 320, 20);
+        header.add(lblSub);
+
+        // column headers
+        javax.swing.JLabel colName = new javax.swing.JLabel("Full Name");
+        colName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        colName.setForeground(new java.awt.Color(28, 94, 56));
+        colName.setBounds(24, 84, 200, 20);
+        dialog.add(colName);
+
+        javax.swing.JLabel colPos = new javax.swing.JLabel("Position");
+        colPos.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        colPos.setForeground(new java.awt.Color(28, 94, 56));
+        colPos.setBounds(240, 84, 180, 20);
+        dialog.add(colPos);
+
+        javax.swing.JLabel colContact = new javax.swing.JLabel("Contact");
+        colContact.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        colContact.setForeground(new java.awt.Color(28, 94, 56));
+        colContact.setBounds(430, 84, 160, 20);
+        dialog.add(colContact);
+
+        // divider
+        javax.swing.JSeparator sep = new javax.swing.JSeparator();
+        sep.setBounds(20, 106, 660, 2);
+        sep.setForeground(new java.awt.Color(200, 220, 210));
+        dialog.add(sep);
+
+        // scroll panel for officers list
+        javax.swing.JPanel listPanel = new javax.swing.JPanel(null);
+        listPanel.setBackground(new java.awt.Color(248, 250, 249));
+
+        javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(listPanel);
+        scroll.setBounds(10, 110, 680, 280);
+        scroll.setBorder(null);
+        scroll.getViewport().setBackground(new java.awt.Color(248, 250, 249));
+        dialog.add(scroll);
+
+        // load officers
+        int[] listHeight = {0};
+        loadOfficerRows(listPanel, listHeight, scroll, dialog);
+
+        // add officer section
+        javax.swing.JSeparator sep2 = new javax.swing.JSeparator();
+        sep2.setBounds(20, 398, 660, 2);
+        sep2.setForeground(new java.awt.Color(200, 220, 210));
+        dialog.add(sep2);
+
+        javax.swing.JLabel lblAdd = new javax.swing.JLabel("Add Officer");
+        lblAdd.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
+        lblAdd.setForeground(new java.awt.Color(28, 94, 56));
+        lblAdd.setBounds(24, 406, 120, 24);
+        dialog.add(lblAdd);
+
+        javax.swing.JTextField nameInput = new javax.swing.JTextField();
+        nameInput.setBounds(24, 435, 180, 28);
+        nameInput.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        nameInput.setForeground(new java.awt.Color(28, 94, 56));
+        nameInput.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(180, 210, 195)));
+        dialog.add(nameInput);
+
+        javax.swing.JTextField posInput = new javax.swing.JTextField();
+        posInput.setBounds(215, 435, 180, 28);
+        posInput.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        posInput.setForeground(new java.awt.Color(28, 94, 56));
+        posInput.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(180, 210, 195)));
+        dialog.add(posInput);
+
+        javax.swing.JTextField contactInput = new javax.swing.JTextField();
+        contactInput.setBounds(406, 435, 160, 28);
+        contactInput.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        contactInput.setForeground(new java.awt.Color(28, 94, 56));
+        contactInput.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(180, 210, 195)));
+        dialog.add(contactInput);
+
+        // placeholder hints
+        nameInput.setToolTipText("Full Name");
+        posInput.setToolTipText("Position (e.g. President)");
+        contactInput.setToolTipText("Contact Number");
+
+        javax.swing.JButton btnAdd = new javax.swing.JButton("Add");
+        btnAdd.setBounds(578, 435, 80, 28);
+        btnAdd.setBackground(new java.awt.Color(28, 94, 56));
+        btnAdd.setForeground(java.awt.Color.WHITE);
+        btnAdd.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnAdd.setBorderPainted(false);
+        btnAdd.setFocusPainted(false);
+        btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnAdd.addActionListener(e -> {
+
+            String name = nameInput.getText().trim();
+            String pos  = posInput.getText().trim();
+            String contact = contactInput.getText().trim();
+
+            if (name.isEmpty() || pos.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(dialog, "Name and Position are required.");
+                return;
+            }
+
+            try {
+
+                java.sql.Connection conn = bond.db.DBConnection.getConnection();
+                java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO officer (org_id, academic_year_id, full_name, position, contact_number) " +
+                    "VALUES (?, (SELECT academic_year_id FROM academic_year WHERE is_current = 1 LIMIT 1), ?, ?, ?)"
+                );
+                ps.setInt(1, bond.util.SessionManager.getCurrentOrgId());
+                ps.setString(2, name);
+                ps.setString(3, pos);
+                ps.setString(4, contact.isEmpty() ? null : contact);
+                ps.executeUpdate();
+                conn.close();
+
+                nameInput.setText("");
+                posInput.setText("");
+                contactInput.setText("");
+
+                listPanel.removeAll();
+                listHeight[0] = 0;
+                loadOfficerRows(listPanel, listHeight, scroll, dialog);
+
+            } catch (Exception ex) {
+                System.out.println("Add officer error: " + ex.getMessage());
+                javax.swing.JOptionPane.showMessageDialog(dialog, "Failed to add officer: " + ex.getMessage());
+            }
+        });
+        dialog.add(btnAdd);
+
+        javax.swing.JButton btnClose = new javax.swing.JButton("Close");
+        btnClose.setBounds(580, 476, 80, 28);
+        btnClose.setBackground(new java.awt.Color(180, 210, 195));
+        btnClose.setForeground(new java.awt.Color(28, 94, 56));
+        btnClose.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+        btnClose.setBorderPainted(false);
+        btnClose.setFocusPainted(false);
+        btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnClose.addActionListener(e -> dialog.dispose());
+        dialog.add(btnClose);
+
+        dialog.setVisible(true);
+    }
+
+    private void loadOfficerRows(javax.swing.JPanel listPanel, int[] listHeight,
+                                  javax.swing.JScrollPane scroll, java.awt.Window parentWindow) {
+        try {
+
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT officer_id, full_name, position, contact_number FROM officer " +
+                "WHERE org_id = ? ORDER BY officer_id ASC"
+            );
+            ps.setInt(1, bond.util.SessionManager.getCurrentOrgId());
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            int y = 4;
+            boolean hasRows = false;
+
+            while (rs.next()) {
+
+                hasRows = true;
+                int offId = rs.getInt("officer_id");
+                String name    = rs.getString("full_name");
+                String pos     = rs.getString("position");
+                String contact = rs.getString("contact_number");
+                if (contact == null) contact = "—";
+
+                javax.swing.JLabel lName = new javax.swing.JLabel(name);
+                lName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lName.setForeground(new java.awt.Color(40, 40, 40));
+                lName.setBounds(14, y + 4, 200, 20);
+                listPanel.add(lName);
+
+                javax.swing.JLabel lPos = new javax.swing.JLabel(pos);
+                lPos.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lPos.setForeground(new java.awt.Color(40, 40, 40));
+                lPos.setBounds(230, y + 4, 180, 20);
+                listPanel.add(lPos);
+
+                javax.swing.JLabel lContact = new javax.swing.JLabel(contact);
+                lContact.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                lContact.setForeground(new java.awt.Color(40, 40, 40));
+                lContact.setBounds(420, y + 4, 160, 20);
+                listPanel.add(lContact);
+
+                javax.swing.JButton btnDel = new javax.swing.JButton("Remove");
+                btnDel.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                btnDel.setForeground(new java.awt.Color(180, 30, 30));
+                btnDel.setBackground(new java.awt.Color(255, 240, 240));
+                btnDel.setBorderPainted(false);
+                btnDel.setFocusPainted(false);
+                btnDel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnDel.setBounds(582, y, 80, 26);
+                final int oid = offId;
+                btnDel.addActionListener(e -> {
+                    int confirm = javax.swing.JOptionPane.showConfirmDialog(
+                        parentWindow, "Remove " + name + "?", "Confirm",
+                        javax.swing.JOptionPane.YES_NO_OPTION);
+                    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                        try {
+                            java.sql.Connection c2 = bond.db.DBConnection.getConnection();
+
+                            java.sql.PreparedStatement chk = c2.prepareStatement(
+                                "SELECT COUNT(*) FROM org_admin WHERE officer_id = ?"
+                            );
+                            chk.setInt(1, oid);
+                            java.sql.ResultSet chkRs = chk.executeQuery();
+                            chkRs.next();
+                            if (chkRs.getInt(1) > 0) {
+                                javax.swing.JOptionPane.showMessageDialog(parentWindow,
+                                    "Cannot remove this officer — they are linked to an Org Admin account.");
+                                c2.close();
+                                return;
+                            }
+
+                            java.sql.PreparedStatement ps2 = c2.prepareStatement(
+                                "DELETE FROM officer WHERE officer_id = ?"
+                            );
+                            ps2.setInt(1, oid);
+                            ps2.executeUpdate();
+                            c2.close();
+                            listPanel.removeAll();
+                            listHeight[0] = 0;
+                            loadOfficerRows(listPanel, listHeight, scroll, parentWindow);
+                        } catch (Exception ex) {
+                            System.out.println("Remove officer error: " + ex.getMessage());
+                        }
+                    }
+                });
+                listPanel.add(btnDel);
+
+                y += 34;
+            }
+
+            if (!hasRows) {
+                javax.swing.JLabel none = new javax.swing.JLabel("No officers added yet.");
+                none.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.ITALIC, 12));
+                none.setForeground(new java.awt.Color(160, 160, 160));
+                none.setBounds(14, 8, 300, 20);
+                listPanel.add(none);
+                y += 30;
+            }
+
+            listHeight[0] = y + 10;
+            listPanel.setPreferredSize(new java.awt.Dimension(670, listHeight[0]));
+            listPanel.revalidate();
+            listPanel.repaint();
+            conn.close();
+
+        } catch (Exception ex) {
+            System.out.println("Load officers error: " + ex.getMessage());
+        }
+    }
   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
+    
+    
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

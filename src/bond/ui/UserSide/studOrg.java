@@ -35,7 +35,7 @@ public class studOrg extends javax.swing.JFrame {
 
     public studOrg() {
         initComponents();
-        setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);
         searchInput1.setOpaque(false);
         searchInput1.setBorder(null);
         searchInput1.setBackground(new java.awt.Color(0, 0, 0, 0));
@@ -49,11 +49,13 @@ public class studOrg extends javax.swing.JFrame {
             setupHover(btn);
         }
         loadOrgs();
+        jPanel1.setComponentZOrder(settingsBtn, 0);
+        
     }
 
     
     private void loadOrgs() {
-            loadOrgs("");
+        loadOrgs("");
     }
 
     private void loadOrgs(String query) {
@@ -93,13 +95,13 @@ public class studOrg extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        darkPanel = new javax.swing.JPanel();
         settingsPanel = new javax.swing.JPanel();
         settings = new javax.swing.JPanel();
         settingsLabel = new javax.swing.JLabel();
         exBtn = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        darkPanel = new javax.swing.JPanel();
         explore = new javax.swing.JLabel();
         studOrg = new javax.swing.JLabel();
         org5 = new javax.swing.JButton();
@@ -126,6 +128,8 @@ public class studOrg extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        darkPanel.setBackground(new java.awt.Color(0, 0, 0));
 
         settingsPanel.setBackground(new java.awt.Color(255, 255, 255));
         settingsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -182,7 +186,7 @@ public class studOrg extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        settingsPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 210, 60));
+        settingsPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 87, 210, 60));
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/login.png"))); // NOI18N
         jButton2.setBorder(null);
@@ -194,24 +198,24 @@ public class studOrg extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        settingsPanel.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 210, -1));
-
-        jPanel1.add(settingsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 0, 210, 600));
-
-        darkPanel.setBackground(new java.awt.Color(0, 0, 0));
+        settingsPanel.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 143, 210, -1));
 
         javax.swing.GroupLayout darkPanelLayout = new javax.swing.GroupLayout(darkPanel);
         darkPanel.setLayout(darkPanelLayout);
         darkPanelLayout.setHorizontalGroup(
             darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 810, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, darkPanelLayout.createSequentialGroup()
+                .addGap(0, 790, Short.MAX_VALUE)
+                .addComponent(settingsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         darkPanelLayout.setVerticalGroup(
             darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, darkPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(settingsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jPanel1.add(darkPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 600));
+        jPanel1.add(darkPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 600));
 
         explore.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 14)); // NOI18N
         explore.setForeground(new java.awt.Color(255, 255, 255));
@@ -494,12 +498,13 @@ public class studOrg extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
-        new loginChoices(this).setVisible(true);
-        this.dispose();
+        this.setVisible(false);
+        loginChoices lc = new loginChoices(this);
+        lc.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void org1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_org1ActionPerformed
-        new studOrgClicked().setVisible(true);
+        new studOrgClicked(orgIds[0]).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_org1ActionPerformed
 

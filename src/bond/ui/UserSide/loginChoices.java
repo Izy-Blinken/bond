@@ -35,6 +35,7 @@ public class loginChoices extends javax.swing.JFrame {
 
     public loginChoices() {
         initComponents();
+        this.setLocationRelativeTo(null);
 
     }
 

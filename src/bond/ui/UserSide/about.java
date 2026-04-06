@@ -35,7 +35,7 @@ public class about extends javax.swing.JFrame {
 
     public about() {
         initComponents();
-        setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);
         
 javax.swing.SwingUtilities.invokeLater(() -> {
     aboutScroll.getVerticalScrollBar().setValue(0);
@@ -470,14 +470,16 @@ javax.swing.SwingUtilities.invokeLater(() -> {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-                    new loginChoices(this).setVisible(true);
-        this.dispose();
+        this.setVisible(false);
+        loginChoices lc = new loginChoices(this);
+        lc.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-                   new registerAnOrg(this).setVisible(true);
-        this.dispose();
+        this.setVisible(false);
+        loginChoices lc = new loginChoices(this);
+        lc.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

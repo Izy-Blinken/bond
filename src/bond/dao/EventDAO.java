@@ -13,20 +13,41 @@ public class EventDAO {
     // Add
     public boolean addEvent(Event e) {
         String sql = "INSERT INTO event (org_id, academic_year_id, posted_by, title, description, event_date, status) " +
-                     "VALUES (?, 1, 1, ?, ?, ?, 'Upcoming')";
+                     "VALUES (?, 1, ?, ?, ?, ?, ?)";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
+            
             ps.setInt(1, e.getOrgId());
-            ps.setString(2, e.getName());
-            ps.setString(3, e.getDescription());
-            ps.setString(4, e.getDate());
+            ps.setInt(2, bond.util.SessionManager.getCurrentAdminId());
+            ps.setString(3, e.getName());
+            ps.setString(4, e.getDescription());
+            ps.setString(5, e.getDate());
+            ps.setString(6, determineStatus(e.getDate()));
+            
             boolean result = ps.executeUpdate() > 0;
             conn.close();
             return result;
         } catch (Exception ex) {
             System.out.println("Add event error: " + ex.getMessage());
             return false;
+        }
+    }
+    
+    //status
+    private String determineStatus(String dateStr) {
+
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date eventDate = sdf.parse(dateStr);
+            java.util.Date today = new java.util.Date();
+            if (eventDate.before(today)) {
+                return "Completed";
+            } else {
+                return "Upcoming";
+            }
+        } catch (Exception ex) {
+            return "Upcoming";
         }
     }
 
