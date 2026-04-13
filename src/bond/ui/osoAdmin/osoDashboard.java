@@ -28,15 +28,7 @@ public class osoDashboard extends javax.swing.JFrame {
                 "SELECT COUNT(*) FROM organization WHERE status = 'Active'").executeQuery();
             if (rs1.next()) totalOrgsCOUNT.setText(String.valueOf(rs1.getInt(1)));
 
-            totalmemCOUNT.setVisible(false);
-            totalMembers.setVisible(false);
-            totalMembersSlot.setVisible(false);
-            icon2.setVisible(false);
-            pendingsCOUNT.setVisible(false);
-            pendingsCOUNT1.setVisible(false);
-            pendings.setVisible(false);
-            pendingsSlot.setVisible(false);
-            icon4.setVisible(false);
+          
 
             java.sql.ResultSet rs3 = conn.prepareStatement(
                 "SELECT COUNT(*) FROM event").executeQuery();
@@ -202,23 +194,15 @@ public class osoDashboard extends javax.swing.JFrame {
         sidebar = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        icon4 = new javax.swing.JLabel();
         icon3 = new javax.swing.JLabel();
-        icon2 = new javax.swing.JLabel();
         icon1 = new javax.swing.JLabel();
-        pendings = new javax.swing.JLabel();
         eventsCOUNT = new javax.swing.JLabel();
         events = new javax.swing.JLabel();
-        pendingsCOUNT1 = new javax.swing.JLabel();
-        totalmemCOUNT = new javax.swing.JLabel();
-        totalMembers = new javax.swing.JLabel();
         totalOrgsCOUNT = new javax.swing.JLabel();
         totalOrgs = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        totalMembersSlot = new javax.swing.JLabel();
         eventsSlot = new javax.swing.JLabel();
-        pendingsSlot = new javax.swing.JLabel();
         totalOrgSlot = new javax.swing.JLabel();
         pendingsCOUNT = new javax.swing.JLabel();
         regOrgPanel = new javax.swing.JLabel();
@@ -294,47 +278,21 @@ public class osoDashboard extends javax.swing.JFrame {
         jPanel1.setPreferredSize(new java.awt.Dimension(798, 750));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        icon4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/mdi_account-pending.png"))); // NOI18N
-        jPanel1.add(icon4, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 150, -1, -1));
-
         icon3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/mdi_calendar.png"))); // NOI18N
-        jPanel1.add(icon3, new org.netbeans.lib.awtextra.AbsoluteConstraints(428, 150, -1, -1));
-
-        icon2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/mdi_people.png"))); // NOI18N
-        jPanel1.add(icon2, new org.netbeans.lib.awtextra.AbsoluteConstraints(248, 150, -1, -1));
+        jPanel1.add(icon3, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 150, -1, -1));
 
         icon1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/la_university.png"))); // NOI18N
         jPanel1.add(icon1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 150, -1, -1));
 
-        pendings.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 12)); // NOI18N
-        pendings.setForeground(new java.awt.Color(28, 94, 56));
-        pendings.setText("Pendings");
-        jPanel1.add(pendings, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 210, 60, 30));
-
         eventsCOUNT.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 24)); // NOI18N
         eventsCOUNT.setForeground(new java.awt.Color(28, 94, 56));
         eventsCOUNT.setText("5");
-        jPanel1.add(eventsCOUNT, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 180, 30, 30));
+        jPanel1.add(eventsCOUNT, new org.netbeans.lib.awtextra.AbsoluteConstraints(255, 180, 30, 30));
 
         events.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 12)); // NOI18N
         events.setForeground(new java.awt.Color(28, 94, 56));
         events.setText("Events");
-        jPanel1.add(events, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 220, -1, 20));
-
-        pendingsCOUNT1.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 24)); // NOI18N
-        pendingsCOUNT1.setForeground(new java.awt.Color(28, 94, 56));
-        pendingsCOUNT1.setText("5");
-        jPanel1.add(pendingsCOUNT1, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 180, 20, 30));
-
-        totalmemCOUNT.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 24)); // NOI18N
-        totalmemCOUNT.setForeground(new java.awt.Color(28, 94, 56));
-        totalmemCOUNT.setText("5");
-        jPanel1.add(totalmemCOUNT, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 30, 30));
-
-        totalMembers.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 12)); // NOI18N
-        totalMembers.setForeground(new java.awt.Color(28, 94, 56));
-        totalMembers.setText("Total Members");
-        jPanel1.add(totalMembers, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 220, -1, 20));
+        jPanel1.add(events, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 220, -1, 20));
 
         totalOrgsCOUNT.setFont(new java.awt.Font("Plus Jakarta Sans", 1, 24)); // NOI18N
         totalOrgsCOUNT.setForeground(new java.awt.Color(28, 94, 56));
@@ -356,14 +314,8 @@ public class osoDashboard extends javax.swing.JFrame {
         jLabel11.setText("Overview of all student organizations");
         jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, -1, 20));
 
-        totalMembersSlot.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/slot.png"))); // NOI18N
-        jPanel1.add(totalMembersSlot, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 134, -1, -1));
-
         eventsSlot.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/slot.png"))); // NOI18N
-        jPanel1.add(eventsSlot, new org.netbeans.lib.awtextra.AbsoluteConstraints(407, 134, -1, -1));
-
-        pendingsSlot.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/slot.png"))); // NOI18N
-        jPanel1.add(pendingsSlot, new org.netbeans.lib.awtextra.AbsoluteConstraints(584, 134, -1, -1));
+        jPanel1.add(eventsSlot, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 135, -1, -1));
 
         totalOrgSlot.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/slot.png"))); // NOI18N
         jPanel1.add(totalOrgSlot, new org.netbeans.lib.awtextra.AbsoluteConstraints(53, 134, -1, -1));
@@ -450,9 +402,7 @@ public class osoDashboard extends javax.swing.JFrame {
     private javax.swing.JLabel eventsCOUNT;
     private javax.swing.JLabel eventsSlot;
     private javax.swing.JLabel icon1;
-    private javax.swing.JLabel icon2;
     private javax.swing.JLabel icon3;
-    private javax.swing.JLabel icon4;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JPanel jPanel1;
@@ -460,18 +410,12 @@ public class osoDashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel navbar;
     private javax.swing.JButton orgBtn;
-    private javax.swing.JLabel pendings;
     private javax.swing.JLabel pendingsCOUNT;
-    private javax.swing.JLabel pendingsCOUNT1;
-    private javax.swing.JLabel pendingsSlot;
     private javax.swing.JLabel regOrgPanel;
     private javax.swing.JButton settingsBtn;
     private javax.swing.JLabel sidebar;
-    private javax.swing.JLabel totalMembers;
-    private javax.swing.JLabel totalMembersSlot;
     private javax.swing.JLabel totalOrgSlot;
     private javax.swing.JLabel totalOrgs;
     private javax.swing.JLabel totalOrgsCOUNT;
-    private javax.swing.JLabel totalmemCOUNT;
     // End of variables declaration//GEN-END:variables
 }
