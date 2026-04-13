@@ -23,6 +23,7 @@ public class loginChoices extends javax.swing.JFrame {
         backBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         backBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 backBtn.setForeground(new java.awt.Color(200, 230, 210));
             }

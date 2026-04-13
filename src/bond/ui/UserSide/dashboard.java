@@ -15,6 +15,7 @@ public class dashboard extends javax.swing.JFrame {
         btn.setForeground(java.awt.Color.WHITE);
 
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btn.setForeground(new java.awt.Color(150, 220, 180));
             }
