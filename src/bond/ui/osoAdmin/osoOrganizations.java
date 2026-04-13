@@ -486,9 +486,9 @@ public class osoOrganizations extends javax.swing.JFrame {
 
         javax.swing.JPanel orgListPanel = new javax.swing.JPanel(null);
         orgListPanel.setBackground(new java.awt.Color(248, 250, 249));
-        jPanel2.add(orgListPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 760, Integer.MAX_VALUE));
-
+        jPanel2.add(orgListPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 760, 600));
         java.util.List<String[]> orgRows = new java.util.ArrayList<>();
+        
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             java.sql.ResultSet rs = conn.prepareStatement(
@@ -765,7 +765,7 @@ public class osoOrganizations extends javax.swing.JFrame {
                 orgListPanel.revalidate();
                 orgListPanel.repaint();
 
-                int newHeight = y + 20;
+                int newHeight = Math.max(600, y + 20);
                 orgListRenderedHeight[0] = newHeight;
                 orgListPanel.setBounds(0, 90, 760, newHeight);
 
