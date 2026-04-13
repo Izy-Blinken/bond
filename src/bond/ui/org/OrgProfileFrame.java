@@ -352,7 +352,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
         btnManageOfficers.setBackground(new java.awt.Color(28, 94, 56));
         btnManageOfficers.setForeground(java.awt.Color.WHITE);
         btnManageOfficers.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
-        btnManageOfficers.setBounds(800, 460, 140, 30);
+        btnManageOfficers.setBounds(800, 470, 140, 30);
         btnManageOfficers.addActionListener(e -> showOfficerDialog());
         contentPanel.add(btnManageOfficers);
         contentPanel.setComponentZOrder(btnManageOfficers, 0);
@@ -783,7 +783,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
  
         // Filter buttons
         javax.swing.JButton btnAll = new javax.swing.JButton("All");
-        btnAll.setBounds(280, 560, 60, 24);
+        btnAll.setBounds(580, 525, 60, 24);
         btnAll.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
         btnAll.setBackground("All".equals(roleFilter) ? new java.awt.Color(28,94,56) : new java.awt.Color(200,220,210));
         btnAll.setForeground("All".equals(roleFilter) ? java.awt.Color.WHITE : new java.awt.Color(28,94,56));
@@ -793,7 +793,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
         contentPanel.add(btnAll); contentPanel.setComponentZOrder(btnAll, 0);
  
         javax.swing.JButton btnOfficer = new javax.swing.JButton("Officer");
-        btnOfficer.setBounds(348, 560, 70, 24);
+        btnOfficer.setBounds(645, 525, 70, 24);
         btnOfficer.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
         btnOfficer.setBackground("Officer".equals(roleFilter) ? new java.awt.Color(28,94,56) : new java.awt.Color(200,220,210));
         btnOfficer.setForeground("Officer".equals(roleFilter) ? java.awt.Color.WHITE : new java.awt.Color(28,94,56));
@@ -803,7 +803,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
         contentPanel.add(btnOfficer); contentPanel.setComponentZOrder(btnOfficer, 0);
  
         javax.swing.JButton btnMember = new javax.swing.JButton("Member");
-        btnMember.setBounds(426, 560, 72, 24);
+        btnMember.setBounds(720, 525, 72, 24);
         btnMember.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
         btnMember.setBackground("Member".equals(roleFilter) ? new java.awt.Color(28,94,56) : new java.awt.Color(200,220,210));
         btnMember.setForeground("Member".equals(roleFilter) ? java.awt.Color.WHITE : new java.awt.Color(28,94,56));
