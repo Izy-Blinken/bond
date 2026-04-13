@@ -4,6 +4,8 @@
  */
 package bond.ui.UserSide;
 
+import bond.db.DBSetup;
+
 
 public class dashboard extends javax.swing.JFrame {
 
@@ -429,9 +431,11 @@ public class dashboard extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+        DBSetup.main(new String[]{});
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new dashboard().setVisible(true);
+                
             }
         });
     }

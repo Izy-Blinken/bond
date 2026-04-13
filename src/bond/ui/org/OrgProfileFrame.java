@@ -495,10 +495,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
             int orgId = bond.util.SessionManager.getCurrentOrgId();
             java.sql.PreparedStatement ps = conn.prepareStatement(
                 "SELECT o.org_name, o.classification, o.mission, o.vision, " +
-                "COALESCE(" +
-                "  (SELECT adv.full_name FROM adviser adv WHERE adv.org_id = o.org_id ORDER BY adv.adviser_id DESC LIMIT 1)," +
-                "  o.adviser" +
-                ") AS adviser " +
+                "(SELECT adv.full_name FROM adviser adv WHERE adv.org_id = o.org_id ORDER BY adv.adviser_id DESC LIMIT 1) AS adviser " +
                 "FROM organization o WHERE o.org_id = ?"
             );
             ps.setInt(1, orgId);
@@ -587,12 +584,13 @@ public class OrgProfileFrame extends javax.swing.JFrame {
                     try {
                         java.sql.Connection cReg = bond.db.DBConnection.getConnection();
                         java.sql.PreparedStatement psReg = cReg.prepareStatement(
-                            "SELECT appointed FROM registration_form WHERE org_id = ? ORDER BY reg_id DESC LIMIT 1"
+                            "SELECT appointed_by FROM registration_form WHERE form_id = " +
+                            "(SELECT form_id FROM organization WHERE org_id = ?) LIMIT 1"
                         );
                         psReg.setInt(1, bond.util.SessionManager.getCurrentOrgId());
                         java.sql.ResultSet rsReg = psReg.executeQuery();
                         if (rsReg.next()) {
-                            String appointed = rsReg.getString("appointed");
+                            String appointed = rsReg.getString("appointed_by");
                             if (appointed != null && !appointed.trim().isEmpty()) {
                                 name = appointed.trim();
                             }
@@ -1439,12 +1437,13 @@ public class OrgProfileFrame extends javax.swing.JFrame {
                     try {
                         java.sql.Connection cReg = bond.db.DBConnection.getConnection();
                         java.sql.PreparedStatement psReg = cReg.prepareStatement(
-                            "SELECT appointed FROM registration_form WHERE org_id = ? ORDER BY reg_id DESC LIMIT 1"
+                            "SELECT appointed_by FROM registration_form WHERE form_id = " +
+                            "(SELECT form_id FROM organization WHERE org_id = ?) LIMIT 1"
                         );
                         psReg.setInt(1, bond.util.SessionManager.getCurrentOrgId());
                         java.sql.ResultSet rsReg = psReg.executeQuery();
                         if (rsReg.next()) {
-                            String appointed = rsReg.getString("appointed");
+                            String appointed = rsReg.getString("appointed_by");
                             if (appointed != null && !appointed.trim().isEmpty()) {
                                 name = appointed.trim();
                             }

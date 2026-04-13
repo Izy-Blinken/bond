@@ -274,11 +274,9 @@ public class osoOrganizations extends javax.swing.JFrame {
                 "SELECT o.org_name, o.classification, o.status, " +
                 "COALESCE(o.mission,'') AS mission, " +
                 "COALESCE(o.vision,'') AS vision, COALESCE(o.description,'') AS description, " +
-                "COALESCE(" +
-                "  (SELECT adv.full_name FROM adviser adv WHERE adv.org_id = o.org_id ORDER BY adv.adviser_id DESC LIMIT 1)," +
-                "  o.adviser" +
-                ") AS adviser " +
-                "FROM organization o WHERE o.org_id=?");
+                "(SELECT adv.full_name FROM adviser adv WHERE adv.org_id = o.org_id ORDER BY adv.adviser_id DESC LIMIT 1) AS adviser " +
+                "FROM organization o WHERE o.org_id=?"
+            );
             ps.setInt(1, orgId);
             java.sql.ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -379,15 +377,14 @@ public class osoOrganizations extends javax.swing.JFrame {
                 // Update organization
                 java.sql.PreparedStatement psOrg = conn.prepareStatement(
                     "UPDATE organization SET org_name=?, classification=?, mission=?, " +
-                    "vision=?, description=?, status=?, adviser=? WHERE org_id=?");
+                    "vision=?, description=?, status=? WHERE org_id=?");
                 psOrg.setString(1, newName);
                 psOrg.setString(2, newClass);
                 psOrg.setString(3, newMission);
                 psOrg.setString(4, newVision);
                 psOrg.setString(5, newDesc);
                 psOrg.setString(6, newStatus);
-                psOrg.setString(7, newAdviser.isEmpty() ? null : newAdviser);
-                psOrg.setInt(8, orgId);
+                psOrg.setInt(7, orgId);
                 psOrg.executeUpdate();
 
                 // Update or insert adviser
@@ -489,7 +486,7 @@ public class osoOrganizations extends javax.swing.JFrame {
 
         javax.swing.JPanel orgListPanel = new javax.swing.JPanel(null);
         orgListPanel.setBackground(new java.awt.Color(248, 250, 249));
-        jPanel2.add(orgListPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 760, 600));
+        jPanel2.add(orgListPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 760, Integer.MAX_VALUE));
 
         java.util.List<String[]> orgRows = new java.util.ArrayList<>();
         try {
@@ -768,8 +765,7 @@ public class osoOrganizations extends javax.swing.JFrame {
                 orgListPanel.revalidate();
                 orgListPanel.repaint();
 
-                // Update orgListPanel bounds so pending section sits below actual content
-                int newHeight = Math.max(600, y + 20);
+                int newHeight = y + 20;
                 orgListRenderedHeight[0] = newHeight;
                 orgListPanel.setBounds(0, 90, 760, newHeight);
 
