@@ -43,6 +43,8 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
         this.setLocationRelativeTo(null);
         this.orgId = orgId;
         initComponents();
+        jPanel3.setComponentZOrder(settingsPanel1, 0); // settings drawer on top
+        jPanel3.setComponentZOrder(darkPanel1, 1);     // dim overlay just under it
 
         
         javax.swing.SwingUtilities.invokeLater(() -> {
@@ -143,7 +145,7 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
                 javax.swing.JLabel lDate = new javax.swing.JLabel(date != null ? date : "—");
                 lDate.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
                 lDate.setForeground(new java.awt.Color(40, 40, 40));
-                jPanel1.add(lDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(455, rowY, 145, 22));
+                jPanel1.add(lDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(325, rowY, 145, 22));
                 jPanel1.setComponentZOrder(lDate, 0); eventRowLabels.add(lDate);
 
                 // STATUS — x=615, w=140
@@ -154,7 +156,7 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
                 javax.swing.JLabel lStatus = new javax.swing.JLabel(status != null ? status : "—");
                 lStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
                 lStatus.setForeground(sc);
-                jPanel1.add(lStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(615, rowY, 140, 22));
+                jPanel1.add(lStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, rowY, 140, 22));
                 jPanel1.setComponentZOrder(lStatus, 0); eventRowLabels.add(lStatus);
                 
                 rowY += 30;
@@ -196,9 +198,8 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
             yearFilterCombo.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
             yearFilterCombo.setBackground(java.awt.Color.WHITE);
             yearFilterCombo.setForeground(new java.awt.Color(40, 40, 40));
-            // ← Adjust x/y so the combo sits top-right of your officer table heading
             jPanel1.add(yearFilterCombo,
-                new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 1195, 160, 28));
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(752, 1165, 160, 28));
             jPanel1.setComponentZOrder(yearFilterCombo, 0);
             yearFilterCombo.addActionListener(e -> {
                 String sel = (String) yearFilterCombo.getSelectedItem();
@@ -1008,8 +1009,8 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        new registerAnOrg().setVisible(true);
-        this.dispose();
+        new registerAnOrg(this).setVisible(true); 
+        this.setVisible(false);      
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed

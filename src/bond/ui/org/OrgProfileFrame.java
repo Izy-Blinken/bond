@@ -840,7 +840,7 @@ public class OrgProfileFrame extends javax.swing.JFrame {
             final String mRole = m.getRole();
             final String mCourse = m.getCourse() != null ? m.getCourse() : "";
             javax.swing.JButton btnEdit = new javax.swing.JButton("Edit");
-            btnEdit.setBounds(900, y, 50, 22);
+            btnEdit.setBounds(850, y, 50, 22);
             btnEdit.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 10));
             btnEdit.setBackground(new java.awt.Color(28, 94, 56));
             btnEdit.setForeground(java.awt.Color.WHITE);
@@ -850,8 +850,8 @@ public class OrgProfileFrame extends javax.swing.JFrame {
             contentPanel.add(btnEdit); contentPanel.setComponentZOrder(btnEdit, 0);
  
             // Remove button
-            javax.swing.JButton btnRem = new javax.swing.JButton("✕");
-            btnRem.setBounds(956, y, 30, 22);
+            javax.swing.JButton btnRem = new javax.swing.JButton("X");
+            btnRem.setBounds(906, y, 30, 22);
             btnRem.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 10));
             btnRem.setBackground(new java.awt.Color(200, 50, 50));
             btnRem.setForeground(java.awt.Color.WHITE);

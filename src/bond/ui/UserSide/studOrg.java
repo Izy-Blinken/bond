@@ -58,6 +58,8 @@ public class studOrg extends javax.swing.JFrame {
         jPanel1.setComponentZOrder(studOrgBtn, 2);
         jPanel1.setComponentZOrder(dashboardBtn, 3);
         jPanel1.setComponentZOrder(searchInput1, 4);
+        jPanel1.setComponentZOrder(darkPanel, 0);
+
         searchInput1.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) { loadOrgs(searchInput1.getText().trim()); }
             public void removeUpdate(javax.swing.event.DocumentEvent e) { loadOrgs(searchInput1.getText().trim()); }
@@ -87,9 +89,10 @@ public class studOrg extends javax.swing.JFrame {
         categoryCombo.setForeground(new java.awt.Color(28, 94, 56));
         categoryCombo.setBorder(javax.swing.BorderFactory.createLineBorder(
             new java.awt.Color(180, 210, 195)));
+        
         jPanel1.add(categoryCombo,
-            new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 140, 230, 30));
-        jPanel1.setComponentZOrder(categoryCombo, 0);
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 140, 230, 30));
+        jPanel1.setComponentZOrder(categoryCombo, 2);
 
         categoryCombo.addActionListener(e -> {
             String selected = (String) categoryCombo.getSelectedItem();
@@ -116,7 +119,10 @@ public class studOrg extends javax.swing.JFrame {
         // Position scroll panel 
         jPanel1.add(orgListScroll,
             new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 210, 880, 360));
-        jPanel1.setComponentZOrder(orgListScroll, 1);        
+        jPanel1.setComponentZOrder(orgListScroll, 3);
+        jPanel1.setComponentZOrder(categoryCombo, 2);
+        jPanel1.setComponentZOrder(darkPanel, 0);
+        jPanel1.setComponentZOrder(orgListScroll, 1);   
         loadOrgs();
     }
 
@@ -344,8 +350,8 @@ public class studOrg extends javax.swing.JFrame {
             settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(settingsLayout.createSequentialGroup()
                 .addGap(49, 49, 49)
-                .addComponent(settingsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addComponent(settingsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
                 .addComponent(exBtn)
                 .addGap(17, 17, 17))
         );
