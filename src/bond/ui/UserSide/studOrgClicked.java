@@ -69,7 +69,7 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
 
         loadOrgData();
         locationLbl1.setVisible(false);
-        dateLbl1.setLocation(450, dateLbl1.getY());
+        dateLbl1.setLocation(450, dateLbl1.getY());  
     }
 
     public studOrgClicked() {
@@ -436,13 +436,13 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
         locationLbl = new javax.swing.JLabel();
         statusLbl = new javax.swing.JLabel();
         completedBtn = new javax.swing.JButton();
+        darkPanel = new javax.swing.JPanel();
         settingsPanel = new javax.swing.JPanel();
         settings = new javax.swing.JPanel();
         settingsLabel = new javax.swing.JLabel();
         exBtn = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        darkPanel = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         searchInput1 = new javax.swing.JTextField();
         searchIcon = new javax.swing.JLabel();
@@ -531,6 +531,19 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
             }
         });
 
+        darkPanel.setBackground(new java.awt.Color(0, 0, 0));
+
+        javax.swing.GroupLayout darkPanelLayout = new javax.swing.GroupLayout(darkPanel);
+        darkPanel.setLayout(darkPanelLayout);
+        darkPanelLayout.setHorizontalGroup(
+            darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 810, Short.MAX_VALUE)
+        );
+        darkPanelLayout.setVerticalGroup(
+            darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 600, Short.MAX_VALUE)
+        );
+
         settingsPanel.setBackground(new java.awt.Color(255, 255, 255));
         settingsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -589,19 +602,6 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
         jButton2.setContentAreaFilled(false);
         jButton2.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/UserImages/lohinSettingshover.png"))); // NOI18N
         settingsPanel.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 210, -1));
-
-        darkPanel.setBackground(new java.awt.Color(0, 0, 0));
-
-        javax.swing.GroupLayout darkPanelLayout = new javax.swing.GroupLayout(darkPanel);
-        darkPanel.setLayout(darkPanelLayout);
-        darkPanelLayout.setHorizontalGroup(
-            darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 810, Short.MAX_VALUE)
-        );
-        darkPanelLayout.setVerticalGroup(
-            darkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
-        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -737,7 +737,7 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
         missionArea.setDisabledTextColor(new java.awt.Color(255, 255, 255));
         missionArea.setOpaque(false);
         missionArea.setPreferredSize(new java.awt.Dimension(700, 200));
-        jPanel1.add(missionArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 620, 830, 190));
+        jPanel1.add(missionArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 640, 830, 190));
 
         jSeparator4.setForeground(new java.awt.Color(28, 94, 56));
         jPanel1.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 1710, 1000, 20));
@@ -807,7 +807,7 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
         visionArea.setDisabledTextColor(new java.awt.Color(255, 255, 255));
         visionArea.setOpaque(false);
         visionArea.setPreferredSize(new java.awt.Dimension(700, 200));
-        jPanel1.add(visionArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 860, 830, 190));
+        jPanel1.add(visionArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 890, 830, 190));
 
         jSeparator3.setForeground(new java.awt.Color(28, 94, 56));
         jPanel1.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 1090, 1000, 20));
