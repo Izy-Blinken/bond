@@ -11,6 +11,9 @@ package bond.ui.UserSide;
 public class studOrg extends javax.swing.JFrame {
     
     private int[] orgIds = new int[5];
+    private javax.swing.JPanel orgCardPanel;
+    private javax.swing.JScrollPane orgListScroll;
+    private String currentCategoryFilter = "";
 
     private void setupHover(javax.swing.JButton btn) {
 
@@ -48,42 +51,225 @@ public class studOrg extends javax.swing.JFrame {
         for (javax.swing.JButton btn : buttons) {
             setupHover(btn);
         }
-        loadOrgs();
+
         jPanel1.setComponentZOrder(settingsBtn, 0);
+        jPanel1.setComponentZOrder(aboutBtn, 1);
+        jPanel1.setComponentZOrder(studOrgBtn, 2);
+        jPanel1.setComponentZOrder(dashboardBtn, 3);
+        jPanel1.setComponentZOrder(searchInput1, 4);
+        searchInput1.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { loadOrgs(searchInput1.getText().trim()); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { loadOrgs(searchInput1.getText().trim()); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { loadOrgs(searchInput1.getText().trim()); }
+        });
         
+        // Hide old course-label filter buttons
+        bsitBtn.setVisible(false);
+        bsedBtn.setVisible(false);
+        bshmBtn.setVisible(false);
+        bstmBtn.setVisible(false);
+        bitBtn.setVisible(false);
+        allBtn.setVisible(false);
+
+        // Add a category dropdown
+        String[] categories = {
+            "All Categories",
+            "Academic",
+            "Civic & Cultural",
+            "Religious",
+            "Media & Publications",
+            "Sports & Recreation"
+        };
+        javax.swing.JComboBox<String> categoryCombo = new javax.swing.JComboBox<>(categories);
+        categoryCombo.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+        categoryCombo.setBackground(java.awt.Color.WHITE);
+        categoryCombo.setForeground(new java.awt.Color(28, 94, 56));
+        categoryCombo.setBorder(javax.swing.BorderFactory.createLineBorder(
+            new java.awt.Color(180, 210, 195)));
+        jPanel1.add(categoryCombo,
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 140, 230, 30));
+        jPanel1.setComponentZOrder(categoryCombo, 0);
+
+        categoryCombo.addActionListener(e -> {
+            String selected = (String) categoryCombo.getSelectedItem();
+            String cat = "All Categories".equals(selected) ? "" : selected;
+            loadOrgs(searchInput1.getText().trim(), cat);
+        });
+
+        // org cards
+        org1.setVisible(false); org2.setVisible(false);
+        org3.setVisible(false); org4.setVisible(false); org5.setVisible(false);
+
+        // Create scroll 
+        orgListScroll = new javax.swing.JScrollPane();
+        orgListScroll.setHorizontalScrollBarPolicy(
+            javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        orgListScroll.setBorder(null);
+        orgListScroll.setOpaque(false);
+        orgListScroll.getViewport().setOpaque(false);
+
+        orgCardPanel = new javax.swing.JPanel(null);
+        orgCardPanel.setOpaque(false);
+        orgListScroll.setViewportView(orgCardPanel);
+
+        // Position scroll panel 
+        jPanel1.add(orgListScroll,
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 210, 880, 360));
+        jPanel1.setComponentZOrder(orgListScroll, 1);        
+        loadOrgs();
     }
 
     
     private void loadOrgs() {
-        loadOrgs("");
+        loadOrgs("", currentCategoryFilter);
     }
 
     private void loadOrgs(String query) {
+        loadOrgs(query, currentCategoryFilter);
+    }
 
-        javax.swing.JButton[] orgs = {org1, org2, org3, org4, org5};
+    private void loadOrgs(String query, String category) {
+        currentCategoryFilter = category;
+        
+        if (orgCardPanel == null) return;
+        orgCardPanel.removeAll();
 
         try {
-
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
-            java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT org_id FROM organization WHERE status = 'Active' AND org_name LIKE ? ORDER BY org_id ASC LIMIT 5"
-            );
+            String sql =
+                "SELECT o.org_id, o.org_name, o.classification, o.status, o.logo_path, " +
+                "(SELECT COUNT(*) FROM members m WHERE m.org_id = o.org_id) AS member_count " +
+                "FROM organization o WHERE (o.org_name LIKE ? OR o.classification LIKE ? OR o.description LIKE ?)";
+            if (category != null && !category.isEmpty()) sql += " AND o.classification = ?";
+            sql += " ORDER BY o.org_name ASC";
+
+            java.sql.PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "%" + query + "%");
+            ps.setString(2, "%" + query + "%");
+            ps.setString(3, "%" + query + "%");
+            
+            if (category != null && !category.isEmpty()) {
+                ps.setString(4, category);
+            }
             java.sql.ResultSet rs = ps.executeQuery();
 
-            int i = 0;
-            while (rs.next() && i < 5) {
-                orgIds[i] = rs.getInt("org_id");
-                orgs[i].setVisible(true);
-                i++;
+            java.util.List<String[]> rows = new java.util.ArrayList<>();
+            while (rs.next()) {
+                rows.add(new String[]{
+                    String.valueOf(rs.getInt("org_id")),
+                    rs.getString("org_name"),
+                    rs.getString("classification"),
+                    rs.getString("status"),
+                    rs.getString("logo_path") != null ? rs.getString("logo_path") : "",
+                    String.valueOf(rs.getInt("member_count"))
+                });
             }
-
-            while (i < 5) {
-                orgs[i].setVisible(false);
-                i++;
-            }
-
             conn.close();
+
+            if (rows.isEmpty()) {
+                javax.swing.JLabel none = new javax.swing.JLabel("No results found");
+                none.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.ITALIC, 14));
+                none.setForeground(new java.awt.Color(180, 180, 180));
+                none.setBounds(20, 20, 400, 28);
+                orgCardPanel.add(none);
+                orgCardPanel.setPreferredSize(new java.awt.Dimension(860, 80));
+                orgCardPanel.revalidate(); orgCardPanel.repaint();
+                return;
+            }
+
+            int y = 8;
+            for (String[] row : rows) {
+                final int oid    = Integer.parseInt(row[0]);
+                final String name      = row[1];
+                final String cls       = row[2];
+                final String status    = row[3];
+                final String photoPath = row[4];
+                final String members   = row[5];
+
+                javax.swing.JPanel card = new javax.swing.JPanel(null);
+                card.setBackground(new java.awt.Color(237, 245, 240));
+                card.setBorder(javax.swing.BorderFactory.createLineBorder(
+                    new java.awt.Color(180, 210, 195)));
+                card.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                card.setBounds(8, y, 840, 68);
+
+                // Avatar / logo
+                int photoSize = 42;
+                boolean loaded = false;
+                if (!photoPath.isEmpty()) {
+                    try {
+                        java.net.URL url = getClass().getClassLoader().getResource(photoPath);
+                        if (url != null) {
+                            java.awt.Image img = new javax.swing.ImageIcon(url).getImage()
+                                .getScaledInstance(photoSize, photoSize, java.awt.Image.SCALE_SMOOTH);
+                            javax.swing.JLabel pl = new javax.swing.JLabel(new javax.swing.ImageIcon(img));
+                            pl.setBounds(10, 13, photoSize, photoSize);
+                            card.add(pl);
+                            loaded = true;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                if (!loaded) {
+                    final String letter = name.substring(0, 1).toUpperCase();
+                    javax.swing.JLabel circle = new javax.swing.JLabel() {
+                        @Override protected void paintComponent(java.awt.Graphics g) {
+                            java.awt.Graphics2D g2 = (java.awt.Graphics2D) g;
+                            g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                                java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                            g2.setColor(new java.awt.Color(28, 94, 56, 60));
+                            g2.fillOval(0, 0, photoSize - 1, photoSize - 1);
+                            g2.setColor(new java.awt.Color(28, 94, 56));
+                            g2.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 16));
+                            java.awt.FontMetrics fm = g2.getFontMetrics();
+                            g2.drawString(letter,
+                                (photoSize - fm.stringWidth(letter)) / 2,
+                                (photoSize + fm.getAscent() - fm.getDescent()) / 2);
+                        }
+                    };
+                    circle.setBounds(10, 13, photoSize, photoSize);
+                    card.add(circle);
+                }
+
+                javax.swing.JLabel lblName = new javax.swing.JLabel(name);
+                lblName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+                lblName.setForeground(new java.awt.Color(28, 94, 56));
+                lblName.setBounds(62, 10, 500, 24);
+                card.add(lblName);
+
+                javax.swing.JLabel lblInfo = new javax.swing.JLabel(cls + " · " + members + " members");
+                lblInfo.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
+                lblInfo.setForeground(new java.awt.Color(100, 140, 120));
+                lblInfo.setBounds(62, 36, 450, 18);
+                card.add(lblInfo);
+
+                java.awt.Color sc = "Active".equals(status)
+                    ? new java.awt.Color(28, 94, 56) : new java.awt.Color(180, 30, 30);
+                javax.swing.JLabel lblStatus = new javax.swing.JLabel("● " + status);
+                lblStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                lblStatus.setForeground(sc);
+                lblStatus.setBounds(700, 24, 120, 20);
+                card.add(lblStatus);
+
+                card.addMouseListener(new java.awt.event.MouseAdapter() {
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        new studOrgClicked(oid).setVisible(true);
+                        dispose();
+                    }
+                    public void mouseEntered(java.awt.event.MouseEvent e) {
+                        card.setBackground(new java.awt.Color(210, 235, 220));
+                    }
+                    public void mouseExited(java.awt.event.MouseEvent e) {
+                        card.setBackground(new java.awt.Color(237, 245, 240));
+                    }
+                });
+
+                orgCardPanel.add(card);
+                y += 76;
+            }
+
+            orgCardPanel.setPreferredSize(new java.awt.Dimension(860, y + 16));
+            orgCardPanel.revalidate();
+            orgCardPanel.repaint();
 
         } catch (Exception ex) {
             System.out.println("Load orgs error: " + ex.getMessage());
@@ -481,13 +667,14 @@ public class studOrg extends javax.swing.JFrame {
     }//GEN-LAST:event_exBtnActionPerformed
 
     private void bitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bitBtnActionPerformed
-            loadOrgs("BIT");
+        loadOrgs("", "Civic & Cultural");
+
     
     }//GEN-LAST:event_bitBtnActionPerformed
 
     private void allBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allBtnActionPerformed
         searchInput1.setText("");
-        loadOrgs();
+        loadOrgs("", "");
     }//GEN-LAST:event_allBtnActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -509,18 +696,34 @@ public class studOrg extends javax.swing.JFrame {
     }//GEN-LAST:event_org1ActionPerformed
 
     private void org2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_org2ActionPerformed
+        if (orgIds[1] > 0) { 
+            new studOrgClicked(orgIds[1]).setVisible(true);
+            dispose(); 
+        }
 
     }//GEN-LAST:event_org2ActionPerformed
 
     private void org5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_org5ActionPerformed
+        if (orgIds[4] > 0) { 
+        new studOrgClicked(orgIds[4]).setVisible(true);
+        dispose(); 
+        }
 
     }//GEN-LAST:event_org5ActionPerformed
 
     private void org3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_org3ActionPerformed
+        if (orgIds[2] > 0) { 
+            new studOrgClicked(orgIds[2]).setVisible(true); 
+            dispose(); 
+        }
 
     }//GEN-LAST:event_org3ActionPerformed
 
     private void org4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_org4ActionPerformed
+        if (orgIds[3] > 0) { 
+            new studOrgClicked(orgIds[3]).setVisible(true); 
+            dispose(); 
+        }
 
     }//GEN-LAST:event_org4ActionPerformed
 

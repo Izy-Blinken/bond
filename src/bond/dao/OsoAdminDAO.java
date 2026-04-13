@@ -75,6 +75,8 @@ public class OsoAdminDAO {
     private String hashPassword(String plain) {
         
         try {
+            
+            
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(plain.getBytes("UTF-8"));
             StringBuilder sb = new StringBuilder();

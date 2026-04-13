@@ -477,9 +477,8 @@ javax.swing.SwingUtilities.invokeLater(() -> {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        this.setVisible(false);
-        loginChoices lc = new loginChoices(this);
-        lc.setVisible(true);
+        new registerAnOrg(this).setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

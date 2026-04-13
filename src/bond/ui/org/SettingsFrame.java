@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                        /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import bond.ui.UserSide.dashboard;
+
 /**
  *
  * @author Erica
@@ -18,11 +19,15 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SettingsFrame.class.getName());
     private javax.swing.JPanel contentPanel;
+    private CircleProfilePanel circleProfile;
+    private java.io.File selectedPhotoFile = null;
 
     class CircleProfilePanel extends javax.swing.JPanel {
+
         private java.awt.image.BufferedImage profileImage = null;
 
         public CircleProfilePanel() {
+
             setOpaque(false);
             setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
             setToolTipText("Click to upload photo");
@@ -31,17 +36,50 @@ public class SettingsFrame extends javax.swing.JFrame {
                 public void mouseClicked(java.awt.event.MouseEvent e) {
                     javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
                     chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-                        "Image Files", "jpg", "jpeg", "png"));
+                            "Image Files", "jpg", "jpeg", "png"));
+
                     if (chooser.showOpenDialog(null) == javax.swing.JFileChooser.APPROVE_OPTION) {
                         try {
-                            profileImage = javax.imageio.ImageIO.read(chooser.getSelectedFile());
+                            java.io.File chosen = chooser.getSelectedFile();
+                            profileImage = javax.imageio.ImageIO.read(chosen);
+                            selectedPhotoFile = chosen;
                             repaint();
+
+                            // Save immediately to DB
+                            int orgId = bond.util.SessionManager.getCurrentOrgId();
+                            java.io.File logoDir = new java.io.File("org_logos");
+                            logoDir.mkdirs();
+                            String fname = chosen.getName();
+                            String ext = fname.contains(".")
+                                ? fname.substring(fname.lastIndexOf('.'))
+                                : ".jpg";
+                            java.io.File dest = new java.io.File(logoDir, "org_" + orgId + ext);
+                            java.nio.file.Files.copy(
+                                chosen.toPath(),
+                                dest.toPath(),
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                            );
+                            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+                            java.sql.PreparedStatement ps = conn.prepareStatement(
+                                "UPDATE organization SET logo_path=? WHERE org_id=?"
+                            );
+                            ps.setString(1, dest.getAbsolutePath());
+                            ps.setInt(2, orgId);
+                            ps.executeUpdate();
+                            conn.close();
+
+                            javax.swing.JOptionPane.showMessageDialog(null, "Logo saved successfully!");
                         } catch (Exception ex) {
-                            System.out.println("Image error: " + ex.getMessage());
+                            System.out.println("Image/save error: " + ex.getMessage());
                         }
                     }
                 }
             });
+        }
+
+        public void setProfileImage(java.awt.image.BufferedImage img) {
+            this.profileImage = img;
+            repaint();
         }
 
         @Override
@@ -49,7 +87,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             super.paintComponent(g);
             java.awt.Graphics2D g2 = (java.awt.Graphics2D) g;
             g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-                                java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
             int w = getWidth(), h = getHeight();
             g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, w, h));
             if (profileImage != null) {
@@ -69,15 +107,15 @@ public class SettingsFrame extends javax.swing.JFrame {
             g2.drawOval(1, 1, w - 2, h - 2);
         }
     }
-    
 
     /**
      * Creates new form SettingsFrame
      */
     public SettingsFrame() {
         this.setLocationRelativeTo(null);
+        
         initComponents();
-        ActiveTab.setBounds(0, 7, 1000, 600); 
+        ActiveTab.setBounds(0, 7, 1000, 600);
         javax.swing.JLabel lblBond = new javax.swing.JLabel("BOND");
         lblBond.setFont(new java.awt.Font("Playfair Display", java.awt.Font.PLAIN, 40));
         lblBond.setForeground(java.awt.Color.WHITE);
@@ -86,16 +124,23 @@ public class SettingsFrame extends javax.swing.JFrame {
         getContentPane().setComponentZOrder(lblBond, 0);
         lblBond.setName("static");
 
-        javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel("Org Admin");
-        lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 16));
+        javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel(bond.util.SessionManager.getOrgName());
+        lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
         lblOrgAdmin.setForeground(java.awt.Color.WHITE);
         lblOrgAdmin.setBounds(30, 115, 160, 25);
         getContentPane().add(lblOrgAdmin);
         getContentPane().setComponentZOrder(lblOrgAdmin, 0);
         lblOrgAdmin.setName("static");
 
+        javax.swing.JLabel lblOrgAcronym = new javax.swing.JLabel("Org Admin");
+        lblOrgAcronym.setBounds(32, 135, 160, 25);
+        lblOrgAcronym.setForeground(java.awt.Color.WHITE);
+        lblOrgAcronym.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
+        getContentPane().add(lblOrgAcronym);
+        getContentPane().setComponentZOrder(lblOrgAcronym, 0);
+
         javax.swing.JLabel lblDashboard = new javax.swing.JLabel("Dashboard");
-        lblDashboard.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
+        lblDashboard.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
         lblDashboard.setForeground(java.awt.Color.WHITE);
         lblDashboard.setBounds(28, 196, 160, 25);
         getContentPane().add(lblDashboard);
@@ -141,30 +186,35 @@ public class SettingsFrame extends javax.swing.JFrame {
         getContentPane().add(lblExitAdmin);
         getContentPane().setComponentZOrder(lblExitAdmin, 0);
         lblExitAdmin.setName("static");
-        
-        
+
         bond.util.SessionManager.loadSession();
         this.setSize(1000, 635);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         getContentPane().setLayout(null);
-        
-        javax.swing.ImageIcon sbDefault = new javax.swing.ImageIcon(   
+
+        javax.swing.ImageIcon sbDefault = new javax.swing.ImageIcon(
                 getClass().getClassLoader().getResource("bond/assets/orgAdminImages/OrgAdmin_SearchBar.png"));
         javax.swing.ImageIcon sbHover = new javax.swing.ImageIcon(
                 getClass().getClassLoader().getResource("bond/assets/orgAdminImages/OrgAdmin_SearchBarHover.png"));
 
         GlobalSearchBar searchBar = new GlobalSearchBar(this, result -> {
             switch (result.type) {
-                case EVENT: navigateTo(new EventFrame()); break;
-                case ANNOUNCEMENT: navigateTo(new AnnouncementFrame()); break;
-                case MEMBER: navigateTo(new OrgProfileFrame()); break;
+                case EVENT:
+                    navigateTo(new EventFrame());
+                    break;
+                case ANNOUNCEMENT:
+                    navigateTo(new AnnouncementFrame());
+                    break;
+                case MEMBER:
+                    navigateTo(new OrgProfileFrame());
+                    break;
             }
-    },
-            () -> SearchBar.setIcon(sbHover),   
-            () -> SearchBar.setIcon(sbDefault)   
+        },
+                () -> SearchBar.setIcon(sbHover),
+                () -> SearchBar.setIcon(sbDefault)
         );
-        
+
         searchBar.installInto(getContentPane());
 
         contentPanel = new javax.swing.JPanel(null);
@@ -173,19 +223,11 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         JLabel bgImage = new JLabel();
         bgImage.setIcon(new javax.swing.ImageIcon(
-            getClass().getResource("/bond/assets/orgAdminImages/OrgAdmin_SettingsScroll.png")));
+                getClass().getResource("/bond/assets/orgAdminImages/OrgAdmin_SettingsScroll.png")));
         bgImage.setBounds(0, -60, 1000, 650);
         contentPanel.add(bgImage);
 
-        JLabel lblOrgAcronym = new JLabel(bond.util.SessionManager.getOrgAcronym() + " Admin");
-        lblOrgAcronym.setBounds(32, 135, 120, 25);
-        lblOrgAcronym.setForeground(java.awt.Color.WHITE);
-        lblOrgAcronym.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
-        getContentPane().add(lblOrgAcronym);
-        getContentPane().setComponentZOrder(lblOrgAcronym, 0);
-        lblOrgAcronym.setName("static");
-
-        CircleProfilePanel circleProfile = new CircleProfilePanel();
+        circleProfile = new CircleProfilePanel(); // assign to class field
         circleProfile.setBounds(274, 127, 70, 70);
         contentPanel.add(circleProfile);
         contentPanel.setComponentZOrder(circleProfile, 0);
@@ -203,48 +245,42 @@ public class SettingsFrame extends javax.swing.JFrame {
         contentPanel.add(lblOrgName);
 
         JTextField fullNameField = makeTextField(290, 230, 350, 40, "Username");
+        ((javax.swing.text.AbstractDocument) fullNameField.getDocument()).setDocumentFilter(null);
         contentPanel.add(fullNameField);
 
         JTextField emailField = makeTextField(290, 295, 350, 40, "Email");
         contentPanel.add(emailField);
 
-        JPasswordField passwordField = makePasswordField(290, 360, 350, 40);
-        contentPanel.add(passwordField);
-
-        JPasswordField confirmPasswordField = makePasswordField(290, 426, 350, 40);
-        contentPanel.add(confirmPasswordField);
-
         JButton btnSave = makeInvisibleButton();
-        btnSave.setBounds(530, 490, 105, 30);
+        btnSave.setBounds(530, 360, 105, 30);
         btnSave.addActionListener(e -> {
             String fullName = fullNameField.getText().trim();
-            String email    = emailField.getText().trim();
-            String password = new String(passwordField.getPassword()).trim();
-            String confirm  = new String(confirmPasswordField.getPassword()).trim();
+            String email = emailField.getText().trim();
 
             if (fullName.isEmpty() || email.isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this,
-                    "Full name and email cannot be empty!", "Warning",
-                    javax.swing.JOptionPane.WARNING_MESSAGE);
+                        "Username and email cannot be empty!", "Warning",
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            if (!password.isEmpty() && !password.equals(confirm)) {
-                javax.swing.JOptionPane.showMessageDialog(this,
-                    "Passwords do not match!", "Warning",
-                    javax.swing.JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            saveSettings(fullName, email, password.isEmpty() ? null : password);
+            saveSettings(fullName, email);
         });
         contentPanel.add(btnSave);
 
         contentPanel.setComponentZOrder(bgImage, contentPanel.getComponentCount() - 1);
 
+
+        contentPanel.setComponentZOrder(btnSave, 0);
+
         javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(contentPanel) {
-            @Override public void setBorder(javax.swing.border.Border b) {
+            @Override
+            public void setBorder(javax.swing.border.Border b) {
                 super.setBorder(javax.swing.BorderFactory.createEmptyBorder());
             }
-            @Override protected void paintBorder(java.awt.Graphics g) {}
+
+            @Override
+            protected void paintBorder(java.awt.Graphics g) {
+            }
         };
         scrollPane.setBounds(0, 86, 1000, 549);
         scrollPane.setBorder(null);
@@ -258,20 +294,28 @@ public class SettingsFrame extends javax.swing.JFrame {
         scrollPane.getVerticalScrollBar().setBorder(null);
         scrollPane.getVerticalScrollBar().setOpaque(false);
         scrollPane.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
-            @Override protected void paintTrack(java.awt.Graphics g, javax.swing.JComponent c, java.awt.Rectangle r) {}
-            @Override protected void paintThumb(java.awt.Graphics g, javax.swing.JComponent c, java.awt.Rectangle r) {
+            @Override
+            protected void paintTrack(java.awt.Graphics g, javax.swing.JComponent c, java.awt.Rectangle r) {
+            }
+
+            @Override
+            protected void paintThumb(java.awt.Graphics g, javax.swing.JComponent c, java.awt.Rectangle r) {
                 java.awt.Graphics2D g2 = (java.awt.Graphics2D) g;
                 g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                         java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new java.awt.Color(180, 180, 180, 150));
                 g2.fillRoundRect(r.x + 2, r.y, r.width - 4, r.height, 8, 8);
             }
-            @Override protected JButton createDecreaseButton(int o) {
+
+            @Override
+            protected JButton createDecreaseButton(int o) {
                 JButton b = new JButton();
                 b.setPreferredSize(new java.awt.Dimension(0, 0));
                 return b;
             }
-            @Override protected JButton createIncreaseButton(int o) {
+
+            @Override
+            protected JButton createIncreaseButton(int o) {
                 JButton b = new JButton();
                 b.setPreferredSize(new java.awt.Dimension(0, 0));
                 return b;
@@ -279,12 +323,12 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         getContentPane().add(scrollPane);
-        
+
         int total = getContentPane().getComponentCount();
         getContentPane().setComponentZOrder(scrollPane, 0);
         getContentPane().setComponentZOrder(jLabel1, getContentPane().getComponentCount() - 1);
         getContentPane().setComponentZOrder(ActiveTab, total - 2);
-        
+
         JButton btnDashboard = makeInvisibleButton();
         btnDashboard.setBounds(0, 196, 210, 40);
         btnDashboard.addActionListener(e -> navigateTo(new DashboardFrame()));
@@ -313,18 +357,19 @@ public class SettingsFrame extends javax.swing.JFrame {
         btnExitAdmin.setBounds(20, 540, 90, 40);
         btnExitAdmin.addActionListener(e -> {
             int confirm = javax.swing.JOptionPane.showConfirmDialog(
-                this, "Are you sure you want to exit admin?",
-                "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
+                    this, "Are you sure you want to exit admin?",
+                    "Exit Admin", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-               navigateTo(new dashboard());
+                navigateTo(new dashboard());
             }
         });
         getContentPane().add(btnExitAdmin);
         getContentPane().setComponentZOrder(btnExitAdmin, 0);
 
         loadAdminData(fullNameField, emailField, lblAdminName, lblOrgName);
+        contentPanel.setComponentZOrder(btnSave, 0);
     }
-    
+
     private JTextField makeTextField(int x, int y, int w, int h, String tooltip) {
         JTextField f = new JTextField();
         f.setBounds(x, y, w, h);
@@ -336,15 +381,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         return f;
     }
 
-    private JPasswordField makePasswordField(int x, int y, int w, int h) {
-        JPasswordField f = new JPasswordField();
-        f.setBounds(x, y, w, h);
-        f.setOpaque(false);
-        f.setBackground(new java.awt.Color(0, 0, 0, 0));
-        f.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-        f.setForeground(java.awt.Color.BLACK);
-        return f;
-    }
+    
 
     private JButton makeInvisibleButton() {
         JButton btn = new JButton();
@@ -362,7 +399,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     }
 
     private void loadAdminData(JTextField fullNameField, JTextField emailField,
-                               JLabel lblAdminName, JLabel lblOrgName) {
+            JLabel lblAdminName, JLabel lblOrgName) {
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
 
@@ -370,12 +407,12 @@ public class SettingsFrame extends javax.swing.JFrame {
             int orgId = bond.util.SessionManager.getCurrentOrgId();
 
             java.sql.PreparedStatement ps1 = conn.prepareStatement(
-                "SELECT username, email FROM org_admin WHERE org_admin_id = ?"
+                    "SELECT username, email FROM org_admin WHERE org_admin_id = ?"
             );
             ps1.setInt(1, adminId);
             java.sql.ResultSet rs = ps1.executeQuery();
             if (rs.next()) {
-                String name  = rs.getString("username");
+                String name = rs.getString("username");
                 String email = rs.getString("email");
                 fullNameField.setText(name);
                 emailField.setText(email);
@@ -384,7 +421,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
 
             java.sql.PreparedStatement ps2 = conn.prepareStatement(
-                "SELECT org_name FROM organization WHERE org_id = ?"
+                "SELECT org_name, logo_path FROM organization WHERE org_id = ?"
             );
             ps2.setInt(1, orgId);
             java.sql.ResultSet rs2 = ps2.executeQuery();
@@ -392,6 +429,21 @@ public class SettingsFrame extends javax.swing.JFrame {
                 String org = rs2.getString("org_name");
                 lblOrgName.setText(org);
                 lblOrgName.setToolTipText(org);
+
+                String logoPath = rs2.getString("logo_path");
+                if (logoPath != null && !logoPath.isEmpty()) {
+                    java.io.File logoFile = new java.io.File(logoPath);
+                    if (logoFile.exists() && circleProfile != null) {
+                        try {
+                            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(logoFile);
+                            if (img != null) {
+                                circleProfile.setProfileImage(img);
+                            }
+                        } catch (Exception imgEx) {
+                            System.out.println("Load logo image error: " + imgEx.getMessage());
+                        }
+                    }
+                }
             }
 
             conn.close();
@@ -400,39 +452,61 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
     }
 
-    private void saveSettings(String fullName, String email, String newPassword) {
+    private void saveSettings(String fullName, String email) {
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             int adminId = bond.util.SessionManager.getCurrentAdminId();
+            int orgId = bond.util.SessionManager.getCurrentOrgId();
 
-            if (newPassword != null) {
-                java.sql.PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE org_admin SET username=?, email=?, password_hash=? WHERE org_admin_id=?"
-                );
-                ps.setString(1, fullName);
-                ps.setString(2, email);
-                ps.setString(3, newPassword);
-                ps.setInt(4, adminId);
-                ps.executeUpdate();
-            } else {
-                java.sql.PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE org_admin SET username=?, email=? WHERE org_admin_id=?"
-                );
-                ps.setString(1, fullName);
-                ps.setString(2, email);
-                ps.setInt(3, adminId);
-                ps.executeUpdate();
+            if (selectedPhotoFile != null) {
+                try {
+                    java.io.File logoDir = new java.io.File("org_logos");
+                    if (!logoDir.exists()) {
+                        logoDir.mkdirs();
+                    }
+
+                    // Derive extension from original file name
+                    String fname = selectedPhotoFile.getName();
+                    String ext = fname.contains(".")
+                            ? fname.substring(fname.lastIndexOf('.'))
+                            : ".jpg";
+
+                    java.io.File dest = new java.io.File(logoDir, "org_" + orgId + ext);
+                    java.nio.file.Files.copy(
+                            selectedPhotoFile.toPath(),
+                            dest.toPath(),
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                    );
+
+                    // Persist the path in the organization table
+                    java.sql.PreparedStatement psLogo = conn.prepareStatement(
+                            "UPDATE organization SET logo_path=? WHERE org_id=?"
+                    );
+                    psLogo.setString(1, dest.getAbsolutePath());
+                    psLogo.setInt(2, orgId);
+                    psLogo.executeUpdate();
+
+                    selectedPhotoFile = null; // reset after saving
+                } catch (Exception photoEx) {
+                    System.out.println("Save logo error: " + photoEx.getMessage());
+                }
             }
-            
+
+            // Update org_admin credentials 
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE org_admin SET username=?, email=? WHERE org_admin_id=?"
+            );
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setInt(3, adminId);
+            ps.executeUpdate();
+
             conn.close();
             javax.swing.JOptionPane.showMessageDialog(this, "Settings saved successfully!");
         } catch (Exception ex) {
             System.out.println("Save settings error: " + ex.getMessage());
         }
     }
-    
-
-    
 
     /**
      * This method is called from within the constructor to initialize the form.

@@ -105,7 +105,6 @@ public class osoAdminProfile extends javax.swing.JFrame {
         orgInfoBtn = new javax.swing.JButton();
         orgName = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
-        logo = new javax.swing.JLabel();
         fullnameInput = new javax.swing.JTextField();
         emailInput = new javax.swing.JTextField();
         roleInput = new javax.swing.JTextField();
@@ -136,15 +135,12 @@ public class osoAdminProfile extends javax.swing.JFrame {
         orgName.setFont(new java.awt.Font("Playfair Display", 1, 20)); // NOI18N
         orgName.setForeground(new java.awt.Color(28, 94, 56));
         orgName.setText("OSO Administrator");
-        jPanel1.add(orgName, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 230, -1, -1));
+        jPanel1.add(orgName, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 230, -1, -1));
 
         jLabel18.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 12)); // NOI18N
         jLabel18.setForeground(new java.awt.Color(28, 94, 56));
         jLabel18.setText("Office of Student Organizations");
-        jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 260, -1, 20));
-
-        logo.setText("logo");
-        jPanel1.add(logo, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 250, 50, -1));
+        jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 260, -1, 20));
 
         fullnameInput.setFont(new java.awt.Font("Plus Jakarta Sans", 0, 12)); // NOI18N
         fullnameInput.setForeground(new java.awt.Color(28, 94, 56));
@@ -352,7 +348,6 @@ public class osoAdminProfile extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel logo;
     private javax.swing.JButton orgBtn;
     private javax.swing.JButton orgInfoBtn;
     private javax.swing.JLabel orgName;

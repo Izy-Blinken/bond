@@ -67,68 +67,342 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
         }
 
         loadOrgData();
+        locationLbl1.setVisible(false);
+        dateLbl1.setLocation(450, dateLbl1.getY());
     }
 
     public studOrgClicked() {
         this(0);
     }
+    
+    //method for filter 
+    private java.util.List<javax.swing.JLabel> eventRowLabels = new java.util.ArrayList<>();
+
+    private void loadFilteredEvents(String filter) {
+        for (javax.swing.JLabel lbl : eventRowLabels) jPanel1.remove(lbl);
+        eventRowLabels.clear();
+        try {
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+
+            java.util.List<String[]> rows = new java.util.ArrayList<>();
+
+            // Events
+            String evSql;
+            if ("Completed".equals(filter)) {
+                evSql = "SELECT title, event_date AS dt, status AS evt_status, 'Event' AS type FROM event WHERE org_id=? AND status IN ('Completed','Cancelled') ORDER BY event_date DESC";
+            } else if ("Upcoming".equals(filter)) {
+                evSql = "SELECT title, event_date AS dt, status AS evt_status, 'Event' AS type FROM event WHERE org_id=? AND status IN ('Upcoming','Ongoing') ORDER BY event_date ASC";
+            } else {
+                evSql = "SELECT title, event_date AS dt, status AS evt_status, 'Event' AS type FROM event WHERE org_id=? ORDER BY event_date DESC";
+            }
+            java.sql.PreparedStatement ps1 = conn.prepareStatement(evSql);
+            ps1.setInt(1, orgId);
+            java.sql.ResultSet rs1 = ps1.executeQuery();
+            while (rs1.next()) {
+                rows.add(new String[]{rs1.getString("title"), rs1.getString("dt"), rs1.getString("evt_status"), rs1.getString("type")});
+            }
+
+            // Announcements only shown in "All" view
+            if (!"Completed".equals(filter) && !"Upcoming".equals(filter)) {
+                java.sql.PreparedStatement ps2 = conn.prepareStatement(
+                    "SELECT title, DATE(created_at) AS dt, 'Posted' AS ann_status, 'Announcement' AS type FROM announcement WHERE org_id=? ORDER BY created_at DESC"
+                );
+                ps2.setInt(1, orgId);
+                java.sql.ResultSet rs2 = ps2.executeQuery();
+                while (rs2.next()) {
+                    rows.add(new String[]{rs2.getString("title"), rs2.getString("dt"), rs2.getString("ann_status"), rs2.getString("type")});
+                }
+            }
+
+            conn.close();
+
+            int rowY = 1870;
+            for (String[] r : rows) {
+                String title = r[0]; String date = r[1]; String status = r[2]; String type = r[3];
+
+                // TYPE pill — x=60, w=105
+                java.awt.Color typeBg = "Event".equals(type) ? new java.awt.Color(28, 94, 56) : new java.awt.Color(60, 120, 180);
+                javax.swing.JLabel lType = new javax.swing.JLabel(type, javax.swing.SwingConstants.CENTER);
+                lType.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 10));
+                lType.setForeground(java.awt.Color.WHITE);
+                lType.setBackground(typeBg);
+                lType.setOpaque(true);
+                lType.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 6, 2, 6));
+                jPanel1.add(lType, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, rowY + 2, 105, 18));
+                jPanel1.setComponentZOrder(lType, 0); eventRowLabels.add(lType);
+
+                // TITLE — x=175, w=270
+                javax.swing.JLabel lTitle = new javax.swing.JLabel(title);
+                lTitle.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lTitle.setForeground(new java.awt.Color(40, 40, 40));
+                jPanel1.add(lTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(175, rowY, 270, 22));
+                jPanel1.setComponentZOrder(lTitle, 0); eventRowLabels.add(lTitle);
+
+                // DATE — x=455, w=145
+                javax.swing.JLabel lDate = new javax.swing.JLabel(date != null ? date : "—");
+                lDate.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lDate.setForeground(new java.awt.Color(40, 40, 40));
+                jPanel1.add(lDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(455, rowY, 145, 22));
+                jPanel1.setComponentZOrder(lDate, 0); eventRowLabels.add(lDate);
+
+                // STATUS — x=615, w=140
+                java.awt.Color sc = "Completed".equals(status) || "Cancelled".equals(status)
+                    ? new java.awt.Color(180, 100, 0)
+                    : "Posted".equals(status) ? new java.awt.Color(60, 120, 180)
+                    : new java.awt.Color(28, 94, 56);
+                javax.swing.JLabel lStatus = new javax.swing.JLabel(status != null ? status : "—");
+                lStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+                lStatus.setForeground(sc);
+                jPanel1.add(lStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(615, rowY, 140, 22));
+                jPanel1.setComponentZOrder(lStatus, 0); eventRowLabels.add(lStatus);
+                
+                rowY += 30;
+            }
+        } catch (Exception ex) { 
+            System.out.println("Filter events error: " + ex.getMessage()); 
+            ex.printStackTrace();
+        }
+        jPanel1.revalidate();
+        jPanel1.repaint();
+    }
+    
+    private javax.swing.JComboBox<String> yearFilterCombo;
+    private java.util.Map<String, Integer> yearLabelToId = new java.util.LinkedHashMap<>();
+
+    private void initOfficerYearFilter() {
+        if (yearFilterCombo != null) jPanel1.remove(yearFilterCombo);
+        yearLabelToId.clear();
+        try {
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT DISTINCT ay.academic_year_id, ay.year_label " +
+                "FROM officer o JOIN academic_year ay ON ay.academic_year_id = o.academic_year_id " +
+                "WHERE o.org_id = ? ORDER BY ay.academic_year_id DESC"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+            java.util.List<String> labels = new java.util.ArrayList<>();
+            while (rs.next()) {
+                String lbl = rs.getString("year_label");
+                int ayId   = rs.getInt("academic_year_id");
+                labels.add(lbl);
+                yearLabelToId.put(lbl, ayId);
+            }
+            conn.close();
+            if (labels.isEmpty()) return;
+            yearFilterCombo = new javax.swing.JComboBox<>(labels.toArray(new String[0]));
+            yearFilterCombo.setSelectedIndex(0);
+            yearFilterCombo.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+            yearFilterCombo.setBackground(java.awt.Color.WHITE);
+            yearFilterCombo.setForeground(new java.awt.Color(40, 40, 40));
+            // ← Adjust x/y so the combo sits top-right of your officer table heading
+            jPanel1.add(yearFilterCombo,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 1195, 160, 28));
+            jPanel1.setComponentZOrder(yearFilterCombo, 0);
+            yearFilterCombo.addActionListener(e -> {
+                String sel = (String) yearFilterCombo.getSelectedItem();
+                if (sel != null) loadOfficerHistoryByYear(yearLabelToId.get(sel));
+            });
+            loadOfficerHistoryByYear(yearLabelToId.get(labels.get(0)));
+        } catch (Exception ex) {
+            System.out.println("Officer year filter error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        jPanel1.revalidate();
+        jPanel1.repaint();
+    }
+
+    private void loadOfficerHistoryByYear(int academicYearId) {
+        for (javax.swing.JLabel lbl : officerRowLabels) jPanel1.remove(lbl);
+        officerRowLabels.clear();
+        if (academicYearId < 0) { jPanel1.revalidate(); jPanel1.repaint(); return; }
+        try {
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT o.full_name, o.position, ay.year_label " +
+                "FROM officer o LEFT JOIN academic_year ay ON ay.academic_year_id = o.academic_year_id " +
+                "WHERE o.org_id = ? AND o.academic_year_id = ? " +
+                "AND o.position IN " +
+                "('President','Vice President','Secretary','Assistant Secretary'," +
+                "'Treasurer','Assistant Treasurer','Auditor','Business Manager','Org Representative') " +
+                "ORDER BY o.officer_id ASC"
+            );
+            ps.setInt(1, orgId);
+            ps.setInt(2, academicYearId);
+            java.sql.ResultSet rs = ps.executeQuery();
+            int rowY = 1260;
+            while (rs.next()) {
+                String pos  = rs.getString("position")  != null ? rs.getString("position")  : "";
+                String name = rs.getString("full_name") != null ? rs.getString("full_name") : "";
+                String term = rs.getString("year_label")!= null ? rs.getString("year_label"): "—";
+                
+                javax.swing.JLabel lPos = new javax.swing.JLabel(pos);
+                lPos.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                
+                lPos.setForeground(new java.awt.Color(40, 40, 40));
+                jPanel1.add(lPos, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, rowY, 280, 22));
+                jPanel1.setComponentZOrder(lPos, 0); officerRowLabels.add(lPos);
+                
+                javax.swing.JLabel lName = new javax.swing.JLabel(name);
+                lName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lName.setForeground(new java.awt.Color(40, 40, 40));
+                
+                jPanel1.add(lName, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, rowY, 280, 22));
+                jPanel1.setComponentZOrder(lName, 0); officerRowLabels.add(lName);
+                
+                javax.swing.JLabel lTerm = new javax.swing.JLabel(term);
+                lTerm.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lTerm.setForeground(new java.awt.Color(40, 40, 40));
+                jPanel1.add(lTerm, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, rowY, 160, 22));
+                jPanel1.setComponentZOrder(lTerm, 0); officerRowLabels.add(lTerm);
+                rowY += 30;
+            }
+            conn.close();
+        } catch (Exception ex) {
+            System.out.println("Load officer (by year) error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        jPanel1.revalidate();
+        jPanel1.repaint();
+    }
+
+    private java.util.List<javax.swing.JLabel> officerRowLabels = new java.util.ArrayList<>();
+    
+    private void loadOfficerHistory() {
+        for (javax.swing.JLabel lbl : officerRowLabels) {
+            jPanel1.remove(lbl);
+        }
+        officerRowLabels.clear();
+
+        try {
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(
+                "SELECT o.full_name, o.position, ay.year_label " +
+                "FROM officer o LEFT JOIN academic_year ay ON ay.academic_year_id = o.academic_year_id " +
+                "WHERE o.org_id = ? AND o.position IN " +
+                "('President','Vice President','Secretary','Assistant Secretary'," +
+                "'Treasurer','Assistant Treasurer','Auditor','Business Manager','Org Representative') " +
+                "ORDER BY ay.academic_year_id DESC, o.officer_id ASC"
+            );
+            ps.setInt(1, orgId);
+            java.sql.ResultSet rs = ps.executeQuery();
+
+            int rowY = 1260; // below header row at 1220
+            while (rs.next()) {
+                String name  = rs.getString("full_name");
+                String pos   = rs.getString("position");
+                String term  = rs.getString("year_label") != null ? rs.getString("year_label") : "—";
+
+                javax.swing.JLabel lPos = new javax.swing.JLabel(pos);
+                lPos.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lPos.setForeground(new java.awt.Color(40, 40, 40));
+                jPanel1.add(lPos, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, rowY, 280, 22));
+                jPanel1.setComponentZOrder(lPos, 0);
+                officerRowLabels.add(lPos);
+
+
+                javax.swing.JLabel lName = new javax.swing.JLabel(name);
+                lName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lName.setForeground(new java.awt.Color(40, 40, 40));
+                jPanel1.add(lName, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, rowY, 260, 22));
+                jPanel1.setComponentZOrder(lName, 0);
+                officerRowLabels.add(lName);
+
+                javax.swing.JLabel lTerm = new javax.swing.JLabel(term);
+                lTerm.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lTerm.setForeground(new java.awt.Color(40, 40, 40));
+                jPanel1.add(lTerm, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, rowY, 160, 22));
+                jPanel1.setComponentZOrder(lTerm, 0);
+                officerRowLabels.add(lTerm);
+
+                rowY += 30;
+            }
+            conn.close();
+        } catch (Exception ex) {
+            System.out.println("Load officer history error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        jPanel1.revalidate();
+        jPanel1.repaint();
+    }
 
     private void loadOrgData() {
+        
         try {
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
 
             // Load org name + description + mission + vision
             java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT org_name, description, mission, vision FROM organization WHERE org_id = ?"
+                "SELECT o.org_name, o.description, o.mission, o.vision, o.classification, " +
+                "(SELECT a.full_name FROM adviser a WHERE a.org_id = o.org_id " +
+                " ORDER BY a.adviser_id DESC LIMIT 1) AS adviser_name " +
+                "FROM organization o WHERE o.org_id = ?"
             );
             ps.setInt(1, orgId);
             java.sql.ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                missionArea.setText(rs.getString("mission"));
-                visionArea.setText(rs.getString("vision"));
+                missionArea.setText(rs.getString("mission") != null ? rs.getString("mission") : "");
+                visionArea.setText(rs.getString("vision")   != null ? rs.getString("vision")   : "");
 
-                // Add org name label dynamically over the bar.png header area
-                javax.swing.JLabel lblOrgName = new javax.swing.JLabel(rs.getString("org_name"));
-                lblOrgName.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 28));
+                String orgName   = rs.getString("org_name")      != null ? rs.getString("org_name")      : "";
+                String cls       = rs.getString("classification") != null ? rs.getString("classification") : "";
+                String desc      = rs.getString("description")   != null ? rs.getString("description")   : "";
+                String adviser   = rs.getString("adviser_name")  != null ? rs.getString("adviser_name")  : "—";
+
+                // Org name: 
+                javax.swing.JLabel lblOrgName = new javax.swing.JLabel(orgName);
+                lblOrgName.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 20));
                 lblOrgName.setForeground(java.awt.Color.WHITE);
-                lblOrgName.setBounds(80, 150, 800, 40);
-                jPanel1.add(lblOrgName);
+                jPanel1.add(lblOrgName, new org.netbeans.lib.awtextra.AbsoluteConstraints(75, 26, 820, 30));
                 jPanel1.setComponentZOrder(lblOrgName, 0);
 
-                // Add description label below name
-                javax.swing.JLabel lblDesc = new javax.swing.JLabel("<html>" + rs.getString("description") + "</html>");
-                lblDesc.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 14));
-                lblDesc.setForeground(java.awt.Color.WHITE);
-                lblDesc.setBounds(80, 200, 800, 60);
-                jPanel1.add(lblDesc);
+                // Classification: 
+                javax.swing.JLabel lblCls = new javax.swing.JLabel(cls.toUpperCase());
+                lblCls.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD | java.awt.Font.ITALIC, 11));
+                lblCls.setForeground(new java.awt.Color(200, 230, 215));
+                lblCls.setOpaque(false);
+                lblCls.setBorder(null);
+                jPanel1.add(lblCls, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 70, 400, 18));
+                jPanel1.setComponentZOrder(lblCls, 0);
+
+                // Description/Objectives: 
+                String htmlDesc = "<html><div style='width:760px; font-family:\"Plus Jakarta Sans\","
+                    + "sans-serif; font-size:13pt; line-height:1.5; color:white;'>"
+                    + desc.replace("\n", "<br>")
+                    + "</div></html>";
+                javax.swing.JLabel lblDesc = new javax.swing.JLabel(htmlDesc);
+                lblDesc.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+                lblDesc.setOpaque(false);
+                jPanel1.add(lblDesc, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 100, 820, 175));
                 jPanel1.setComponentZOrder(lblDesc, 0);
+
+                // Adviser:
+                javax.swing.JLabel lblAdviser = new javax.swing.JLabel("Adviser:  " + adviser);
+                lblAdviser.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 13));
+                lblAdviser.setForeground(new java.awt.Color(220, 240, 230));
+                lblAdviser.setOpaque(false);
+                jPanel1.add(lblAdviser, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 288, 700, 22));
+                jPanel1.setComponentZOrder(lblAdviser, 0);
 
                 jPanel1.revalidate();
                 jPanel1.repaint();
             }
 
             // Load events using computed status
-            java.sql.PreparedStatement ps2 = conn.prepareStatement(
-                "SELECT title, event_date, venue, " +
-                "CASE WHEN event_date < CURDATE() THEN 'Completed' ELSE 'Upcoming' END AS status " +
-                "FROM event WHERE org_id = ? ORDER BY event_date DESC LIMIT 2"
-            );
-            ps2.setInt(1, orgId);
-            java.sql.ResultSet rs2 = ps2.executeQuery();
-
-            if (rs2.next()) {
-                eventsLb3.setText(rs2.getString("title"));
-                dateLbl1.setText(rs2.getString("event_date"));
-                locationLbl1.setText(rs2.getString("venue") != null ? rs2.getString("venue") : "—");
-                statusLbl1.setText(rs2.getString("status"));
-            }
+            //already called in initcomponents
 
             conn.close();
 
         } catch (Exception ex) {
             System.out.println("Load org data error: " + ex.getMessage());
+            ex.printStackTrace();
         }
+
+        loadOfficerHistory();
+        initOfficerYearFilter();
+        loadFilteredEvents("All");
     }
 
     private void addRow(String text, int x, int y, int w) {
@@ -705,60 +979,18 @@ private javax.swing.JLabel eventTitle2 = new javax.swing.JLabel("");
 
     private void allBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allBtnActionPerformed
         // TODO add your handling code here:
+        loadFilteredEvents("All");
         
     }//GEN-LAST:event_allBtnActionPerformed
 
     private void completedBtn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_completedBtn2ActionPerformed
         // TODO add your handling code here:
-        try {
-          java.sql.Connection conn = bond.db.DBConnection.getConnection();
-          java.sql.PreparedStatement ps = conn.prepareStatement(
-              "SELECT title, event_date, venue, 'Completed' AS status " +
-              "FROM event WHERE org_id = ? AND event_date < CURDATE() ORDER BY event_date DESC LIMIT 2"
-          );
-          ps.setInt(1, orgId);
-          java.sql.ResultSet rs = ps.executeQuery();
-          eventsLb3.setText(""); dateLbl1.setText(""); locationLbl1.setText(""); statusLbl1.setText("");
-          
-          if (rs.next()) {
-              eventsLb3.setText(rs.getString("title"));
-              dateLbl1.setText(rs.getString("event_date"));
-              locationLbl1.setText(rs.getString("venue") != null ? rs.getString("venue") : "—");
-              statusLbl1.setText(rs.getString("status"));
-          }
-          conn.close();
-          
-      } catch (Exception ex) { 
-          System.out.println("Completed error: " + ex.getMessage()); 
-      }
+        loadFilteredEvents("Completed");
     }//GEN-LAST:event_completedBtn2ActionPerformed
 
     private void upcomingBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upcomingBtnActionPerformed
         // TODO add your handling code here:
-            try {
-            java.sql.Connection conn = bond.db.DBConnection.getConnection();
-            java.sql.PreparedStatement ps = conn.prepareStatement(
-                "SELECT title, event_date, venue, " +
-                "CASE WHEN event_date < CURDATE() THEN 'Completed' ELSE 'Upcoming' END AS status " +
-                "FROM event WHERE org_id = ? AND event_date >= CURDATE() ORDER BY event_date ASC LIMIT 2"
-            );
-            
-            ps.setInt(1, orgId);
-            java.sql.ResultSet rs = ps.executeQuery();
-            eventsLb3.setText(""); dateLbl1.setText(""); locationLbl1.setText(""); statusLbl1.setText("");
-            
-            if (rs.next()) {
-                eventsLb3.setText(rs.getString("title"));
-                dateLbl1.setText(rs.getString("event_date"));
-                locationLbl1.setText(rs.getString("venue") != null ? rs.getString("venue") : "—");
-                statusLbl1.setText(rs.getString("status"));
-            }
-            
-            conn.close();
-            
-        } catch (Exception ex) {
-            System.out.println("Upcoming error: " + ex.getMessage()); 
-        }
+        loadFilteredEvents("Upcoming");
     }//GEN-LAST:event_upcomingBtnActionPerformed
 
     private void exBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exBtnActionPerformed

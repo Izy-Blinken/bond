@@ -49,8 +49,8 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().setComponentZOrder(lblBond, 0);
         lblBond.setName("static");
  
-        javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel("Org Admin");
-        lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 16));
+        javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel(bond.util.SessionManager.getOrgName());
+        lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
         lblOrgAdmin.setForeground(java.awt.Color.WHITE);
         lblOrgAdmin.setBounds(30, 115, 160, 25);
         getContentPane().add(lblOrgAdmin);
@@ -143,7 +143,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         lblOrgAcronym.setBounds(32, 135, 120, 25);
         lblOrgAcronym.setForeground(java.awt.Color.WHITE);
         lblOrgAcronym.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
-        lblOrgAcronym.setText(bond.util.SessionManager.getOrgAcronym() + " Admin");
+        lblOrgAcronym.setText("Org Admin");
         getContentPane().add(lblOrgAcronym);
         getContentPane().setComponentZOrder(lblOrgAcronym, 0);
         
@@ -194,7 +194,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         contentPanel.add(lblTotalAnnouncements);
         contentPanel.setComponentZOrder(lblTotalAnnouncements, 0);
  
-        // ── Recent Activity
+        //  Recent Activity
         int[] activityY = {345, 375, 406, 437, 469, 503, 533, 564, 594, 627};
         javax.swing.JLabel[] lblActivities = new javax.swing.JLabel[10];
         javax.swing.JLabel[] lblDates      = new javax.swing.JLabel[10];
@@ -271,7 +271,7 @@ public class DashboardFrame extends javax.swing.JFrame {
         getContentPane().setComponentZOrder(SearchBar,   total - 2);
         getContentPane().setComponentZOrder(ActiveTab, total - 3);
  
-        // ── Sidebar Navigation ────────────────────────────────
+        //  Sidebar Navigation 
         javax.swing.JButton btnEvents = makeInvisibleButton();
         btnEvents.setBounds(0, 230, 210, 40);
         btnEvents.addActionListener(e -> navigateTo(new EventFrame()));
@@ -325,7 +325,7 @@ public class DashboardFrame extends javax.swing.JFrame {
 
             int orgId = bond.util.SessionManager.getCurrentOrgId();
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
-
+ 
             java.sql.PreparedStatement ps0 = conn.prepareStatement(
                 "SELECT org_name FROM organization WHERE org_id = ?"
             );
@@ -336,7 +336,8 @@ public class DashboardFrame extends javax.swing.JFrame {
                 lblOrgOverview.setText("Overview of " + orgName);
                 lblOrgOverview.setToolTipText("Overview of " + orgName);
             }
-
+ 
+            // Card 1: Total Members (from members table)
             java.sql.PreparedStatement ps1 = conn.prepareStatement(
                 "SELECT COUNT(*) FROM members WHERE org_id = ?"
             );
@@ -345,7 +346,8 @@ public class DashboardFrame extends javax.swing.JFrame {
             if (rsM.next()) {
                 lblTotalMembers.setText(String.valueOf(rsM.getInt(1)));
             }
-
+ 
+            // Card 2: Total Events
             java.sql.PreparedStatement ps2 = conn.prepareStatement(
                 "SELECT COUNT(*) FROM event WHERE org_id = ?"
             );
@@ -354,7 +356,8 @@ public class DashboardFrame extends javax.swing.JFrame {
             if (rsE.next()) {
                 lblTotalEvents.setText(String.valueOf(rsE.getInt(1)));
             }
-
+ 
+            // Card 4: Total Announcements
             java.sql.PreparedStatement ps3 = conn.prepareStatement(
                 "SELECT COUNT(*) FROM announcement WHERE org_id = ?"
             );
@@ -363,41 +366,49 @@ public class DashboardFrame extends javax.swing.JFrame {
             if (rsA.next()) {
                 lblTotalAnnouncements.setText(String.valueOf(rsA.getInt(1)));
             }
-
-            lblTotalPending.setText("0");
-
+ 
+            // Card 3: Total Officers (was hardcoded 0 — fixed to query officer table)
+            java.sql.PreparedStatement psOff = conn.prepareStatement(
+                "SELECT COUNT(*) FROM officer WHERE org_id = ?"
+            );
+            psOff.setInt(1, orgId);
+            java.sql.ResultSet rsOff = psOff.executeQuery();
+            if (rsOff.next()) {
+                lblTotalPending.setText(String.valueOf(rsOff.getInt(1)));
+            }
+ 
             int i = 0;
-
+ 
             java.sql.PreparedStatement ps4 = conn.prepareStatement(
                 "SELECT title, event_date FROM event WHERE org_id = ? ORDER BY event_date DESC LIMIT 5"
             );
             ps4.setInt(1, orgId);
             java.sql.ResultSet rsEv = ps4.executeQuery();
             while (rsEv.next() && i < 10) {
-                String activity = rsEv.getString("title") + " — event added";
+                String activity = "[Event] " + rsEv.getString("title");
                 String date = rsEv.getString("event_date");
                 lblActivities[i].setText(activity);
                 lblActivities[i].setToolTipText(activity);
                 lblDates[i].setText(date != null ? date : "-");
                 i++;
             }
-
+ 
             java.sql.PreparedStatement ps5 = conn.prepareStatement(
                 "SELECT title, created_at FROM announcement WHERE org_id = ? ORDER BY created_at DESC LIMIT 5"
             );
             ps5.setInt(1, orgId);
             java.sql.ResultSet rsAn = ps5.executeQuery();
             while (rsAn.next() && i < 10) {
-                String activity = rsAn.getString("title") + " — announcement posted";
+                String activity = "[Announcement] " + rsAn.getString("title");
                 String date = rsAn.getString("created_at");
                 lblActivities[i].setText(activity);
                 lblActivities[i].setToolTipText(activity);
                 lblDates[i].setText(date != null ? date : "-");
                 i++;
             }
-
+ 
             conn.close();
-
+ 
         } catch (Exception ex) {
             System.out.println("Dashboard load error: " + ex.getMessage());
         }

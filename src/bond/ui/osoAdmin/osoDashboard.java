@@ -15,92 +15,154 @@ public class osoDashboard extends javax.swing.JFrame {
      */
     public osoDashboard() {
         initComponents();
-        
         this.setLocationRelativeTo(null);
         loadStats();
         setupExitButton();
     }
     
     private void loadStats() {
-        
-        
         try {
-            
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
 
-            java.sql.ResultSet rs1 = conn.prepareStatement("SELECT COUNT(*) FROM organization WHERE status = 'Active'").executeQuery();
-            if (rs1.next()) {
-                totalOrgsCOUNT.setText(String.valueOf(rs1.getInt(1)));
-            }
+            java.sql.ResultSet rs1 = conn.prepareStatement(
+                "SELECT COUNT(*) FROM organization WHERE status = 'Active'").executeQuery();
+            if (rs1.next()) totalOrgsCOUNT.setText(String.valueOf(rs1.getInt(1)));
 
-            java.sql.ResultSet rs2 = conn.prepareStatement("SELECT COUNT(*) FROM members").executeQuery();
-            if (rs2.next()) {
-                totalmemCOUNT.setText(String.valueOf(rs2.getInt(1)));
-            }
+            totalmemCOUNT.setVisible(false);
+            totalMembers.setVisible(false);
+            totalMembersSlot.setVisible(false);
+            icon2.setVisible(false);
+            pendingsCOUNT.setVisible(false);
+            pendingsCOUNT1.setVisible(false);
+            pendings.setVisible(false);
+            pendingsSlot.setVisible(false);
+            icon4.setVisible(false);
 
-            java.sql.ResultSet rs3 = conn.prepareStatement("SELECT COUNT(*) FROM event").executeQuery();
-            if (rs3.next()) {
-                eventsCOUNT.setText(String.valueOf(rs3.getInt(1)));
-            }
+            java.sql.ResultSet rs3 = conn.prepareStatement(
+                "SELECT COUNT(*) FROM event").executeQuery();
+            if (rs3.next()) eventsCOUNT.setText(String.valueOf(rs3.getInt(1)));
 
-            java.sql.ResultSet rs4 = conn.prepareStatement("SELECT COUNT(*) FROM registration_form WHERE review_status = 'Pending'").executeQuery();
-            if (rs4.next()) {
-                pendingsCOUNT.setText(String.valueOf(rs4.getInt(1)));
-            }
-
-            
-            // load registered orgs dynamically below stats
-            java.sql.PreparedStatement psOrg = conn.prepareStatement(
-                "SELECT org_name, classification, status FROM organization ORDER BY org_name ASC"
-            );
-            java.sql.ResultSet rsOrg = psOrg.executeQuery();
-
-            int baseY = 320;
-            while (rsOrg.next()) {
-                String oName   = rsOrg.getString("org_name");
-                String oClass  = rsOrg.getString("classification");
-                String oStatus = rsOrg.getString("status");
-
-                javax.swing.JLabel lName = new javax.swing.JLabel(oName);
-                lName.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
-                lName.setForeground(new java.awt.Color(28, 94, 56));
-                jPanel1.add(lName, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, baseY, 300, 20));
-
-                javax.swing.JLabel lClass = new javax.swing.JLabel(oClass);
-                lClass.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
-                lClass.setForeground(new java.awt.Color(100, 140, 120));
-                jPanel1.add(lClass, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, baseY + 18, 280, 16));
-
-                java.awt.Color sc = "Active".equals(oStatus)
-                    ? new java.awt.Color(28, 94, 56)
-                    : new java.awt.Color(180, 30, 30);
-                javax.swing.JLabel lStatus = new javax.swing.JLabel("● " + oStatus);
-                lStatus.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
-                lStatus.setForeground(sc);
-                jPanel1.add(lStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, baseY + 8, 120, 20));
-
-                baseY += 50;
-            }
-
-            int finalH = Math.max(750, baseY + 30);
-            jPanel1.setPreferredSize(new java.awt.Dimension(798, finalH));
-            jPanel1.revalidate();
-            jPanel1.repaint();
-
-
-            conn.close();
-            
             regOrgPanel.setVisible(false);
-            jPanel1.revalidate();
-            jPanel1.repaint();
-            
+            conn.close();
         } catch (Exception ex) {
             System.out.println("Load stats error: " + ex.getMessage());
         }
-    }
-    
-    private void setupExitButton() {
 
+        loadRecentActivity();
+    }
+
+    private void loadRecentActivity() {
+        java.util.List<java.awt.Component> toRemove = new java.util.ArrayList<>();
+        for (java.awt.Component c : jPanel1.getComponents()) {
+            if ("activityRow".equals(c.getName())) toRemove.add(c);
+        }
+        for (java.awt.Component c : toRemove) jPanel1.remove(c);
+
+        javax.swing.JLabel lblSection = new javax.swing.JLabel("Recent Activities");
+        lblSection.setName("activityRow");
+        lblSection.setFont(new java.awt.Font("Playfair Display", java.awt.Font.BOLD, 18));
+        lblSection.setForeground(new java.awt.Color(28, 94, 56));
+        jPanel1.add(lblSection, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 280, 400, 30));
+
+        javax.swing.JPanel colHeader = new javax.swing.JPanel(null);
+        colHeader.setName("activityRow");
+        colHeader.setBackground(new java.awt.Color(28, 94, 56));
+        colHeader.setBounds(40, 320, 720, 28);
+
+        String[] cols = {"Type", "Title", "Organization", "Posted"};
+        int[] colX     = {10,      90,      340,            560};
+        int[] colW     = {75,      245,     215,            155};
+        for (int i = 0; i < cols.length; i++) {
+            javax.swing.JLabel lh = new javax.swing.JLabel(cols[i]);
+            lh.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+            lh.setForeground(java.awt.Color.WHITE);
+            lh.setBounds(colX[i], 5, colW[i], 18);
+            colHeader.add(lh);
+        }
+        jPanel1.add(colHeader, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 720, 28));
+
+        int rowY = 354;
+        boolean hasRows = false;
+
+        try {
+            java.sql.Connection conn = bond.db.DBConnection.getConnection();
+
+            String sql =
+                "SELECT 'Event' AS type, e.title AS title, o.org_name, e.created_at AS posted " +
+                "FROM event e JOIN organization o ON o.org_id = e.org_id " +
+                "UNION ALL " +
+                "SELECT 'Announcement' AS type, a.title AS title, o.org_name, a.created_at AS posted " +
+                "FROM announcement a JOIN organization o ON o.org_id = a.org_id " +
+                "ORDER BY posted DESC LIMIT 20";
+
+            java.sql.ResultSet rs = conn.prepareStatement(sql).executeQuery();
+
+            while (rs.next()) {
+                hasRows = true;
+                String type   = rs.getString("type");
+                String title  = rs.getString("title");
+                String org    = rs.getString("org_name");
+                String posted = rs.getString("posted");
+                if (posted != null && posted.length() > 16) posted = posted.substring(0, 16);
+
+                javax.swing.JPanel row = new javax.swing.JPanel(null);
+                row.setName("activityRow");
+                boolean even = ((rowY - 354) / 30) % 2 == 0;
+                row.setBackground(even ? new java.awt.Color(237, 245, 240) : java.awt.Color.WHITE);
+                row.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0,
+                    new java.awt.Color(210, 230, 218)));
+
+                java.awt.Color typeColor = "Event".equals(type)
+                    ? new java.awt.Color(28, 94, 56)
+                    : new java.awt.Color(0, 100, 180);
+                javax.swing.JLabel lType = new javax.swing.JLabel(type);
+                lType.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 11));
+                lType.setForeground(typeColor);
+                lType.setBounds(10, 6, 75, 18);
+                row.add(lType);
+
+                javax.swing.JLabel lTitle = new javax.swing.JLabel(title != null ? title : "—");
+                lTitle.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
+                lTitle.setForeground(new java.awt.Color(30, 30, 30));
+                lTitle.setBounds(90, 6, 245, 18);
+                row.add(lTitle);
+
+                javax.swing.JLabel lOrg = new javax.swing.JLabel(org != null ? org : "—");
+                lOrg.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
+                lOrg.setForeground(new java.awt.Color(80, 80, 80));
+                lOrg.setBounds(340, 6, 215, 18);
+                row.add(lOrg);
+
+                javax.swing.JLabel lPosted = new javax.swing.JLabel(posted != null ? posted : "—");
+                lPosted.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 11));
+                lPosted.setForeground(new java.awt.Color(120, 120, 120));
+                lPosted.setBounds(560, 6, 155, 18);
+                row.add(lPosted);
+
+                jPanel1.add(row, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, rowY, 720, 30));
+                rowY += 30;
+            }
+            conn.close();
+        } catch (Exception ex) {
+            System.out.println("Load activity error: " + ex.getMessage());
+        }
+
+        if (!hasRows) {
+            javax.swing.JLabel none = new javax.swing.JLabel("No recent activity yet.");
+            none.setName("activityRow");
+            none.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.ITALIC, 12));
+            none.setForeground(new java.awt.Color(160, 160, 160));
+            jPanel1.add(none, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, rowY + 8, 300, 20));
+            rowY += 30;
+        }
+
+        int finalH = Math.max(600, rowY + 40);
+        jPanel1.setPreferredSize(new java.awt.Dimension(798, finalH));
+        jPanel1.revalidate();
+        jPanel1.repaint();
+    }
+
+    private void setupExitButton() {
         javax.swing.JButton btnExit = new javax.swing.JButton("Exit Admin");
         btnExit.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
         btnExit.setForeground(new java.awt.Color(200, 40, 40));
@@ -108,11 +170,9 @@ public class osoDashboard extends javax.swing.JFrame {
         btnExit.setBorderPainted(false);
         btnExit.setFocusPainted(false);
         btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnExit.setBounds(10, 540, 130, 30);
         btnExit.addActionListener(e -> {
             int confirm = javax.swing.JOptionPane.showConfirmDialog(
-                this, "Exit OSO Admin?", "Exit",
-                javax.swing.JOptionPane.YES_NO_OPTION);
+                this, "Exit OSO Admin?", "Exit", javax.swing.JOptionPane.YES_NO_OPTION);
             if (confirm == javax.swing.JOptionPane.YES_OPTION) {
                 bond.util.SessionManager.logout();
                 new bond.ui.UserSide.loginChoices().setVisible(true);
@@ -122,6 +182,7 @@ public class osoDashboard extends javax.swing.JFrame {
         jPanel2.add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 540, 150, 30));
         jPanel2.setComponentZOrder(btnExit, 0);
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

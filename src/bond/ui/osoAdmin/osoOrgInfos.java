@@ -51,6 +51,17 @@ public class osoOrgInfos extends javax.swing.JFrame {
         tabBtn.setTitleAt(0, "   Info   ");
         tabBtn.setTitleAt(1, "   Members   ");
         tabBtn.setTitleAt(2, "   Pending Posts   ");
+        
+        // clear and disable pending posts
+        jPanel4.removeAll();
+        javax.swing.JLabel lNone = new javax.swing.JLabel("No pending posts. Org Admin posts go live immediately.");
+        lNone.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+        lNone.setForeground(new java.awt.Color(150, 150, 150));
+        lNone.setBounds(30, 80, 500, 20);
+        jPanel4.add(lNone);
+
+        jButton4.setVisible(false);
+        jButton5.setVisible(false);
 
     }
 
@@ -241,6 +252,47 @@ public class osoOrgInfos extends javax.swing.JFrame {
                 int count = rs2.getInt(1);
                 memberCount.setText(memberCount.getText() + " · " + count + " members");
             }
+
+            // Load org detail into Info tab
+            java.sql.PreparedStatement ps3 = conn.prepareStatement(
+                "SELECT org_name, classification, description, mission, vision, status FROM organization WHERE org_id = ?"
+            );
+            ps3.setInt(1, orgId);
+            java.sql.ResultSet rs3 = ps3.executeQuery();
+            if (rs3.next()) {
+                jPanel2.removeAll();
+                icon1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bond/assets/OSOimages/infoTable.png")));
+                jPanel2.add(icon1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 660, 190));
+
+                String[][] fields = {
+                    {"Organization", rs3.getString("org_name")},
+                    {"Classification", rs3.getString("classification")},
+                    {"Status", rs3.getString("status")},
+                    {"Description", rs3.getString("description") != null ? rs3.getString("description") : "—"},
+                    {"Mission", rs3.getString("mission") != null ? rs3.getString("mission") : "—"},
+                    {"Vision", rs3.getString("vision") != null ? rs3.getString("vision") : "—"},
+                };
+                int y = 30;
+                for (String[] field : fields) {
+                    javax.swing.JLabel lKey = new javax.swing.JLabel(field[0] + ":");
+                    lKey.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 12));
+                    lKey.setForeground(new java.awt.Color(28, 94, 56));
+                    lKey.setBounds(30, y, 130, 20);
+                    jPanel2.add(lKey);
+
+                    javax.swing.JLabel lVal = new javax.swing.JLabel("<html>" + field[1] + "</html>");
+                    lVal.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.PLAIN, 12));
+                    lVal.setForeground(new java.awt.Color(40, 40, 40));
+                    lVal.setBounds(170, y, 480, 20);
+                    jPanel2.add(lVal);
+
+                    y += 28;
+                }
+                jPanel2.revalidate();
+                jPanel2.repaint();
+            }
+
+            conn.close();
 
             conn.close();
 
@@ -532,26 +584,20 @@ public class osoOrgInfos extends javax.swing.JFrame {
     private void activeOrinactiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_activeOrinactiveActionPerformed
         // TODO add your handling code here:
         String newStatus = activeOrinactive.isSelected() ? "Inactive" : "Active";
-
+        
         try {
-
             java.sql.Connection conn = bond.db.DBConnection.getConnection();
             java.sql.PreparedStatement ps = conn.prepareStatement(
                 "UPDATE organization SET status = ? WHERE org_id = ?"
             );
             ps.setString(1, newStatus);
             ps.setInt(2, orgId);
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
             conn.close();
-
-            if (rows > 0) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Status updated to: " + newStatus);
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Failed. org_id = " + orgId, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            }
-
+            javax.swing.JOptionPane.showMessageDialog(this, "Status updated to " + newStatus);
+        
         } catch (Exception ex) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            System.out.println("Toggle status error: " + ex.getMessage());
         }
     }//GEN-LAST:event_activeOrinactiveActionPerformed
 

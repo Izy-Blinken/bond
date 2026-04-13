@@ -140,13 +140,20 @@ public class EventFrame extends javax.swing.JFrame {
         getContentPane().setComponentZOrder(lblBond, 0);
         lblBond.setName("static");
 
-        javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel("Org Admin");
-        lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 16));
+        javax.swing.JLabel lblOrgAdmin = new javax.swing.JLabel(bond.util.SessionManager.getOrgName());
+        lblOrgAdmin.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
         lblOrgAdmin.setForeground(java.awt.Color.WHITE);
         lblOrgAdmin.setBounds(30, 115, 160, 25);
         getContentPane().add(lblOrgAdmin);
         getContentPane().setComponentZOrder(lblOrgAdmin, 0);
         lblOrgAdmin.setName("static");
+
+        javax.swing.JLabel lblOrgAcronym = new javax.swing.JLabel("Org Admin");
+        lblOrgAcronym.setBounds(32, 135, 160, 25);
+        lblOrgAcronym.setForeground(java.awt.Color.WHITE);
+        lblOrgAcronym.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
+        getContentPane().add(lblOrgAcronym);
+        getContentPane().setComponentZOrder(lblOrgAcronym, 0);
 
         javax.swing.JLabel lblDashboard = new javax.swing.JLabel("Dashboard");
         lblDashboard.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 14));
@@ -259,15 +266,7 @@ public class EventFrame extends javax.swing.JFrame {
             delBtn.addActionListener(e -> showDeleteDialog(index));
             getContentPane().add(delBtn);
         }
-        
-        javax.swing.JLabel lblOrgAcronym = new javax.swing.JLabel();
-        lblOrgAcronym.setBounds(32, 135, 120, 25);
-        lblOrgAcronym.setForeground(java.awt.Color.WHITE);
-        lblOrgAcronym.setFont(new java.awt.Font("Plus Jakarta Sans", java.awt.Font.BOLD, 13));
-        lblOrgAcronym.setText(bond.util.SessionManager.getOrgAcronym() + " Admin");
-        getContentPane().add(lblOrgAcronym);
-        getContentPane().setComponentZOrder(lblOrgAcronym, 0);
-        lblOrgAcronym.setName("static");
+       
          
 
         loadEvents();

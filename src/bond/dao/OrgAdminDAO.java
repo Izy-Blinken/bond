@@ -43,7 +43,7 @@ public class OrgAdminDAO {
             Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, bond.util.PasswordHasher.hash(password));
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new OrgAdmin(
@@ -100,7 +100,7 @@ public class OrgAdminDAO {
             ps.setInt(2, officerId);
             ps.setInt(3, createdBy);
             ps.setString(4, username);
-            ps.setString(5, password);
+            ps.setString(5, bond.util.PasswordHasher.hash(password));
             ps.setString(6, email);
             int rows = ps.executeUpdate();
             con.close();
@@ -118,7 +118,7 @@ public class OrgAdminDAO {
             Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, bond.util.PasswordHasher.hash(password));
             ps.setString(3, email);
             ps.setInt(4, orgAdminId);
             int rows = ps.executeUpdate();

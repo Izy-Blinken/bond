@@ -147,9 +147,9 @@ public class loginChoices extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (previousFrame != null) {
             previousFrame.setVisible(true);
+        } else {
+            new bond.ui.UserSide.dashboard().setVisible(true);
         }
-        this.dispose();
-
     }//GEN-LAST:event_backBtnActionPerformed
 
     private void osoAdminBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_osoAdminBtnActionPerformed
